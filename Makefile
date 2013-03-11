@@ -1,8 +1,9 @@
 LIB = -lsfml-graphics -lsfml-window -lsfml-system
 SRC = $(wildcard src/*.cpp)
 OBJ = $(SRC:src/%.cpp=obj/%.o)
+TARGET = shooter
 
-all: shooter
+all: $(TARGET)
 
 
 obj/%.o: src/%.cpp
@@ -11,9 +12,9 @@ obj/%.o: src/%.cpp
 
 
 
-shooter: Makefile $(OBJ)
+$(TARGET): Makefile $(OBJ)
 	g++ --std=c++11 -Wall $(OBJ) $(LIB) -o $@
 
 clean:
 	rm -rf obj
-	rm -rf sfml
+	rm -rf $(TARGET)
