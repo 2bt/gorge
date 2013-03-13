@@ -5,7 +5,6 @@
 #include <vector>
 #include <array>
 #include <forward_list>
-#include <unordered_map>
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -26,7 +25,6 @@ static const vector<Poly> tileData = {
 	{ Vec2(0, 0), Vec2(0, 1), Vec2(1, 1) },
 	{ Vec2(0, 0), Vec2(0, 1), Vec2(1, 0) },
 };
-
 
 class Walls {
 public:
@@ -67,6 +65,7 @@ public:
 	float checkCollision(const Poly& poly, Vec2& normal, Vec2& where) {
 		Poly v;
 
+		float distance = 0;
 
 		for (int y = 0; y < 20; y++) {
 			for (int x = 0; x < width; x++) {
@@ -81,23 +80,20 @@ public:
 
 				Vec2 n, w;
 				float d = ::checkCollision(v, poly, n, w);
-				if (d > 0) {
-
+				if (d > distance) {
+					distance = d;
 					normal = n;
 					where = w;
-					return d;
-
 				}
-
 			}
 		}
-
-		return 0;
+		return distance;
 	}
 
 
+
 private:
-    const int width = 27;
+	const int width = 27;
 	const int height = 50;
 	vector<int> tiles;
 	float offset = 0;
@@ -107,10 +103,9 @@ private:
 	float r = width * 0.5;
 
 	int getTile(int y, int x) const {
-		return
-			y < 0 || y >= height ? 0 :
-			x < 0 || x >= width ? 1 :
-			tiles[y * width + x];
+		return	y < 0 || y >= height ? 0 :
+				x < 0 || x >= width ? 1 :
+				tiles[y * width + x];
 	}
 	int& tileAt(int y, int x) {
 		return tiles[y * width + x];
@@ -220,21 +215,28 @@ public:
 		float joy_y = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
 		Vec2 mov;
 		mov.x = (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) or joy_x > 50)
-		        -(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) or joy_x < -50);
+				-(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) or joy_x < -50);
 		mov.y = (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) or joy_y > 50)
-		        -(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) or joy_y < -50);
+				-(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) or joy_y < -50);
 		Vec2 pos = getPosition();
-		pos += mov * 4.0f;
+		pos += mov * 3.0f;
 		pos.x = min(pos.x, 784.0f);
 		pos.x = max(pos.x, 16.0f);
 		pos.y = min(pos.y, 584.0f);
 		pos.y = max(pos.y, 16.0f);
 		setPosition(pos);
 		updateCollisionPoly();
+		Vec2 normal, where;
+		float distance = walls.checkCollision(poly, normal, where);
+		if (distance > 0) {
+			move(normal * -distance);
+			pos = getPosition();
+		}
 
 
-		bool shoot = sf::Joystick::isButtonPressed(0, 0)
-		             | sf::Keyboard::isKeyPressed(sf::Keyboard::X);
+		bool shoot =	sf::Joystick::isButtonPressed(0, 0) |
+						sf::Keyboard::isKeyPressed(sf::Keyboard::X);
+
 		if (shoot && !(tick % 10)) {
 			lasers.push_front(unique_ptr<Laser>(new Laser(pos + Vec2(0, -10))));
 		}
@@ -247,20 +249,12 @@ public:
 		return true;
 	}
 
-
+/*
 	virtual void draw(sf::RenderWindow& win) {
-
-		Vec2 normal, where;
-		float distance = walls.checkCollision(poly, normal, where);
-		if (distance > 0) {
-			move(normal * -distance);
-		}
-
-//		drawPoly(win, poly);
-
+		drawPoly(win, poly);
 		win.draw(*this);
 	};
-
+*/
 
 private:
 	virtual const Poly& getCollisionModel() {
@@ -300,9 +294,9 @@ void draw(sf::RenderWindow& win) {
 int main(int argc, char** argv) {
 
 	sf::RenderWindow window(sf::VideoMode(800, 600), "sfml",
-	                        sf::Style::Titlebar || sf::Style::Close);
+							sf::Style::Titlebar || sf::Style::Close);
 	window.setFramerateLimit(60);
-
+	window.setMouseCursorVisible(false);
 
 	player.init();
 
