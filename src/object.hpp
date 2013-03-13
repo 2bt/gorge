@@ -11,7 +11,6 @@ public:
 		setTexture(tex);
 		setOrigin(spriteWidth * 0.5, spriteWidth * 0.5);
 		setScale(4, 4);
-		setTextureRect(sf::IntRect(0, 0, s.y, s.y));
 		setFrame(0);
 	};
 	virtual void setFrame(size_t frame) {

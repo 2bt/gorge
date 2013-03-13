@@ -1,6 +1,12 @@
 using Vec2 = sf::Vector2f;
 using Poly = std::vector<Vec2>;
 
+inline int randInt(int min, int max) {
+	return min + rand() % (max - min + 1);
+}
+inline float randFloat(float min, float max) {
+	return min + rand() / (float)RAND_MAX * (max - min);
+}
 
 void drawPoly(sf::RenderWindow& win, const Poly poly);
 float checkCollision(const Poly& a, const Poly& b, Vec2& normal, Vec2& where);

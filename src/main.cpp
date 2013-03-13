@@ -12,148 +12,38 @@
 
 #include "helper.hpp"
 #include "object.hpp"
+#include "walls.hpp"
 
 using namespace std;
 
-static int randInt(int a, int b) { return a + rand() % (b - a + 1); }
-
-static const vector<Poly> tileData = {
-	{ },
-	{ Vec2(0, 0), Vec2(0, 1), Vec2(1, 1), Vec2(1, 0) },
-	{ Vec2(0, 0), Vec2(1, 1), Vec2(1, 0) },
-	{ Vec2(0, 1), Vec2(1, 1), Vec2(1, 0) },
-	{ Vec2(0, 0), Vec2(0, 1), Vec2(1, 1) },
-	{ Vec2(0, 0), Vec2(0, 1), Vec2(1, 0) },
-};
-
-class Walls {
-public:
-	Walls() {
-
-		tiles.resize(width * height, 1);
-		for (int i = 0; i < 20; i++) generate();
-	}
-
-	void update() {
-		offset += 0.03;
-		if (offset >= 1) {
-			offset -= 1;
-			generate();
-		}
-	}
-
-	void draw(sf::RenderWindow& win) {
-
-		array<sf::Vertex, 4> v;
-
-		for (int y = 0; y < 20; y++) {
-			for (int x = 0; x < width; x++) {
-
-				int t =  tiles[y * width + x];
-				const Poly& p = tileData[t];
-
-
-				for (size_t i = 0; i < p.size(); i++) {
-					v[i].position = (p[i] + Vec2(x - 1, 18 - y + offset)) * 32.0f;
-					v[i].color = sf::Color(100, 30, 60);
-				}
-				win.draw(v.data(), p.size(), sf::TrianglesFan);
-			}
-		}
-	}
-
-	float checkCollision(const Poly& poly, Vec2& normal, Vec2& where) {
-		Poly v;
-
-		float distance = 0;
-
-		for (int y = 0; y < 20; y++) {
-			for (int x = 0; x < width; x++) {
-
-				int t =  tiles[y * width + x];
-				const Poly& p = tileData[t];
-
-				v.resize(p.size());
-				for (size_t i = 0; i < p.size(); i++) {
-					v[i] = (p[i] + Vec2(x - 1, 18 - y + offset)) * 32.0f;
-				}
-
-				Vec2 n, w;
-				float d = ::checkCollision(v, poly, n, w);
-				if (d > distance) {
-					distance = d;
-					normal = n;
-					where = w;
-				}
-			}
-		}
-		return distance;
-	}
-
-
-
-private:
-	const int width = 27;
-	const int height = 50;
-	vector<int> tiles;
-	float offset = 0;
-
-	float yy = 25;
-	float xx = width * 0.5;;
-	float r = width * 0.5;
-
-	int getTile(int y, int x) const {
-		return	y < 0 || y >= height ? 0 :
-				x < 0 || x >= width ? 1 :
-				tiles[y * width + x];
-	}
-	int& tileAt(int y, int x) {
-		return tiles[y * width + x];
-	}
-
-
-	void generate() {
-
-		copy(tiles.begin() + width, tiles.end(), tiles.begin());
-		yy -= 1;
-
-		while (yy < 40) {
-			for (int y = 0; y < height; y++) {
-				for (int x = 0; x < width; x++) {
-					float dx = xx - x - 0.5;
-					float dy = yy - y - 0.5;
-					if (dx * dx + dy * dy < r * r) tileAt(y, x) = 0;
-				}
-			}
-
-			float ang = (rand() / (float)RAND_MAX * 1.4 - 0.2) * M_PI;
-			yy = yy + sin(ang) * r;
-			xx = xx + cos(ang) * r;
-			xx = std::min(std::max(6.0f, xx), width - 6.0f);
-			r = randInt(20, 70) / 10;
-		}
-
-		for (int x = 0; x < width; x++) {
-			const std::vector<int> neighbors = {
-				getTile(25 + 1, x),
-				getTile(25, x + 1),
-				getTile(25 - 1, x),
-				getTile(25, x - 1)
-			};
-
-			if (getTile(25, x) == 0) {
-				if (std::count(neighbors.begin(), neighbors.end(), 1) == 3) tileAt(25, x) = 1;
-				if (neighbors == std::vector<int>{ 1, 1, 0, 0 }) tileAt(25, x) = 2;
-				if (neighbors == std::vector<int>{ 0, 1, 1, 0 }) tileAt(25, x) = 3;
-				if (neighbors == std::vector<int>{ 0, 0, 1, 1 }) tileAt(25, x) = 4;
-				if (neighbors == std::vector<int>{ 1, 0, 0, 1 }) tileAt(25, x) = 5;
-			}
-		}
-	}
-};
 
 Walls walls;
 
+
+
+class Star : public Object {
+public:
+	Star() {
+		init("media/star.png");
+		speed = randFloat(0.3, 1);
+		float c = (speed - 0.3) * 100;
+		setColor(sf::Color(c, c, c * 1.2));
+		reSet();
+		setPosition({randFloat(-10, 810), randFloat(-10, 610)});
+	}
+	virtual bool update() {
+		move({0, speed});
+		if (getPosition().y > 610) reSet();
+		return true;
+	}
+	float getSpeed() const { return speed; };
+private:
+	void reSet() {
+		setPosition({randFloat(-10, 810), -10});
+		setFrame(randInt(0, 20) == 0);
+	}
+	float speed;;
+};
 
 
 
@@ -168,17 +58,8 @@ public:
 		updateCollisionPoly();
 
 		Vec2 normal, where;
-		if (walls.checkCollision(poly, normal, where) > 0) {
-			return false;
-/*
-			move(n * -d);
-			n *= n.x * vel.x + n.y * vel.y;
-			vel -= 2.0f * (vel - n);
-			vel = - vel;
-			rotate(-atan2(vel.x, vel.y) * 180 / M_PI);
-*/
-		}
-
+		float distance = walls.checkCollision(poly, normal, where);
+		if (distance > 0) return false;
 
 		if (getPosition().y < -10) return false;
 		return true;
@@ -243,9 +124,6 @@ public:
 
 		setFrame(tick++ / 4 % 2);
 
-
-
-
 		return true;
 	}
 
@@ -274,9 +152,12 @@ private:
 
 
 Player player;
+vector<Star> stars;
 
 
 void update() {
+	for (auto& star: stars) star.update();
+
 	walls.update();
 	updateList(lasers);
 	player.update();
@@ -285,6 +166,8 @@ void update() {
 
 void draw(sf::RenderWindow& win) {
 
+	for (auto& star: stars) star.draw(win);
+
 	walls.draw(win);
 	for (auto& laser: lasers) laser->draw(win);
 	player.draw(win);
@@ -292,6 +175,7 @@ void draw(sf::RenderWindow& win) {
 
 
 int main(int argc, char** argv) {
+	srand((unsigned)time(0));
 
 	sf::RenderWindow window(sf::VideoMode(800, 600), "sfml",
 							sf::Style::Titlebar || sf::Style::Close);
@@ -299,6 +183,11 @@ int main(int argc, char** argv) {
 	window.setMouseCursorVisible(false);
 
 	player.init();
+
+	stars.resize(100);
+	sort(stars.begin(), stars.end(), [](const Star& a, const Star& b) {
+		return a.getSpeed() < b.getSpeed();
+	});
 
 
 	while (window.isOpen()) {
