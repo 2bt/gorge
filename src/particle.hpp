@@ -66,13 +66,9 @@ public:
 };
 
 
-inline void makeExplosion(Vec2 pos) {
-	particles.push_front(std::unique_ptr<Particle>(new Explosion(pos)));
-}
-
-
-inline void makeHit(Vec2 pos) {
-	particles.push_front(std::unique_ptr<Particle>(new Hit(pos)));
+template<typename T, typename... Args>
+void makeParticle(Args&&... args) {
+	particles.push_front(std::unique_ptr<Particle>(new T(args...)));
 }
 
 

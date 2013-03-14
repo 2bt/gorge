@@ -23,7 +23,7 @@ public:
 		return tiles[y * width + x];
 	}
 	float getSpeed() const {
-		return 1.5;
+		return 1.25;
 	}
 
 

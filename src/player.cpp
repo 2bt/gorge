@@ -26,7 +26,6 @@ Laser::Laser(Vec2 pos) {
 	init("media/laser.png");
 	setPosition(pos);
 	vel = {0, -16};
-	alive = true;
 }
 
 
@@ -36,7 +35,7 @@ bool Laser::update() {
 
 	float distance = walls.checkCollision(poly);
 	if (distance > 0) {
-		makeHit(getPosition());
+		makeParticle<Hit>(getPosition());
 		return false;
 	}
 
@@ -72,11 +71,26 @@ const Poly& Player::getCollisionModel() {
 	return model;
 }
 
+
 void Player::init() {
 	Object::init("media/ship.png");
 	setPosition(400, 500);
 	score = 0;
 }
+
+
+bool Player::checkCollisionWithBullets() {
+	for (auto& bullet : bullets) {
+		if (::checkCollision(poly, bullet->getCollisionPoly()) > 0) {
+			makeParticle<Hit>(bullet->getPosition());
+			bullet->die();
+			makeParticle<Explosion>(getPosition());
+			return false;
+		}
+	}
+	return true;
+}
+
 
 bool Player::update() {
 
@@ -121,5 +135,5 @@ bool Player::update() {
 	tick %= 8;
 	setFrame(tick > 3);
 
-	return true;
+	return checkCollisionWithBullets();
 }

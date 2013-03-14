@@ -7,7 +7,7 @@ public:
 	void die() { alive = false; }
 private:
 	Vec2 vel;
-	bool alive;
+	bool alive = true;
 	virtual const Poly& getCollisionModel();
 };
 
@@ -23,6 +23,7 @@ public:
 	virtual bool update();
 
 private:
+	bool checkCollisionWithBullets();
 	virtual const Poly& getCollisionModel();
 
 	int tick = 0;

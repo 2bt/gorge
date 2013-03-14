@@ -19,13 +19,17 @@
 
 using namespace std;
 
-std::forward_list<unique_ptr<Particle>> particles;
 Walls walls;
-forward_list<unique_ptr<Laser>> lasers;
 Player player;
+std::forward_list<unique_ptr<Particle>> particles;
+forward_list<unique_ptr<Laser>> lasers;
 forward_list<unique_ptr<BadGuy>> badGuys;
+forward_list<unique_ptr<Bullet>> bullets;
 
-
+template<typename... Args>
+void makeBullet(Args&&... args) {
+	bullets.push_front(unique_ptr<Bullet>(new Bullet(args...)));
+}
 
 
 class CannonGuy : public BadGuy {
@@ -36,8 +40,10 @@ public:
 		angle = ang;
 		cannonAngle = ang + randFloat(-90, 90);
 		setRotation(angle);
-
 	}
+
+
+	int tick = 0;
 	virtual bool update() {
 		move(0, walls.getSpeed());
 
@@ -47,7 +53,18 @@ public:
 			float d = fmodf(a - cannonAngle + 540, 360) - 180;
 			if (d > 0) cannonAngle += 1;
 			if (d < 0) cannonAngle -= 1;
+
+
+			if (tick <= 0) {
+				tick = 100;
+				Vec2 dir = { sinf(cannonAngle * M_PI / 180), -cosf(cannonAngle * M_PI / 180)};
+				makeBullet(getPosition(), dir * randFloat(3, 4));
+
+			}
+			else tick--;
 		}
+		else { tick = 0; }
+
 
 		if (getPosition().y > 648) return false;
 		updateCollisionPoly();
@@ -100,30 +117,31 @@ void update() {
 		Vec2 pos;
 		float ang;
 		if (walls.findCannonGuyLocation(pos, ang)) {
-			badGuys.push_front(unique_ptr<BadGuy>(new CannonGuy(pos, ang)));
+			makeBadGuy<CannonGuy>(pos, ang);
 		}
 
 	}
 
 	walls.update();
 	updateList(lasers);
+	updateList(bullets);
 	player.update();
-
 	updateList(badGuys);
 }
 
 
 void draw(sf::RenderWindow& win) {
-/*
+
 	sf::View view = win.getDefaultView();
 	view.zoom(2);
-	view.move(0, -200);
+	view.move(0, -220);
 	win.setView(view);
-*/
+
 
 
 	for (auto& star : stars) star.draw(win);
 	for (auto& laser : lasers) laser->draw(win);
+	for (auto& bullet : bullets) bullet->draw(win);
 	for (auto& guy : badGuys) guy->draw(win);
 	player.draw(win);
 
