@@ -1,21 +1,12 @@
 class Walls {
 public:
-	Walls();
+	void init();
 	void update();
 	void draw(sf::RenderWindow& win);
 	float checkCollision(const Poly& poly, Vec2& normal, Vec2& where);
-
-
-private:
-	sf::Sprite tileSprite;
-	const int width = 27;
-	const int height = 50;
-	std::vector<int> tiles;
-	float offset = 0;
-
-	float yy = 25;
-	float xx = width * 0.5;;
-	float r = width * 0.5;
+	float getSpeed() {
+		return 1.5;
+	}
 
 	int getTile(int y, int x) const {
 		return	y < 0 || y >= height ? 0 :
@@ -25,6 +16,19 @@ private:
 	int& tileAt(int y, int x) {
 		return tiles[y * width + x];
 	}
+
+	const int width = 27;
+	const int height = 50;
+
+	float offset;
+private:
+	sf::Sprite tileSprite;
+	std::vector<int> tiles;
+
+	int	flightLength;
+
+	Vec2 circlePos;
+	float radius;
 
 	void generate();
 };
