@@ -13,7 +13,7 @@ public:
 		setScale(4, 4);
 		setFrame(0);
 	};
-	virtual void setFrame(size_t frame) {
+	void setFrame(size_t frame) {
 		setTextureRect(sf::IntRect(spriteWidth * frame, 0, spriteWidth, spriteWidth));
 	}
 	virtual bool update() { return true; };
@@ -21,13 +21,16 @@ public:
 		win.draw(*this);
 //		drawPoly(win, poly);
 	};
+	const Poly& getCollisionPoly() {
+		return poly;
+	}
 
 protected:
 	virtual const Poly& getCollisionModel() {
 		static const Poly model;
 		return model;
 	}
-	virtual void updateCollisionPoly() {
+	void updateCollisionPoly() {
 		const Poly& model = getCollisionModel();
 		poly.resize(model.size());
 		sf::Transform trans = getTransform();

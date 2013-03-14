@@ -27,12 +27,12 @@ void Walls::init() {
 	sf::Texture& tex = loadTexture("media/tiles.png");
 	tileSprite.setTexture(tex);
 	tileSprite.setScale(4, 4);
-	tileSprite.setColor(sf::Color(100, 30, 60));
+	tileSprite.setColor(sf::Color(80, 30, 60));
 
 	offset = 0;
 	flightLength = 0;
 	tiles.resize(width * height, 1);
-	circlePos = Vec2(width * 0.5, 25);
+	circlePos = Vec2(width * 0.5, 24);
 	radius = width * 0.5;
 	for (int i = 0; i < 20; i++) generate();
 }
@@ -47,7 +47,9 @@ void Walls::update() {
 }
 
 void Walls::draw(sf::RenderWindow& win) {
-	for (int y = 0; y < 22; y++) {
+//	for (int y = 0; y < 22; y++) {
+	for (int y = 0; y < height; y++) {
+
 		for (int x = 0; x < width; x++) {
 			int t =  tiles[y * width + x];
 			tileSprite.setTextureRect(sf::IntRect(t * 8, 0, 8, 8));
@@ -58,7 +60,45 @@ void Walls::draw(sf::RenderWindow& win) {
 	}
 }
 
-float Walls::checkCollision(const Poly& poly, Vec2& normal, Vec2& where) {
+
+bool Walls::findCannonGuyLocation(Vec2& pos, float& ang) {
+	struct Location { Vec2 pos; float ang; };
+	vector<Location> locs;
+
+	for (int x = 1; x < width - 1; x++) {
+		Vec2 pos = Vec2((x - 0.5) * 32, (19.5 - 22) * 32 + offset);
+		if (getTile(22, x) == 0) {
+
+			const std::vector<int> nb = {
+				getTile(22 + 1, x),
+				getTile(22, x + 1),
+				getTile(22 - 1, x),
+				getTile(22, x - 1)
+			};
+			if (count(nb.begin(), nb.end(), 1) == 1 &&
+				count(nb.begin(), nb.end(), 0) == 3) {
+				float a = vector<float>{180, 270, 0, 90}
+					[find(nb.begin(), nb.end(), 1) - nb.begin()];
+				locs.push_back({ pos, a });
+			}
+
+		}
+	}
+
+	if (!locs.empty()) {
+		Location& loc = locs[randInt(0, locs.size() - 1)];
+		pos = loc.pos;
+		ang = loc.ang;
+		return true;
+	}
+	return false;
+}
+
+
+float Walls::checkCollision(const Poly& poly, Vec2* pnormal, Vec2* pwhere) {
+	// very naive
+	Vec2 normal;
+	Vec2 where;
 	Poly v;
 	float distance = 0;
 	for (int y = 0; y < 22; y++) {
@@ -71,7 +111,7 @@ float Walls::checkCollision(const Poly& poly, Vec2& normal, Vec2& where) {
 			}
 
 			Vec2 n, w;
-			float d = ::checkCollision(v, poly, n, w);
+			float d = ::checkCollision(v, poly, &n, &w);
 			if (d > distance) {
 				distance = d;
 				normal = n;
@@ -79,6 +119,8 @@ float Walls::checkCollision(const Poly& poly, Vec2& normal, Vec2& where) {
 			}
 		}
 	}
+	if (pnormal) *pnormal = normal;
+	if (pwhere) *pwhere = where;
 	return distance;
 }
 
@@ -106,18 +148,18 @@ void Walls::generate() {
 
 	for (int x = 0; x < width; x++) {
 		const std::vector<int> neighbors = {
-			getTile(25 + 1, x),
-			getTile(25, x + 1),
-			getTile(25 - 1, x),
-			getTile(25, x - 1)
+			getTile(24 + 1, x) == 1,
+			getTile(24, x + 1) == 1,
+			getTile(24 - 1, x) == 1,
+			getTile(24, x - 1) == 1
 		};
 
-		if (getTile(25, x) == 0) {
-			if (count(neighbors.begin(), neighbors.end(), 1) == 3) tileAt(25, x) = 1;
-			if (neighbors == std::vector<int>{ 1, 1, 0, 0 }) tileAt(25, x) = 2;
-			if (neighbors == std::vector<int>{ 0, 1, 1, 0 }) tileAt(25, x) = 3;
-			if (neighbors == std::vector<int>{ 0, 0, 1, 1 }) tileAt(25, x) = 4;
-			if (neighbors == std::vector<int>{ 1, 0, 0, 1 }) tileAt(25, x) = 5;
+		if (getTile(24, x) == 0) {
+			if (count(neighbors.begin(), neighbors.end(), 1) == 3) tileAt(24, x) = 1;
+			if (neighbors == std::vector<int>{ 1, 1, 0, 0 }) tileAt(24, x) = 2;
+			if (neighbors == std::vector<int>{ 0, 1, 1, 0 }) tileAt(24, x) = 3;
+			if (neighbors == std::vector<int>{ 0, 0, 1, 1 }) tileAt(24, x) = 4;
+			if (neighbors == std::vector<int>{ 1, 0, 0, 1 }) tileAt(24, x) = 5;
 		}
 	}
 }

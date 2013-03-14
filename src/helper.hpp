@@ -9,7 +9,7 @@ inline float randFloat(float min, float max) {
 }
 
 void drawPoly(sf::RenderWindow& win, const Poly poly);
-float checkCollision(const Poly& a, const Poly& b, Vec2& normal, Vec2& where);
+float checkCollision(const Poly& a, const Poly& b, Vec2* pnormal=nullptr, Vec2* pwhere=nullptr);
 
 template<class T>
 void updateList(std::forward_list<std::unique_ptr<T>>& list) {

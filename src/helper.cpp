@@ -24,7 +24,9 @@ void drawPoly(sf::RenderWindow& win, const Poly poly) {
 }
 
 
-float checkCollision(const Poly& a, const Poly& b, Vec2& normal, Vec2& where) {
+float checkCollision(const Poly& a, const Poly& b, Vec2* pnormal, Vec2* pwhere) {
+	Vec2 normal;
+	Vec2 where;
 	if (a.empty() || b.empty()) return 0;
 
 	float distance = 9e99;
@@ -58,6 +60,8 @@ float checkCollision(const Poly& a, const Poly& b, Vec2& normal, Vec2& where) {
 			p1 = p2;
 		}
 	}
+	if (pnormal) *pnormal = normal;
+	if (pwhere) *pwhere = where;
 	return distance;
 }
 

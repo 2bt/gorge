@@ -16,7 +16,47 @@
 
 using namespace std;
 
+class Particle : public Object { };
+forward_list<unique_ptr<Particle>> particles;
 
+
+
+class Explosion : public Particle {
+public:
+	Explosion(Vec2 pos) {
+		init("media/explosion.png");
+		setColor(sf::Color(255, 255, 100));
+		setPosition(pos);
+//		setRotation(randFloat(0, 360));
+	}
+	virtual bool update() {
+		tick++;
+		setFrame(tick);
+		if (tick > frameCount) return false;
+		return true;
+	}
+	virtual void draw(sf::RenderWindow& win) {
+		win.draw(*this, sf::BlendAdd);
+	}
+protected:
+	Explosion() {};
+	size_t tick = 0;
+};
+class Hit : public Explosion {
+public:
+	Hit(Vec2 pos) {
+		init("media/hit.png");
+		setColor(sf::Color(255, 255, 100));
+		setPosition(pos);
+		setRotation(randFloat(0, 360));
+	}
+};
+void makeExplosion(Vec2 pos) {
+	particles.push_front(unique_ptr<Particle>(new Explosion(pos)));
+}
+void makeHit(Vec2 pos) {
+	particles.push_front(unique_ptr<Particle>(new Hit(pos)));
+}
 
 
 
@@ -57,27 +97,35 @@ public:
 	Laser(Vec2 pos) {
 		init("media/laser.png");
 		setPosition(pos);
+		vel = {0, -16};
+		alive = true;
 	}
 	virtual bool update() {
 		move(vel);
 		updateCollisionPoly();
 
-		Vec2 normal, where;
-		float distance = walls.checkCollision(poly, normal, where);
-		if (distance > 0) return false;
+		float distance = walls.checkCollision(poly);
+		if (distance > 0) {
+			makeHit(getPosition());
+			return false;
+		}
 
 		if (getPosition().y < -16) return false;
-		return true;
+		return alive;
+	}
+	void die() {
+		alive = false;
 	}
 private:
-	Vec2 vel = {0, -16};
+	Vec2 vel;
+	bool alive;
 
 	virtual const Poly& getCollisionModel() {
 		static const Poly model = {
-			Vec2(0.5, 2.5),
-			Vec2(0.5, -2.5),
-			Vec2(-0.5, -2.5),
-			Vec2(-0.5, 2.5),
+			Vec2(1, 3),
+			Vec2(1, -3),
+			Vec2(-1, -3),
+			Vec2(-1, 3),
 		};
 		return model;
 	}
@@ -113,8 +161,8 @@ public:
 		pos.y = max(pos.y, 16.0f);
 		setPosition(pos);
 		updateCollisionPoly();
-		Vec2 normal, where;
-		float distance = walls.checkCollision(poly, normal, where);
+		Vec2 normal;
+		float distance = walls.checkCollision(poly, &normal);
 		if (distance > 0) {
 			// TODO: explode here
 			move(normal * -distance);
@@ -127,9 +175,8 @@ public:
 
 		if (shoot) {
 			if (shootDelay == 0) {
-				lasers.push_front(
-					unique_ptr<Laser>(new Laser(pos + Vec2(0, -10))));
-				shootDelay = 10;
+				lasers.push_front(unique_ptr<Laser>(new Laser(pos + Vec2(0, -10))));
+				shootDelay = 15;
 			}
 			else shootDelay--;
 		}
@@ -159,32 +206,60 @@ private:
 	size_t tick = 0;
 };
 
+Player player;
 
-class Enemy : public Object {
+
+class BadGuy : public Object {
 public:
+	BadGuy(int shield) : shield(shield) {}
+protected:
+	bool checkCollisionWithLaser() {
+		for (auto& laser : lasers) {
+			if (::checkCollision(poly, laser->getCollisionPoly()) > 0) {
+				makeHit(laser->getPosition());
+				laser->die();
+				shield--;
+				if (shield <= 0) {
+					makeExplosion(getPosition());
+					break;
+				}
+			}
+		}
+		return shield > 0;
+	}
 private:
+	int shield;
 };
 
 
-class Cannon : public Enemy {
+class CannonGuy : public BadGuy {
 public:
-	Cannon(Vec2 pos, float ang) {
+	CannonGuy(Vec2 pos, float ang) : BadGuy(1) {
 		init("media/cannon.png");
 		setPosition(pos);
 		angle = ang;
+		cannonAngle = ang + randFloat(-90, 90);
+		setRotation(angle);
 
 	}
 	virtual bool update() {
 		move(0, walls.getSpeed());
-		setRotation(angle);
 
+		if (walls.look(getPosition(), player.getPosition())) {
+			Vec2 diff = player.getPosition() - getPosition();
+			float a = atan2(diff.y, diff.x) * 180 / M_PI + 90;
+			float d = fmodf(a - cannonAngle + 540, 360) - 180;
+			if (d > 0) cannonAngle += 1;
+			if (d < 0) cannonAngle -= 1;
+		}
+
+		if (getPosition().y > 648) return false;
 		updateCollisionPoly();
-		return true;
+		return checkCollisionWithLaser();
 	}
-	float q = 0;
+
 	virtual void draw(sf::RenderWindow& win) {
-		q += 0.03;
-		setRotation(angle + sin(q) * 90);
+		setRotation(cannonAngle);
 		setFrame(1);
 		win.draw(*this);
 
@@ -193,18 +268,20 @@ public:
 		win.draw(*this);
 
 //		drawPoly(win, poly);
-
 	}
 
 private:
 	float angle;
+	float cannonAngle;
 
 
 	virtual const Poly& getCollisionModel() {
 		static const Poly model = {
 			Vec2(4, 4),
-			Vec2(4, -5),
-			Vec2(-4, -5),
+			Vec2(4, 0),
+			Vec2(2, -4),
+			Vec2(-2, -4),
+			Vec2(-4, 0),
 			Vec2(-4, 4),
 		};
 		return model;
@@ -216,37 +293,22 @@ private:
 
 
 
-forward_list<unique_ptr<Enemy>> enemies;
-Player player;
+forward_list<unique_ptr<BadGuy>> badGuys;
 vector<Star> stars;
 
 
 void update() {
 	for (auto& star: stars) star.update();
+	updateList(particles);
 
 	static int i = 0;
-	if (!(i++ % 200)) {
+	if (!(i++ % 100)) {
 
-		struct Location { Vec2 pos; float ang; };
-		vector<Location> locs;
-
-		for (int x = 1; x < walls.width - 1; x++) {
-			Vec2 pos = Vec2((x - 0.5) * 32, (19.5 - 21) * 32 + walls.offset);
-			if (walls.getTile(21, x) == 0) {
-				if (walls.getTile(22, x) == 1) locs.push_back({ pos, 180 });
-				if (walls.getTile(21, x - 1) == 1) locs.push_back({ pos, 90 });
-				if (walls.getTile(21, x + 1) == 1) locs.push_back({ pos, 270 });
-				if (walls.getTile(20, x) == 1) locs.push_back({ pos, 0 });
-			}
+		Vec2 pos;
+		float ang;
+		if (walls.findCannonGuyLocation(pos, ang)) {
+			badGuys.push_front(unique_ptr<BadGuy>(new CannonGuy(pos, ang)));
 		}
-
-		if (!locs.empty()) {
-			Location& loc = locs[randInt(0, locs.size() - 1)];
-			enemies.push_front(
-				unique_ptr<Enemy>(new Cannon(loc.pos, loc.ang)));
-		}
-
-
 
 	}
 
@@ -254,31 +316,33 @@ void update() {
 	updateList(lasers);
 	player.update();
 
-	updateList(enemies);
+	updateList(badGuys);
 }
 
 
 void draw(sf::RenderWindow& win) {
+/*
 	sf::View view = win.getDefaultView();
-	view.zoom(1.2);
+	view.zoom(2);
+	view.move(0, -200);
 	win.setView(view);
-	static const Poly frame {{0,0}, {800, 0}, {800, 600}, {0, 600}};
-
+*/
 
 
 	for (auto& star : stars) star.draw(win);
-
 	for (auto& laser : lasers) laser->draw(win);
+	for (auto& guy : badGuys) guy->draw(win);
 	player.draw(win);
-	for (auto& enemy : enemies) enemy->draw(win);
 
 	walls.draw(win);
 
+	for (auto& particle : particles) particle->draw(win);
 
 
 
 
-	drawPoly(win, frame);
+
+	drawPoly(win, {{-1,-1}, {801, -1}, {801, 601}, {-1, 601}});
 }
 
 
