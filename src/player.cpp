@@ -46,10 +46,10 @@ bool Laser::update() {
 
 const Poly& Laser::getCollisionModel() {
 	static const Poly model = {
-		Vec2(1, 3),
+		Vec2(1, 5),
 		Vec2(1, -3),
 		Vec2(-1, -3),
-		Vec2(-1, 3),
+		Vec2(-1, 5),
 	};
 	return model;
 }
@@ -112,8 +112,9 @@ bool Player::update() {
 	Vec2 normal;
 	float distance = walls.checkCollision(poly, &normal);
 	if (distance > 0) {
-		// TODO: explode here
-		move(normal * -distance);
+		makeParticle<Explosion>(pos);
+
+		move(normal * -distance - normal * 20.0f);
 		pos = getPosition();
 	}
 

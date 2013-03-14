@@ -63,7 +63,7 @@ public:
 			}
 			else tick--;
 		}
-		else { tick = 0; }
+		else tick = 0;
 
 
 		if (getPosition().y > 648) return false;
@@ -135,7 +135,7 @@ void draw(sf::RenderWindow& win) {
 	sf::View view = win.getDefaultView();
 	view.zoom(2);
 	view.move(0, -220);
-	win.setView(view);
+//	win.setView(view);
 
 
 

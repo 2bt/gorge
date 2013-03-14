@@ -61,7 +61,6 @@ public:
 		init("media/hit.png");
 		setColor(sf::Color(255, 255, 100));
 		setPosition(pos);
-		setRotation(randFloat(0, 360));
 	}
 };
 
