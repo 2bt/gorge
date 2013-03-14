@@ -13,7 +13,7 @@ public:
 		setScale(4, 4);
 		setFrame(0);
 	};
-	void setFrame(size_t frame) {
+	void setFrame(int frame) {
 		setTextureRect(sf::IntRect(spriteWidth * frame, 0, spriteWidth, spriteWidth));
 	}
 	virtual bool update() { return true; };
@@ -21,9 +21,7 @@ public:
 		win.draw(*this);
 //		drawPoly(win, poly);
 	};
-	const Poly& getCollisionPoly() {
-		return poly;
-	}
+	const Poly& getCollisionPoly() { return poly; }
 
 protected:
 	virtual const Poly& getCollisionModel() {
@@ -37,8 +35,8 @@ protected:
 		trans.translate(getOrigin());
 		for (size_t i = 0; i < poly.size(); i++) poly[i] = trans * model[i];
 	}
-	size_t frameCount;
-	size_t spriteWidth;
+	int frameCount;
+	int spriteWidth;
 	Poly poly;
 };
 

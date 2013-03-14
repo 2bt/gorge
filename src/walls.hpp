@@ -1,3 +1,4 @@
+
 class Walls {
 public:
 	void init();
@@ -42,3 +43,4 @@ private:
 };
 
 
+extern Walls walls;
