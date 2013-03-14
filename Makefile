@@ -1,7 +1,7 @@
 LIB = -lsfml-graphics -lsfml-window -lsfml-system
 SRC = $(wildcard src/*.cpp)
 OBJ = $(SRC:src/%.cpp=obj/%.o)
-TARGET = shooter
+TARGET = gorge
 
 all: $(TARGET)
 
@@ -17,4 +17,4 @@ $(TARGET): Makefile $(OBJ)
 
 clean:
 	rm -rf obj
-	rm -rf $(TARGET)
+	rm -f $(TARGET)
