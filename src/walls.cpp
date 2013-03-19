@@ -27,7 +27,7 @@ void Walls::init() {
 	sf::Texture& tex = loadTexture("media/tiles.png");
 	tileSprite.setTexture(tex);
 	tileSprite.setScale(4, 4);
-	tileSprite.setColor(sf::Color(80, 30, 60));
+	tileSprite.setColor(sf::Color(60, 30, 70));
 
 	offset = 0;
 	flightLength = 0;
@@ -47,8 +47,8 @@ void Walls::update() {
 }
 
 void Walls::draw(sf::RenderWindow& win) {
-//	for (int y = 0; y < 22; y++) {
-	for (int y = 0; y < height; y++) {
+	for (int y = 0; y < 22; y++) {
+//	for (int y = 0; y < height; y++) {
 
 		for (int x = 0; x < width; x++) {
 			int t =  tiles[y * width + x];

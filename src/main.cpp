@@ -56,7 +56,7 @@ public:
 			vel = Vec2(cos(ang), sin(ang)) * speed;
 			if (dot(vel, normal) > 0) vel = -vel;
 		}
-		delay += randInt(1, 3);
+		delay += randInt(1, 4);
 		if (delay > 300) {
 			delay = 0;
 			float ang = randFloat(0, 2 * M_PI);
@@ -93,6 +93,7 @@ private:
 	}
 };
 
+
 class RapidBullet : public Bullet {
 public:
 	RapidBullet(Vec2 pos, Vec2 velocity) {
@@ -104,10 +105,10 @@ public:
 protected:
 	virtual const Poly& getCollisionModel() const {
 		static const Poly model = {
-			Vec2(0.5, 3),
-			Vec2(0.5, -3),
-			Vec2(-0.5, -3),
-			Vec2(-0.5, 3),
+			Vec2(0.5, 2),
+			Vec2(0.5, -2),
+			Vec2(-0.5, -2),
+			Vec2(-0.5, 2),
 		};
 		return model;
 	}
@@ -116,10 +117,11 @@ protected:
 
 class SquareGuy : public BadGuy {
 public:
-	SquareGuy(Vec2 pos) : BadGuy(3) {
+	SquareGuy(Vec2 pos) : BadGuy(2) {
 		init("media/square.png");
 		setPosition(pos);
 		vel = normalized(Vec2(randFloat(-1, 1), 1)) * speed;
+		tick = randInt(0, 150);
 	}
 
 	virtual bool update() {
@@ -136,22 +138,30 @@ public:
 		bounce = false;
 		updateCollisionPoly();
 
-		if (randInt(0, 100) == 0) {
-			Vec2 diff = normalized(player.getPosition() - getPosition());
-			makeBullet<RapidBullet>(getPosition(), diff * 6.0f);
+		Vec2 pos = getPosition();
+
+		if (tick > 155 || walls.look(pos, player.getPosition())) {
+			tick = (tick + 1) % 180;
 		}
 
-		setFrame(tick / 4);
-		if (++tick >= frameCount * 4) tick = 0;
+		if (tick == 155 || tick == 163 || tick == 171) {
+			Vec2 diff = player.getPosition() - pos;
+			float ang = atan2(diff.x, diff.y) + randFloat(-0.1, 0.1);
+			diff = Vec2(sin(ang), cos(ang));
+			makeBullet<RapidBullet>(pos, diff * randFloat(4.5, 5));
+		}
 
-		Vec2 pos = getPosition();
+		setFrame(frame / 4);
+		if (++frame >= frameCount * 4) frame = 0;
+
 		if (pos.x < -50 || pos.x > 850) return false;
 		if (pos.y < -100 || pos.y > 650) return false;
 		return checkCollisionWithLaser();
 	}
 
 private:
-	int tick = 0;
+	int frame = 0;
+	int tick;
 	Vec2 vel;
 	bool bounce;
 	const float speed = 1.2;
@@ -189,7 +199,7 @@ public:
 		init("media/cannon.png");
 		setPosition(pos);
 		angle = ang;
-		cannonAngle = ang + randFloat(-90, 90);
+		cannonAngle = ang + randFloat(-80, 80);
 		setRotation(angle);
 		tick = randInt(100, 200);
 	}
@@ -215,7 +225,7 @@ public:
 				if (tick == 0) {
 					tick = randInt(100, 150);
 					diff = normalized(diff);
-					makeBullet<Bullet>(getPosition() + diff * 16.0f, diff * 5.0f);
+					makeBullet<Bullet>(getPosition() + diff * 16.0f, diff * 4.0f);
 				}
 			}
 		}

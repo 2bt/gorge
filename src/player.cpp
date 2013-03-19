@@ -95,10 +95,12 @@ bool Player::checkCollisionWithBullets() {
 bool Player::checkCollisionWithBadGuys() {
 	Vec2 normal, pos;
 	for (auto& guy : badGuys) {
-		if (::checkCollision(poly, guy->getCollisionPoly(), &normal, &pos) > 0) {
+		float distance = ::checkCollision(poly, guy->getCollisionPoly(), &normal, &pos);
+		if (distance > 0) {
 			makeParticle<Hit>(pos);
 			guy->takeHit(1);
 			makeParticle<Explosion>(getPosition());
+			move(normal * (distance + 25.0f));
 			return false;
 		}
 	}
@@ -129,13 +131,13 @@ bool Player::update() {
 	if (distance > 0) {
 		makeParticle<Explosion>(pos);
 
-		move(normal * -distance - normal * 20.0f);
+		move(normal * -(distance + 25.0f));
 		pos = getPosition();
 	}
 
 
-	bool shoot =	sf::Joystick::isButtonPressed(0, 0) |
-					sf::Keyboard::isKeyPressed(sf::Keyboard::X);
+	bool shoot = sf::Joystick::isButtonPressed(0, 0) |
+				sf::Keyboard::isKeyPressed(sf::Keyboard::X);
 
 	if (shoot) {
 		if (shootDelay == 0) {
