@@ -26,10 +26,161 @@ forward_list<unique_ptr<Laser>> lasers;
 forward_list<unique_ptr<BadGuy>> badGuys;
 forward_list<unique_ptr<Bullet>> bullets;
 
-template<typename... Args>
-void makeBullet(Args&&... args) {
-	bullets.push_front(unique_ptr<Bullet>(new Bullet(args...)));
-}
+
+
+class RingGuy : public BadGuy {
+public:
+	RingGuy(Vec2 pos) : BadGuy(1) {
+		init("media/ring.png");
+		setPosition(pos);
+
+
+		float ang = randFloat(0, M_PI);
+		vel = Vec2(cos(ang), sin(ang)) * speed;
+
+	}
+
+	virtual bool update() {
+		move(0, walls.getSpeed());
+		move(vel);
+
+		updateCollisionPoly();
+		Vec2 normal;
+		float distance = walls.checkCollision(poly, &normal);
+		if (distance > 0) {
+			move(normal * -distance);
+			updateCollisionPoly();
+			delay = 0;
+
+			float ang = randFloat(0, 2 * M_PI);
+			vel = Vec2(cos(ang), sin(ang)) * speed;
+			if (dot(vel, normal) > 0) vel = -vel;
+		}
+		delay += randInt(1, 3);
+		if (delay > 300) {
+			delay = 0;
+			float ang = randFloat(0, 2 * M_PI);
+			vel = Vec2(cos(ang), sin(ang)) * speed;
+		}
+
+		setFrame(tick / 4);
+		if (++tick >= frameCount * 4) tick = 0;
+
+		Vec2 pos = getPosition();
+		if (pos.x < -50 || pos.x > 850) return false;
+		if (pos.y < -100 || pos.y > 650) return false;
+		return checkCollisionWithLaser();
+	}
+
+private:
+	const float speed = 2;
+	int tick = 0;
+	int delay;
+	Vec2 vel;
+
+	virtual const Poly& getCollisionModel() const {
+		static const Poly model = {
+			Vec2(2, 4),
+			Vec2(4, 2),
+			Vec2(4, -2),
+			Vec2(2, -4),
+			Vec2(-2, -4),
+			Vec2(-4, -2),
+			Vec2(-4, 2),
+			Vec2(-2, 4),
+		};
+		return model;
+	}
+};
+
+class RapidBullet : public Bullet {
+public:
+	RapidBullet(Vec2 pos, Vec2 velocity) {
+		init("media/rapid.png");
+		setPosition(pos);
+		vel = velocity;
+		rotate(atan2(vel.x, -vel.y + walls.getSpeed()) * 180 / M_PI);
+	}
+protected:
+	virtual const Poly& getCollisionModel() const {
+		static const Poly model = {
+			Vec2(0.5, 3),
+			Vec2(0.5, -3),
+			Vec2(-0.5, -3),
+			Vec2(-0.5, 3),
+		};
+		return model;
+	}
+};
+
+
+class SquareGuy : public BadGuy {
+public:
+	SquareGuy(Vec2 pos) : BadGuy(3) {
+		init("media/square.png");
+		setPosition(pos);
+		vel = normalized(Vec2(randFloat(-1, 1), 1)) * speed;
+	}
+
+	virtual bool update() {
+		move(0, walls.getSpeed());
+		move(vel);
+		bounce = true;
+		updateCollisionPoly();
+
+		Vec2 normal;
+		float distance = walls.checkCollision(poly, &normal);
+		if (distance > 0) vel -= normal * 0.1f;
+		else vel = normalized(vel) * speed;
+
+		bounce = false;
+		updateCollisionPoly();
+
+		if (randInt(0, 100) == 0) {
+			Vec2 diff = normalized(player.getPosition() - getPosition());
+			makeBullet<RapidBullet>(getPosition(), diff * 6.0f);
+		}
+
+		setFrame(tick / 4);
+		if (++tick >= frameCount * 4) tick = 0;
+
+		Vec2 pos = getPosition();
+		if (pos.x < -50 || pos.x > 850) return false;
+		if (pos.y < -100 || pos.y > 650) return false;
+		return checkCollisionWithLaser();
+	}
+
+private:
+	int tick = 0;
+	Vec2 vel;
+	bool bounce;
+	const float speed = 1.2;
+
+	virtual const Poly& getCollisionModel() const {
+		static const Poly model = {
+			Vec2(2, 4),
+			Vec2(4, 2),
+			Vec2(4, -2),
+			Vec2(2, -4),
+			Vec2(-2, -4),
+			Vec2(-4, -2),
+			Vec2(-4, 2),
+			Vec2(-2, 4),
+		};
+		static const Poly bounceModel = {
+			Vec2(3, 6),
+			Vec2(6, 3),
+			Vec2(6, -3),
+			Vec2(3, -6),
+			Vec2(-3, -6),
+			Vec2(-6, -3),
+			Vec2(-6, 3),
+			Vec2(-3, 6),
+		};
+		return bounce ? bounceModel : model;
+	}
+};
+
 
 
 class CannonGuy : public BadGuy {
@@ -40,34 +191,38 @@ public:
 		angle = ang;
 		cannonAngle = ang + randFloat(-90, 90);
 		setRotation(angle);
+		tick = randInt(100, 200);
 	}
 
-
-	int tick = 0;
 	virtual bool update() {
 		move(0, walls.getSpeed());
+		updateCollisionPoly();
 
-		if (walls.look(getPosition(), player.getPosition())) {
-			Vec2 diff = player.getPosition() - getPosition();
-			float a = atan2(diff.y, diff.x) * 180 / M_PI + 90;
-			float d = fmodf(a - cannonAngle + 540, 360) - 180;
-			if (d > 0) cannonAngle += 1;
-			if (d < 0) cannonAngle -= 1;
+		Vec2 diff = player.getPosition() - getPosition();
+		float ang = atan2(diff.x, -diff.y) * 180 / M_PI;
 
+		float angDiff = fmodf(angle - ang + 540, 360) - 180;
 
-			if (tick <= 0) {
-				tick = 100;
-				Vec2 dir = { sinf(cannonAngle * M_PI / 180), -cosf(cannonAngle * M_PI / 180)};
-				makeBullet(getPosition(), dir * randFloat(3, 4));
+		if (angDiff >= -100 && angDiff <= 100 && tick < 50 &&
+			walls.look(getPosition(), player.getPosition())) {
 
+			float speed = 1;
+			float d = fmodf(cannonAngle - ang + 540, 360) - 180;
+			if (d > speed) cannonAngle -= speed;
+			else if (d < -speed) cannonAngle += speed;
+			else {
+				cannonAngle -= d;
+				if (tick == 0) {
+					tick = randInt(100, 150);
+					diff = normalized(diff);
+					makeBullet<Bullet>(getPosition() + diff * 16.0f, diff * 5.0f);
+				}
 			}
-			else tick--;
 		}
-		else tick = 0;
+		if (tick > 0) tick--;
 
 
 		if (getPosition().y > 648) return false;
-		updateCollisionPoly();
 		return checkCollisionWithLaser();
 	}
 
@@ -79,16 +234,15 @@ public:
 		setRotation(angle);
 		setFrame(0);
 		win.draw(*this);
-
-//		drawPoly(win, poly);
 	}
 
 private:
 	float angle;
 	float cannonAngle;
+	int tick;
 
 
-	virtual const Poly& getCollisionModel() {
+	virtual const Poly& getCollisionModel() const {
 		static const Poly model = {
 			Vec2(4, 4),
 			Vec2(4, 0),
@@ -108,21 +262,35 @@ vector<Star> stars;
 
 
 void update() {
-	for (auto& star: stars) star.update();
-	updateList(particles);
-
+	// spawn bad guys
 	static int i = 0;
-	if (!(i++ % 100)) {
+
+	i += randInt(1, 3);
+
+	if (i > 300) {
+		i = 0;
 
 		Vec2 pos;
 		float ang;
-		if (walls.findCannonGuyLocation(pos, ang)) {
+		if (walls.findFreeWallSpot(pos, ang)) {
 			makeBadGuy<CannonGuy>(pos, ang);
 		}
 
+
+		if (walls.findFreeSpot(pos)) {
+			makeBadGuy<SquareGuy>(pos);
+		}
+
+		if (walls.findFreeSpot(pos)) {
+			makeBadGuy<RingGuy>(pos);
+		}
 	}
 
+
+
+	for (auto& star: stars) star.update();
 	walls.update();
+	updateList(particles);
 	updateList(lasers);
 	updateList(bullets);
 	player.update();
@@ -180,22 +348,18 @@ int main(int argc, char** argv) {
 			case sf::Event::Closed:
 				window.close();
 				break;
-
 			case sf::Event::KeyPressed:
 				if (e.key.code == sf::Keyboard::Escape) window.close();
 				break;
-
 			default:
 				break;
 			}
-
 		}
 		update();
 		window.clear();
 		draw(window);
 		window.display();
 	}
-
 	return 0;
 }
 

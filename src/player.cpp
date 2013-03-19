@@ -44,7 +44,7 @@ bool Laser::update() {
 }
 
 
-const Poly& Laser::getCollisionModel() {
+const Poly& Laser::getCollisionModel() const {
 	static const Poly model = {
 		Vec2(1, 5),
 		Vec2(1, -3),
@@ -59,7 +59,7 @@ const Poly& Laser::getCollisionModel() {
 
 
 
-const Poly& Player::getCollisionModel() {
+const Poly& Player::getCollisionModel() const {
 	static const Poly model = {
 		Vec2(4, 4),
 		Vec2(4, 0),
@@ -90,6 +90,21 @@ bool Player::checkCollisionWithBullets() {
 	}
 	return true;
 }
+
+
+bool Player::checkCollisionWithBadGuys() {
+	Vec2 normal, pos;
+	for (auto& guy : badGuys) {
+		if (::checkCollision(poly, guy->getCollisionPoly(), &normal, &pos) > 0) {
+			makeParticle<Hit>(pos);
+			guy->takeHit(1);
+			makeParticle<Explosion>(getPosition());
+			return false;
+		}
+	}
+	return true;
+}
+
 
 
 bool Player::update() {
@@ -136,5 +151,8 @@ bool Player::update() {
 	tick %= 8;
 	setFrame(tick > 3);
 
-	return checkCollisionWithBullets();
+	checkCollisionWithBullets();
+	checkCollisionWithBadGuys();
+
+	return true;
 }

@@ -1,4 +1,3 @@
-
 class Object : public sf::Sprite {
 public:
 	Object() {};
@@ -21,10 +20,10 @@ public:
 		win.draw(*this);
 //		drawPoly(win, poly);
 	};
-	const Poly& getCollisionPoly() { return poly; }
+	const Poly& getCollisionPoly() const { return poly; }
 
 protected:
-	virtual const Poly& getCollisionModel() {
+	virtual const Poly& getCollisionModel() const {
 		static const Poly model;
 		return model;
 	}

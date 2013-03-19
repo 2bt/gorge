@@ -61,7 +61,30 @@ void Walls::draw(sf::RenderWindow& win) {
 }
 
 
-bool Walls::findCannonGuyLocation(Vec2& pos, float& ang) {
+
+bool Walls::findFreeSpot(Vec2& pos) {
+
+	vector<Vec2> locs;
+	for (int x = 1; x < width - 1; x++) {
+		Vec2 pos = Vec2((x - 0.5) * 32, (19.5 - 22) * 32 + offset);
+		if (getTile(22, x) == 0 &&
+			getTile(21, x - 1) == 0 &&
+			getTile(21, x + 0) == 0 &&
+			getTile(21, x + 1) == 0) {
+			locs.push_back(pos);
+		}
+	}
+
+	if (!locs.empty()) {
+		pos = locs[randInt(0, locs.size() - 1)];
+		return true;
+	}
+	return false;
+}
+
+
+
+bool Walls::findFreeWallSpot(Vec2& pos, float& ang) {
 	struct Location { Vec2 pos; float ang; };
 	vector<Location> locs;
 
@@ -101,7 +124,7 @@ float Walls::checkCollision(const Poly& poly, Vec2* pnormal, Vec2* pwhere) {
 	Vec2 where;
 	Poly v;
 	float distance = 0;
-	for (int y = 0; y < 22; y++) {
+	for (int y = 0; y < 24; y++) {
 		for (int x = 0; x < width; x++) {
 			const Poly& p = tileData[tiles[y * width + x]];
 			v.resize(p.size());

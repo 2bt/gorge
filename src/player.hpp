@@ -5,10 +5,11 @@ public:
 	Laser(Vec2 pos);
 	virtual bool update();
 	void die() { alive = false; }
+	int getDamage() { return 1; }
 private:
 	Vec2 vel;
 	bool alive = true;
-	virtual const Poly& getCollisionModel();
+	virtual const Poly& getCollisionModel() const;
 };
 
 
@@ -24,7 +25,8 @@ public:
 
 private:
 	bool checkCollisionWithBullets();
-	virtual const Poly& getCollisionModel();
+	bool checkCollisionWithBadGuys();
+	virtual const Poly& getCollisionModel() const;
 
 	int tick = 0;
 	int shootDelay;

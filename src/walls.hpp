@@ -5,7 +5,8 @@ public:
 	void update();
 	void draw(sf::RenderWindow& win);
 	float checkCollision(const Poly& poly, Vec2* pnormal=nullptr, Vec2* pwhere=nullptr);
-	bool findCannonGuyLocation(Vec2& pos, float& ang);
+	bool findFreeWallSpot(Vec2& pos, float& ang);
+	bool findFreeSpot(Vec2& pos);
 
 
 	bool look(Vec2 src, Vec2 dst) {
