@@ -121,7 +121,7 @@ public:
 		init("media/square.png");
 		setPosition(pos);
 		vel = normalized(Vec2(randFloat(-1, 1), 1)) * speed;
-		tick = randInt(0, 150);
+		tick = randInt(0, 100);
 	}
 
 	virtual bool update() {
@@ -140,15 +140,13 @@ public:
 
 		Vec2 pos = getPosition();
 
-		if (tick > 155 || walls.look(pos, player.getPosition())) {
-			tick = (tick + 1) % 180;
-		}
-
-		if (tick == 155 || tick == 163 || tick == 171) {
+		if (tick >= 170 || walls.look(pos, player.getPosition())) tick++;
+		if (tick == 170 || tick == 180 || tick == 190) {
 			Vec2 diff = player.getPosition() - pos;
 			float ang = atan2(diff.x, diff.y) + randFloat(-0.1, 0.1);
 			diff = Vec2(sin(ang), cos(ang));
-			makeBullet<RapidBullet>(pos, diff * randFloat(4.5, 5));
+			makeBullet<RapidBullet>(pos, diff * randFloat(4.2, 4.6));
+			if (tick == 190) tick = 0;
 		}
 
 		setFrame(frame / 4);
@@ -164,7 +162,7 @@ private:
 	int tick;
 	Vec2 vel;
 	bool bounce;
-	const float speed = 1.2;
+	const float speed = 1.3;
 
 	virtual const Poly& getCollisionModel() const {
 		static const Poly model = {
