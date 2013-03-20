@@ -434,24 +434,25 @@ void update() {
 
 
 float quakeAmp = 0;
-void triggerQuake() { quakeAmp += 5; }
+void triggerQuake() {
+	quakeAmp += 5;
+	quakeAmp = min(quakeAmp, 10.0f);
+}
+
 
 void draw(sf::RenderWindow& win) {
-
+/*
 	sf::View view = win.getDefaultView();
 	view.zoom(2);
 	view.move(0, -220);
-//	win.setView(view);
+	win.setView(view);
+*/
 
-
-	{
-		quakeAmp *= 0.93;
-		float ang = randFloat(0, 2 * M_PI);
-		sf::View view = win.getDefaultView();
-		view.move(int(sin(ang) * quakeAmp), int(cos(ang) * quakeAmp));
-		win.setView(view);
-	}
-
+	quakeAmp *= 0.93;
+	float ang = randFloat(0, 2 * M_PI);
+	sf::View view = win.getDefaultView();
+	view.move(int(sin(ang) * quakeAmp), int(cos(ang) * quakeAmp));
+	win.setView(view);
 
 	for (auto& star : stars) star.draw(win);
 	for (auto& laser : lasers) laser->draw(win);
@@ -460,8 +461,6 @@ void draw(sf::RenderWindow& win) {
 	player.draw(win);
 	walls.draw(win);
 	for (auto& particle : particles) particle->draw(win);
-
-
 
 //	drawPoly(win, {{-1,-1}, {801, -1}, {801, 601}, {-1, 601}});
 }
