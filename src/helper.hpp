@@ -1,13 +1,10 @@
 using Vec2 = sf::Vector2f;
 using Poly = std::vector<Vec2>;
 
-inline Vec2 normalized(Vec2 v) {
-	float len = sqrtf(v.x * v.x + v.y * v.y);
-	v /= len;
-	return v;
-}
 
 inline float dot(Vec2 a, Vec2 b) { return a.x * b.x + a.y * b.y; }
+inline float length(Vec2 v) { return sqrt(dot(v, v)); }
+inline Vec2 normalized(Vec2 v) { return v / length(v); }
 
 inline int randInt(int min, int max) {
 	return min + rand() % (max - min + 1);

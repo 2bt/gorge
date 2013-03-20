@@ -28,6 +28,117 @@ forward_list<unique_ptr<Bullet>> bullets;
 
 
 
+class QueueGuy : public BadGuy {
+public:
+	QueueGuy(Vec2 pos) : BadGuy(1) {
+		init("media/queue.png");
+		setPosition(pos);
+
+		vel = Vec2(randFloat(-1, 1), 1);
+		side = randInt(0, 1) ? 1 : -1;
+	}
+
+	virtual bool update() {
+
+		move(0, walls.getSpeed());
+		move(vel);
+
+
+		updateCollisionPoly();
+		Vec2 normal;
+		float distance = walls.checkCollision(poly, &normal);
+		if (distance > 0) {
+			move(normal * -distance);
+			updateCollisionPoly();
+			// bounce of walls
+			vel -= 2.0f * normal * dot(vel, normal);
+		}
+
+		// find leader
+		QueueGuy* leader = nullptr;
+		float squareDist = 10000;
+		for (unique_ptr<BadGuy>& guy : badGuys) {
+			QueueGuy* queue = dynamic_cast<QueueGuy*>(&*guy);
+			if (queue && queue != this) {
+				Vec2 diff = queue->getPosition() - getPosition();
+				Vec2 dir = normalized(diff);
+				if (dot(normalized(vel), dir) > 0.1 && dot(vel, queue->vel) > 0.5) {
+					float d = dot(diff, diff);
+					if (d < squareDist) {
+						squareDist = d;
+						leader = queue;
+					}
+				}
+			}
+		}
+
+		if (randInt(0, 100) == 0) side = -side;
+
+		if (leader) { // follow
+			Vec2 dst = leader->getPosition() - normalized(leader->vel) * 50.0f;
+			Vec2 dir = dst - getPosition();
+
+			Vec2 a = dir * 0.01f + (leader->vel - vel) * 0.2f;
+			if (length(a) > 0.1f) a *= 0.1f / length(a);
+			vel += a;
+		}
+		else { // lead
+
+			Vec2 dir = normalized(vel);
+			Vec2 per(dir.y, -dir.x);
+
+			Poly sensor = { getPosition(),
+				getPosition() + dir * 60.0f - per * 30.0f,
+				getPosition() + dir * 60.0f + per * 30.0f,
+			};
+			distance = walls.checkCollision(sensor);
+			float dodge = (distance > 0) ? 0.05 : -0.01;
+			dodge *= side;
+			float ss = sin(dodge);
+			float cc = cos(dodge);
+			vel = Vec2(
+				vel.x * cc - vel.y * ss,
+				vel.x * ss + vel.y * cc
+			);
+
+			float v = length(vel);
+			if (v < 2.2) vel += dir * 0.05f;
+
+
+		}
+		float v = length(vel);
+		if (v > 3) vel *= 3 / v;
+
+
+		setRotation(atan2(-vel.x, vel.y) * 180 / M_PI);
+
+		setFrame(frame / 4);
+		if (++frame >= frameCount * 4) frame = 0;
+
+		Vec2 pos = getPosition();
+		if (pos.x < -50 || pos.x > 850) return false;
+		if (pos.y < -200 || pos.y > 650) return false;
+		return checkCollisionWithLaser();
+	}
+
+private:
+	const float speed = 2;
+	int frame = 0;
+	int side;
+	Vec2 vel;
+
+	virtual const Poly& getCollisionModel() const {
+		static const Poly model = {
+			Vec2(3, 4),
+			Vec2(3, -4),
+			Vec2(-3, -4),
+			Vec2(-3, 4),
+		};
+		return model;
+	}
+};
+
+
 class RingGuy : public BadGuy {
 public:
 	RingGuy(Vec2 pos) : BadGuy(1) {
@@ -162,7 +273,7 @@ private:
 	int tick;
 	Vec2 vel;
 	bool bounce;
-	const float speed = 1.3;
+	const float speed = 1.1;
 
 	virtual const Poly& getCollisionModel() const {
 		static const Poly model = {
@@ -270,27 +381,31 @@ vector<Star> stars;
 
 
 void update() {
-	// spawn bad guys
+
+	// spawn bad guys here
+	Vec2 pos;
+	float ang;
+
 	static int i = 0;
+	i++;;
+	i %= 400;
+	if (i == 0) {
 
-	i += randInt(1, 3);
+		if (walls.findFreeWallSpot(pos, ang)) makeBadGuy<CannonGuy>(pos, ang);
+		if (walls.findFreeSpot(pos)) makeBadGuy<SquareGuy>(pos);
+		if (walls.findFreeSpot(pos)) makeBadGuy<RingGuy>(pos);
 
-	if (i > 300) {
-		i = 0;
-
-		Vec2 pos;
-		float ang;
-		if (walls.findFreeWallSpot(pos, ang)) {
-			makeBadGuy<CannonGuy>(pos, ang);
-		}
-
-
-		if (walls.findFreeSpot(pos)) {
-			makeBadGuy<SquareGuy>(pos);
-		}
+	}
+	if (i == 100) {
+		if (walls.findFreeSpot(pos)) makeBadGuy<RingGuy>(pos);
+		if (walls.findFreeSpot(pos)) makeBadGuy<RingGuy>(pos);
+	}
+	if (i == 200) {
 
 		if (walls.findFreeSpot(pos)) {
-			makeBadGuy<RingGuy>(pos);
+			makeBadGuy<QueueGuy>(pos);
+			makeBadGuy<QueueGuy>(pos - Vec2(0, 50));
+			makeBadGuy<QueueGuy>(pos - Vec2(0, 100));
 		}
 	}
 
@@ -311,7 +426,7 @@ void draw(sf::RenderWindow& win) {
 	sf::View view = win.getDefaultView();
 	view.zoom(2);
 	view.move(0, -220);
-//	win.setView(view);
+	win.setView(view);
 
 
 
@@ -320,12 +435,8 @@ void draw(sf::RenderWindow& win) {
 	for (auto& bullet : bullets) bullet->draw(win);
 	for (auto& guy : badGuys) guy->draw(win);
 	player.draw(win);
-
 	walls.draw(win);
-
 	for (auto& particle : particles) particle->draw(win);
-
-
 
 
 

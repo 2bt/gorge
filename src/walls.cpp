@@ -47,8 +47,8 @@ void Walls::update() {
 }
 
 void Walls::draw(sf::RenderWindow& win) {
-	for (int y = 0; y < 22; y++) {
-//	for (int y = 0; y < height; y++) {
+//	for (int y = 0; y < 22; y++) {
+	for (int y = 0; y < height; y++) {
 
 		for (int x = 0; x < width; x++) {
 			int t =  tiles[y * width + x];
@@ -69,6 +69,7 @@ bool Walls::findFreeSpot(Vec2& pos) {
 		Vec2 pos = Vec2((x - 0.5) * 32, (19.5 - 22) * 32 + offset);
 		if (getTile(22, x) == 0 &&
 			getTile(21, x - 1) == 0 &&
+			getTile(23, x) == 0 &&
 			getTile(21, x + 0) == 0 &&
 			getTile(21, x + 1) == 0) {
 			locs.push_back(pos);
