@@ -31,12 +31,15 @@ class Particle : public Object { };
 extern std::forward_list<std::unique_ptr<Particle>> particles;
 
 
+
+void triggerQuake();
 class Explosion : public Particle {
 public:
 	Explosion(Vec2 pos) {
 		init("media/explosion.png");
 		setColor(sf::Color(255, 255, 100));
 		setPosition(pos);
+		triggerQuake();
 	}
 	virtual bool update() {
 		tick++;
