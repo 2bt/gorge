@@ -445,7 +445,7 @@ void draw(sf::RenderWindow& win) {
 
 
 	{
-		quakeAmp *= 0.95;
+		quakeAmp *= 0.93;
 		float ang = randFloat(0, 2 * M_PI);
 		sf::View view = win.getDefaultView();
 		view.move(int(sin(ang) * quakeAmp), int(cos(ang) * quakeAmp));
