@@ -36,6 +36,8 @@ public:
 
 		vel = Vec2(randFloat(-1, 1), 1);
 		side = randInt(0, 1) ? 1 : -1;
+
+		tick = randInt(0, 90);
 	}
 
 	virtual bool update() {
@@ -62,7 +64,7 @@ public:
 			if (queue && queue != this) {
 				Vec2 diff = queue->getPosition() - getPosition();
 				Vec2 dir = normalized(diff);
-				if (dot(normalized(vel), dir) > 0.1 && dot(vel, queue->vel) > 0.5) {
+				if (dot(normalized(vel), dir) > 0.1 && dot(vel, queue->vel) > 0.1) {
 					float d = dot(diff, diff);
 					if (d < squareDist) {
 						squareDist = d;
@@ -77,7 +79,6 @@ public:
 		if (leader) { // follow
 			Vec2 dst = leader->getPosition() - normalized(leader->vel) * 50.0f;
 			Vec2 dir = dst - getPosition();
-
 			Vec2 a = dir * 0.01f + (leader->vel - vel) * 0.2f;
 			if (length(a) > 0.1f) a *= 0.1f / length(a);
 			vel += a;
@@ -107,10 +108,19 @@ public:
 
 		}
 		float v = length(vel);
-		if (v > 3) vel *= 3 / v;
-
+		if (v > 2.8) vel *= 2.8f / v;
 
 		setRotation(atan2(-vel.x, vel.y) * 180 / M_PI);
+
+
+		tick += randInt(0, 1);
+		if (tick >= 100 && walls.look(getPosition(), player.getPosition())) {
+			tick = randInt(0, 50);
+			Vec2 dir = normalized(player.getPosition() - getPosition());
+			makeBullet<Bullet>(getPosition(), dir * randFloat(3.5, 4));
+		}
+
+
 
 		setFrame(frame / 4);
 		if (++frame >= frameCount * 4) frame = 0;
@@ -125,6 +135,7 @@ private:
 	const float speed = 2;
 	int frame = 0;
 	int side;
+	int tick;
 	Vec2 vel;
 
 	virtual const Poly& getCollisionModel() const {
@@ -426,7 +437,7 @@ void draw(sf::RenderWindow& win) {
 	sf::View view = win.getDefaultView();
 	view.zoom(2);
 	view.move(0, -220);
-	win.setView(view);
+//	win.setView(view);
 
 
 
