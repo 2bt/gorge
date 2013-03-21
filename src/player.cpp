@@ -146,7 +146,7 @@ bool Player::update() {
 		}
 		else shootDelay--;
 	}
-	else shootDelay = 0;
+	else if (shootDelay > 0) shootDelay--;
 
 
 	tick++;
