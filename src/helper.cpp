@@ -123,7 +123,7 @@ sf::Sound& playSound(const string& filename, Vec2 pos) {
 	sounds.emplace_front(loadSoundBuffer(filename));
 	sf::Sound& sound = sounds.front();
 	sound.setPosition(pos.x, pos.y, 0);
-	sound.setAttenuation(0.01);
+	sound.setAttenuation(0.005);
 	sound.play();
 
 	return sound;
