@@ -118,8 +118,11 @@ public:
 			tick += randInt(1, 2);
 			if (tick >= 300 && !walls.shootAt(getPosition(), player.getPosition())) {
 				tick = randInt(0, 100);
-				Vec2 dir = normalized(player.getPosition() - getPosition());
-				makeBullet<Bullet>(getPosition(), dir * randFloat(3.7, 4));
+
+				Vec2 diff = player.getPosition() - pos;
+				float ang = atan2(diff.x, diff.y) + randFloat(-0.1, 0.1);
+				Vec2 dir = Vec2(sin(ang), cos(ang));
+				makeBullet<Bullet>(pos, dir * randFloat(3.7, 4));
 			}
 
 		}
@@ -311,9 +314,9 @@ public:
 		if (tick >= 170 || !walls.shootAt(pos, player.getPosition())) tick++;
 		if (tick == 170 || tick == 180 || tick == 190) {
 			Vec2 diff = player.getPosition() - pos;
-			float ang = atan2(diff.x, diff.y) + randFloat(-0.1, 0.1);
-			diff = Vec2(sin(ang), cos(ang));
-			makeBullet<RapidBullet>(pos, diff * randFloat(4.2, 4.6));
+			float ang = atan2(diff.x, diff.y) + randFloat(-0.2, 0.2);
+			Vec2 dir = Vec2(sin(ang), cos(ang));
+			makeBullet<RapidBullet>(pos, dir * randFloat(4.2, 4.6));
 			if (tick == 190) tick = 0;
 		}
 

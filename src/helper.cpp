@@ -51,7 +51,7 @@ float checkCollision(const Poly& a, const Poly& b, Vec2* pnormal, Vec2* pwhere) 
 		const Poly* pa = m ? &a : &b;
 		const Poly* pb = m ? &b : &a;
 
-		Vec2 p1 = (*pa)[pa->size() - 1];
+		Vec2 p1 = pa->back();
 		for (Vec2 p2: *pa) {
 			float c_d = 0;
 			Vec2 c_n;

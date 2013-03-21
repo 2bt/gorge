@@ -140,7 +140,7 @@ bool Walls::shootAt(Vec2 src, Vec2 dst, float* interpolation) {
 							(v.y + 19 - y) * 32 + offset);
 			};
 
-			Vec2 a = transform(p[p.size() - 1]);
+			Vec2 a = transform(p.back());
 			for (Vec2 b : p) {
 				b = transform(b);
 
