@@ -97,7 +97,7 @@ bool Player::checkCollisionWithBadGuys() {
 			makeParticle<Hit>(pos);
 			guy->takeHit(1);
 			makeParticle<Explosion>(getPosition());
-			move(normal * (distance + 25.0f));
+			move(normal * (distance + 15.0f));
 			return false;
 		}
 	}
