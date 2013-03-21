@@ -5,10 +5,6 @@
 #include <vector>
 #include <forward_list>
 
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
 #include "helper.hpp"
 #include "object.hpp"
 #include "walls.hpp"
@@ -25,7 +21,8 @@ using namespace std;
 Laser::Laser(Vec2 pos) {
 	init("media/laser.png");
 	setPosition(pos);
-	vel = {0, -16};
+	vel = Vec2(0, -16);
+	playSound("media/laser.wav", pos);
 }
 
 
@@ -141,7 +138,7 @@ bool Player::update() {
 
 	if (shoot) {
 		if (shootDelay == 0) {
-			lasers.push_front(std::unique_ptr<Laser>(new Laser(pos + Vec2(0, -10))));
+			lasers.emplace_front(std::unique_ptr<Laser>(new Laser(pos + Vec2(0, -10))));
 			shootDelay = 15;
 		}
 		else shootDelay--;
@@ -155,6 +152,8 @@ bool Player::update() {
 
 	checkCollisionWithBullets();
 	checkCollisionWithBadGuys();
+
+
 
 	return true;
 }

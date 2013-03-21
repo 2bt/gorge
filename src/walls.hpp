@@ -1,4 +1,3 @@
-
 class Walls {
 public:
 	void init();
@@ -16,12 +15,8 @@ public:
 				x < 0 || x >= width ? 1 :
 				tiles[y * width + x];
 	}
-	int& tileAt(int y, int x) {
-		return tiles[y * width + x];
-	}
-	float getSpeed() const {
-		return 1.25;
-	}
+	int& tileAt(int y, int x) { return tiles[y * width + x]; }
+	float getSpeed() const { return 1.25; }
 
 
 	const int width = 27;

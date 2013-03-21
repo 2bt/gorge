@@ -1,5 +1,3 @@
-
-
 class Laser : public Object {
 public:
 	Laser(Vec2 pos);

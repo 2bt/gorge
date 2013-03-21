@@ -1,3 +1,8 @@
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+
 extern sf::RenderWindow window;
 
 using Vec2 = sf::Vector2f;
@@ -38,3 +43,5 @@ void updateList(std::forward_list<std::unique_ptr<T>>& list) {
 
 sf::Texture& loadTexture(const std::string& filename);
 
+sf::Sound& playSound(const std::string& filename, Vec2 pos);
+void updateSounds();

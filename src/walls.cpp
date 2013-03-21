@@ -5,14 +5,12 @@
 #include <vector>
 #include <forward_list>
 
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
 #include "helper.hpp"
 #include "walls.hpp"
 
 using namespace std;
+
+
 static const vector<Poly> tileData = {
 	{ },
 	{ Vec2(0, 0), Vec2(0, 1), Vec2(1, 1), Vec2(1, 0) },
@@ -21,6 +19,7 @@ static const vector<Poly> tileData = {
 	{ Vec2(0, 0), Vec2(0, 1), Vec2(1, 1) },
 	{ Vec2(0, 0), Vec2(0, 1), Vec2(1, 0) },
 };
+
 
 void Walls::init() {
 
@@ -37,6 +36,7 @@ void Walls::init() {
 	for (int i = 0; i < 20; i++) generate();
 }
 
+
 void Walls::update() {
 	offset += getSpeed();
 	while (offset >= 32) {
@@ -46,12 +46,14 @@ void Walls::update() {
 	}
 }
 
+
 void Walls::draw() {
 //	for (int y = 0; y < 22; y++) {
 	for (int y = 0; y < height; y++) {
 
 		for (int x = 0; x < width; x++) {
-			int t =  tiles[y * width + x];
+			int t =  getTile(y, x);
+			if (t <= 0) continue;
 			tileSprite.setTextureRect(sf::IntRect(t * 8, 0, 8, 8));
 			tileSprite.setPosition((x - 1) * 32, (19 - y) * 32 + offset);
 			window.draw(tileSprite);
@@ -61,36 +63,32 @@ void Walls::draw() {
 }
 
 
-
 bool Walls::findFreeSpot(Vec2& pos) {
-
-	vector<Vec2> locs;
+	vector<int> list;
 	for (int x = 1; x < width - 1; x++) {
-		Vec2 pos = Vec2((x - 0.5) * 32, (19.5 - 22) * 32 + offset);
 		if (getTile(22, x) == 0 &&
 			getTile(21, x - 1) == 0 &&
 			getTile(23, x) == 0 &&
 			getTile(21, x + 0) == 0 &&
 			getTile(21, x + 1) == 0) {
-			locs.push_back(pos);
+			list.push_back(x);
 		}
 	}
 
-	if (!locs.empty()) {
-		pos = locs[randInt(0, locs.size() - 1)];
+	if (!list.empty()) {
+		int x = list[randInt(0, list.size() - 1)];
+		pos = Vec2((x - 0.5) * 32, (19.5 - 22) * 32 + offset);
 		return true;
 	}
 	return false;
 }
 
 
-
 bool Walls::findFreeWallSpot(Vec2& pos, float& ang) {
-	struct Location { Vec2 pos; float ang; };
-	vector<Location> locs;
+	struct Location { int x; float ang; };
+	vector<Location> list;
 
 	for (int x = 1; x < width - 1; x++) {
-		Vec2 pos = Vec2((x - 0.5) * 32, (19.5 - 22) * 32 + offset);
 		if (getTile(22, x) == 0) {
 
 			const std::vector<int> nb = {
@@ -103,22 +101,20 @@ bool Walls::findFreeWallSpot(Vec2& pos, float& ang) {
 				count(nb.begin(), nb.end(), 0) == 3) {
 				float a = vector<float>{180, 270, 0, 90}
 					[find(nb.begin(), nb.end(), 1) - nb.begin()];
-				locs.push_back({ pos, a });
+				list.push_back({ x, a });
 			}
 
 		}
 	}
 
-	if (!locs.empty()) {
-		Location& loc = locs[randInt(0, locs.size() - 1)];
-		pos = loc.pos;
-		ang = loc.ang;
+	if (!list.empty()) {
+		Location& l = list[randInt(0, list.size() - 1)];
+		pos = Vec2((l.x - 0.5) * 32, (19.5 - 22) * 32 + offset);
+		ang = l.ang;
 		return true;
 	}
 	return false;
 }
-
-
 
 
 /*
@@ -133,18 +129,15 @@ bool Walls::shootAt(Vec2 src, Vec2 dst, float* interpolation) {
 	// very naive
 	bool found = false;
 	float inter = 0;
-
 	for (int y = 0; y < 24; y++) {
 		for (int x = 0; x < width; x++) {
-			const Poly& p = tileData[tiles[y * width + x]];
-			if (p.empty()) continue;
-
+			int t = getTile(y, x);
+			if (t <= 0) continue;
+			const Poly& p = tileData[t];
 
 			auto transform = [&](Vec2 v)->Vec2 {
-				return Vec2(
-					(v.x + x - 1) * 32,
-					(v.y + 19 - y) * 32 + offset
-				);
+				return Vec2((v.x + x - 1) * 32,
+							(v.y + 19 - y) * 32 + offset);
 			};
 
 			Vec2 a = transform(p[p.size() - 1]);
@@ -162,11 +155,9 @@ bool Walls::shootAt(Vec2 src, Vec2 dst, float* interpolation) {
 			}
 		}
 	}
-
 	if (interpolation) *interpolation = inter;
 	return found;
 }
-
 
 
 float Walls::checkCollision(const Poly& poly, Vec2* pnormal, Vec2* pwhere) {
@@ -177,7 +168,9 @@ float Walls::checkCollision(const Poly& poly, Vec2* pnormal, Vec2* pwhere) {
 	float distance = 0;
 	for (int y = 0; y < 24; y++) {
 		for (int x = 0; x < width; x++) {
-			const Poly& p = tileData[tiles[y * width + x]];
+			int t = getTile(y, x);
+			if (t <= 0) continue;
+			const Poly& p = tileData[t];
 			v.resize(p.size());
 			for (size_t i = 0; i < p.size(); i++) {
 				v[i].x = (p[i].x + x - 1) * 32;
@@ -197,7 +190,6 @@ float Walls::checkCollision(const Poly& poly, Vec2* pnormal, Vec2* pwhere) {
 	if (pwhere) *pwhere = where;
 	return distance;
 }
-
 
 
 void Walls::generate() {
@@ -237,5 +229,3 @@ void Walls::generate() {
 		}
 	}
 }
-
-

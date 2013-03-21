@@ -4,6 +4,7 @@ public:
 		init("media/bullet.png");
 		setPosition(pos);
 		vel = velocity;
+		playSound("media/bullet.wav", pos);
 	}
 
 	virtual bool update() {
@@ -43,7 +44,7 @@ extern std::forward_list<std::unique_ptr<Bullet>> bullets;
 
 template<typename T, typename... Args>
 void makeBullet(Args&&... args) {
-	bullets.push_front(std::unique_ptr<Bullet>(new T(args...)));
+	bullets.emplace_front(std::unique_ptr<Bullet>(new T(args...)));
 }
 
 
@@ -85,5 +86,5 @@ extern std::forward_list<std::unique_ptr<BadGuy>> badGuys;
 
 template<typename T, typename... Args>
 void makeBadGuy(Args&&... args) {
-	badGuys.push_front(std::unique_ptr<BadGuy>(new T(args...)));
+	badGuys.emplace_front(std::unique_ptr<BadGuy>(new T(args...)));
 }

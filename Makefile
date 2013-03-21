@@ -1,4 +1,4 @@
-LIB = -lsfml-graphics -lsfml-window -lsfml-system
+LIB = -lsfml-audio -lsfml-graphics -lsfml-window -lsfml-system
 SRC = $(wildcard src/*.cpp)
 OBJ = $(SRC:src/%.cpp=obj/%.o)
 TARGET = gorge

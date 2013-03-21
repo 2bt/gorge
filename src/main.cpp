@@ -6,10 +6,6 @@
 #include <vector>
 #include <forward_list>
 
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
 #include "helper.hpp"
 #include "object.hpp"
 #include "walls.hpp"
@@ -49,6 +45,7 @@ public:
 
 	}
 } font;
+
 
 
 
@@ -263,6 +260,7 @@ private:
 };
 
 
+
 class RapidBullet : public Bullet {
 public:
 	RapidBullet(Vec2 pos, Vec2 velocity) {
@@ -270,6 +268,7 @@ public:
 		setPosition(pos);
 		vel = velocity;
 		rotate(atan2(vel.x, -vel.y + walls.getSpeed()) * 180 / M_PI);
+		playSound("media/rapid.wav", pos);
 	}
 protected:
 	virtual const Poly& getCollisionModel() const {
@@ -485,6 +484,8 @@ void update() {
 	updateList(bullets);
 	player.update();
 	updateList(badGuys);
+
+	updateSounds();
 }
 
 
@@ -542,6 +543,9 @@ int main(int argc, char** argv) {
 							sf::Style::Titlebar || sf::Style::Close);
 	window.setFramerateLimit(60);
 	window.setMouseCursorVisible(false);
+
+	sf::Listener::setPosition(400, 300, -400);
+
 	font.init();
 
 

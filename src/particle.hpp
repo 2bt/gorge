@@ -40,6 +40,7 @@ public:
 		setColor(sf::Color(255, 255, 100));
 		setPosition(pos);
 		triggerQuake();
+		playSound("media/explosion.wav", pos).setPitch(randFloat(0.8, 1.3));
 	}
 	virtual bool update() {
 		tick++;
@@ -59,12 +60,13 @@ public:
 		init("media/hit.png");
 		setColor(sf::Color(255, 255, 100));
 		setPosition(pos);
+		playSound("media/hit.wav", pos);
 	}
 };
 
 
 template<typename T, typename... Args>
 void makeParticle(Args&&... args) {
-	particles.push_front(std::unique_ptr<Particle>(new T(args...)));
+	particles.emplace_front(std::unique_ptr<Particle>(new T(args...)));
 }
 

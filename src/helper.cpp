@@ -5,11 +5,8 @@
 #include <forward_list>
 #include <unordered_map>
 
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
 #include "helper.hpp"
+
 
 using namespace std;
 
@@ -85,7 +82,7 @@ float checkCollision(const Poly& a, const Poly& b, Vec2* pnormal, Vec2* pwhere) 
 	return distance;
 }
 
-
+/*
 sf::Texture& loadTexture(const string& filename) {
 	static unordered_map<string, sf::Texture> textures;
 
@@ -95,6 +92,53 @@ sf::Texture& loadTexture(const string& filename) {
 	}
 	return textures[filename];
 }
+*/
 
+
+template<class T>
+T& loadResource(const string& filename) {
+	static unordered_map<string, T> resources;
+	if (!resources.count(filename)) {
+		T& t = resources[filename];
+		t.loadFromFile(filename);
+	}
+	return resources[filename];
+}
+
+
+sf::Texture& loadTexture(const string& filename) {
+	return loadResource<sf::Texture>(filename);
+}
+
+
+
+static sf::SoundBuffer& loadSoundBuffer(const string& filename) {
+	return loadResource<sf::SoundBuffer>(filename);
+}
+
+static forward_list<sf::Sound> sounds;
+
+
+sf::Sound& playSound(const string& filename, Vec2 pos) {
+	sounds.emplace_front(loadSoundBuffer(filename));
+	sf::Sound& sound = sounds.front();
+	sound.setPosition(pos.x, pos.y, 0);
+	sound.setAttenuation(0.01);
+	sound.play();
+
+	return sound;
+}
+
+
+void updateSounds() {
+	auto prevIt = sounds.before_begin();
+	for (auto it = sounds.begin(); it != sounds.end(); it++) {
+		if (it->getStatus() == sf::Sound::Stopped) {
+			sounds.erase_after(prevIt);
+			it = prevIt;
+		}
+		else prevIt = it;
+	}
+}
 
 
