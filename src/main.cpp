@@ -20,17 +20,9 @@
 
 using namespace std;
 
-Walls walls;
-Player player;
-std::forward_list<unique_ptr<Particle>> particles;
-forward_list<unique_ptr<Laser>> lasers;
-forward_list<unique_ptr<BadGuy>> badGuys;
-forward_list<unique_ptr<Bullet>> bullets;
-
-
 sf::RenderWindow window;
 
-class Font : public sf::Sprite {
+class : public sf::Sprite {
 public:
 	void init() {
 		sf::Texture& tex = loadTexture("media/font.png");
@@ -56,11 +48,16 @@ public:
 		}
 
 	}
-};
+} font;
 
 
 
-Font font;
+Walls walls;
+Player player;
+std::forward_list<unique_ptr<Particle>> particles;
+forward_list<unique_ptr<Laser>> lasers;
+forward_list<unique_ptr<BadGuy>> badGuys;
+forward_list<unique_ptr<Bullet>> bullets;
 
 
 class QueueGuy : public BadGuy {
@@ -199,6 +196,7 @@ private:
 };
 
 
+
 class RingGuy : public BadGuy {
 public:
 	RingGuy(Vec2 pos) : BadGuy(1, 100) {
@@ -303,7 +301,7 @@ public:
 
 		Vec2 normal;
 		float distance = walls.checkCollision(poly, &normal);
-		if (distance > 0) vel -= normal * 0.1f;
+		if (distance > 0) vel -= normal * 0.06f;
 		else vel = normalized(vel) * speed;
 
 		bounce = false;
