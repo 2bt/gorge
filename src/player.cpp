@@ -77,11 +77,14 @@ void Player::init() {
 
 
 bool Player::checkCollisionWithBullets() {
+	Vec2 normal;
 	for (auto& bullet : bullets) {
-		if (::checkCollision(poly, bullet->getCollisionPoly()) > 0) {
+		float distance = ::checkCollision(poly, bullet->getCollisionPoly(), &normal);
+		if (distance > 0) {
 			makeParticle<Hit>(bullet->getPosition());
 			bullet->die();
 			makeParticle<Explosion>(getPosition());
+			move(normal * (distance + 5.0f));
 			return false;
 		}
 	}
