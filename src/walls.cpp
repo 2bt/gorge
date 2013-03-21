@@ -71,7 +71,7 @@ bool Walls::findFreeSpot(Vec2& pos) {
 			getTile(23, x) == 0 &&
 			getTile(21, x + 0) == 0 &&
 			getTile(21, x + 1) == 0) {
-			list.push_back(x);
+			list.emplace_back(x);
 		}
 	}
 
@@ -101,7 +101,7 @@ bool Walls::findFreeWallSpot(Vec2& pos, float& ang) {
 				count(nb.begin(), nb.end(), 0) == 3) {
 				float a = vector<float>{180, 270, 0, 90}
 					[find(nb.begin(), nb.end(), 1) - nb.begin()];
-				list.push_back({ x, a });
+				list.emplace_back(Location{x, a});
 			}
 
 		}
