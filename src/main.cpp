@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <stdarg.h>
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -27,17 +28,50 @@ forward_list<unique_ptr<BadGuy>> badGuys;
 forward_list<unique_ptr<Bullet>> bullets;
 
 
+sf::RenderWindow window;
+
+class Font : public sf::Sprite {
+public:
+	void init() {
+		sf::Texture& tex = loadTexture("media/font.png");
+		setTexture(tex);
+		setScale(2, 2);
+	}
+
+	void print(Vec2 pos, const char* text, ...) {
+
+		char line[256];
+		va_list args;
+		va_start(args, text);
+		vsnprintf(line, 256, text, args);
+		va_end(args);
+
+		setPosition(pos);
+		for (char c : line) {
+			if (c <= 0) break;
+
+			setTextureRect(sf::IntRect(c % 8 * 8, c / 8 * 8, 8, 8));
+			window.draw(*this);
+			move(16, 0);
+		}
+
+	}
+};
+
+
+
+Font font;
+
 
 class QueueGuy : public BadGuy {
 public:
-	QueueGuy(Vec2 pos) : BadGuy(1) {
+	QueueGuy(Vec2 pos) : BadGuy(1, 70) {
 		init("media/queue.png");
 		setPosition(pos);
 
 		vel = Vec2(randFloat(-1, 1), 1);
-		side = randInt(0, 1) ? 1 : -1;
 
-		tick = randInt(0, 90);
+		tick = randInt(0, 200);
 	}
 
 	virtual bool update() {
@@ -56,13 +90,15 @@ public:
 			vel -= 2.0f * normal * dot(vel, normal);
 		}
 
+		Vec2 pos = getPosition();
+
 		// find leader
 		QueueGuy* leader = nullptr;
 		float squareDist = 10000;
 		for (unique_ptr<BadGuy>& guy : badGuys) {
 			QueueGuy* queue = dynamic_cast<QueueGuy*>(&*guy);
 			if (queue && queue != this) {
-				Vec2 diff = queue->getPosition() - getPosition();
+				Vec2 diff = queue->getPosition() - pos;
 				Vec2 dir = normalized(diff);
 				if (dot(normalized(vel), dir) > 0.1 && dot(vel, queue->vel) > 0.1) {
 					float d = dot(diff, diff);
@@ -74,27 +110,46 @@ public:
 			}
 		}
 
-		if (randInt(0, 100) == 0) side = -side;
+
 
 		if (leader) { // follow
 			Vec2 dst = leader->getPosition() - normalized(leader->vel) * 50.0f;
-			Vec2 dir = dst - getPosition();
+			Vec2 dir = dst - pos;
 			Vec2 a = dir * 0.01f + (leader->vel - vel) * 0.2f;
 			if (length(a) > 0.1f) a *= 0.1f / length(a);
 			vel += a;
+
+
+			// shoot
+			tick += randInt(1, 2);
+			if (tick >= 300 && !walls.shootAt(getPosition(), player.getPosition())) {
+				tick = randInt(0, 100);
+				Vec2 dir = normalized(player.getPosition() - getPosition());
+				makeBullet<Bullet>(getPosition(), dir * randFloat(3.7, 4));
+			}
+
 		}
 		else { // lead
 
 			Vec2 dir = normalized(vel);
-			Vec2 per(dir.y, -dir.x);
+			Vec2 perp(dir.y, -dir.x);
 
-			Poly sensor = { getPosition(),
-				getPosition() + dir * 60.0f - per * 30.0f,
-				getPosition() + dir * 60.0f + per * 30.0f,
-			};
-			distance = walls.checkCollision(sensor);
-			float dodge = (distance > 0) ? 0.05 : -0.01;
-			dodge *= side;
+
+			if (--turnDelay <= 0) {
+				turn = randFloat(-1, 1) * 0.03;
+				turnDelay = randInt(30, 100);
+			}
+
+			float dodge = turn;
+			float i1, i2;
+			bool s1 = walls.shootAt(pos + perp * 10.0f, pos + dir * 60.0f + perp * 40.0f, &i1);
+			bool s2 = walls.shootAt(pos - perp * 10.0f, pos + dir * 60.0f - perp * 40.0f, &i2);
+			if (s1 || s2) {
+				dodge = (s1 < s2 || i1 < i2) ? -0.2 * (1 - i2) : 0.2 * (1 - i1);
+				vel *= 0.98f;
+			}
+
+
 			float ss = sin(dodge);
 			float cc = cos(dodge);
 			vel = Vec2(
@@ -113,19 +168,11 @@ public:
 		setRotation(atan2(-vel.x, vel.y) * 180 / M_PI);
 
 
-		tick += randInt(0, 1);
-		if (tick >= 100 && walls.look(getPosition(), player.getPosition())) {
-			tick = randInt(0, 50);
-			Vec2 dir = normalized(player.getPosition() - getPosition());
-			makeBullet<Bullet>(getPosition(), dir * randFloat(3.5, 4));
-		}
-
 
 
 		setFrame(frame / 4);
 		if (++frame >= frameCount * 4) frame = 0;
 
-		Vec2 pos = getPosition();
 		if (pos.x < -50 || pos.x > 850) return false;
 		if (pos.y < -200 || pos.y > 650) return false;
 		return checkCollisionWithLaser();
@@ -134,7 +181,9 @@ public:
 private:
 	const float speed = 2;
 	int frame = 0;
-	int side;
+
+	float turn = 0;
+	int turnDelay = 0;
 	int tick;
 	Vec2 vel;
 
@@ -152,7 +201,7 @@ private:
 
 class RingGuy : public BadGuy {
 public:
-	RingGuy(Vec2 pos) : BadGuy(1) {
+	RingGuy(Vec2 pos) : BadGuy(1, 100) {
 		init("media/ring.png");
 		setPosition(pos);
 
@@ -239,7 +288,7 @@ protected:
 
 class SquareGuy : public BadGuy {
 public:
-	SquareGuy(Vec2 pos) : BadGuy(2) {
+	SquareGuy(Vec2 pos) : BadGuy(2, 250) {
 		init("media/square.png");
 		setPosition(pos);
 		vel = normalized(Vec2(randFloat(-1, 1), 1)) * speed;
@@ -262,7 +311,7 @@ public:
 
 		Vec2 pos = getPosition();
 
-		if (tick >= 170 || walls.look(pos, player.getPosition())) tick++;
+		if (tick >= 170 || !walls.shootAt(pos, player.getPosition())) tick++;
 		if (tick == 170 || tick == 180 || tick == 190) {
 			Vec2 diff = player.getPosition() - pos;
 			float ang = atan2(diff.x, diff.y) + randFloat(-0.1, 0.1);
@@ -315,7 +364,7 @@ private:
 
 class CannonGuy : public BadGuy {
 public:
-	CannonGuy(Vec2 pos, float ang) : BadGuy(1) {
+	CannonGuy(Vec2 pos, float ang) : BadGuy(1, 200) {
 		init("media/cannon.png");
 		setPosition(pos);
 		angle = ang;
@@ -334,7 +383,7 @@ public:
 		float angDiff = fmodf(angle - ang + 540, 360) - 180;
 
 		if (angDiff >= -100 && angDiff <= 100 && tick < 50 &&
-			walls.look(getPosition(), player.getPosition())) {
+			!walls.shootAt(getPosition(), player.getPosition())) {
 
 			float speed = 1;
 			float d = fmodf(cannonAngle - ang + 540, 360) - 180;
@@ -356,14 +405,14 @@ public:
 		return checkCollisionWithLaser();
 	}
 
-	virtual void draw(sf::RenderWindow& win) {
+	virtual void draw() {
 		setRotation(cannonAngle);
 		setFrame(1);
-		win.draw(*this);
+		window.draw(*this);
 
 		setRotation(angle);
 		setFrame(0);
-		win.draw(*this);
+		window.draw(*this);
 	}
 
 private:
@@ -400,25 +449,34 @@ void update() {
 	static int i = 0;
 	i++;;
 	i %= 400;
+
 	if (i == 0) {
 
 		if (walls.findFreeWallSpot(pos, ang)) makeBadGuy<CannonGuy>(pos, ang);
-		if (walls.findFreeSpot(pos)) makeBadGuy<SquareGuy>(pos);
 		if (walls.findFreeSpot(pos)) makeBadGuy<RingGuy>(pos);
 
+	}
+	if (i == 50) {
+		if (walls.findFreeSpot(pos)) makeBadGuy<SquareGuy>(pos);
+		if (walls.findFreeSpot(pos)) makeBadGuy<QueueGuy>(pos);
+		if (walls.findFreeSpot(pos)) makeBadGuy<QueueGuy>(pos);
 	}
 	if (i == 100) {
 		if (walls.findFreeSpot(pos)) makeBadGuy<RingGuy>(pos);
 		if (walls.findFreeSpot(pos)) makeBadGuy<RingGuy>(pos);
 	}
-	if (i == 200) {
+
+	if (i == 300) {
 
 		if (walls.findFreeSpot(pos)) {
 			makeBadGuy<QueueGuy>(pos);
 			makeBadGuy<QueueGuy>(pos - Vec2(0, 50));
 			makeBadGuy<QueueGuy>(pos - Vec2(0, 100));
 		}
+		if (walls.findFreeSpot(pos)) makeBadGuy<QueueGuy>(pos);
 	}
+
+
 
 
 
@@ -440,39 +498,55 @@ void triggerQuake() {
 }
 
 
-void draw(sf::RenderWindow& win) {
+void draw() {
 /*
 	sf::View view = win.getDefaultView();
 	view.zoom(2);
 	view.move(0, -220);
-	win.setView(view);
+	window.setView(view);
 */
 
+	window.setView(window.getDefaultView());
+
+	for (auto& star : stars) star.draw();
+
+/*
 	quakeAmp *= 0.93;
 	float ang = randFloat(0, 2 * M_PI);
-	sf::View view = win.getDefaultView();
+	sf::View view = window.getDefaultView();
 	view.move(int(sin(ang) * quakeAmp), int(cos(ang) * quakeAmp));
-	win.setView(view);
+	window.setView(view);
+*/
 
-	for (auto& star : stars) star.draw(win);
-	for (auto& laser : lasers) laser->draw(win);
-	for (auto& bullet : bullets) bullet->draw(win);
-	for (auto& guy : badGuys) guy->draw(win);
-	player.draw(win);
-	walls.draw(win);
-	for (auto& particle : particles) particle->draw(win);
+	for (auto& laser : lasers) laser->draw();
+	for (auto& bullet : bullets) bullet->draw();
+	for (auto& guy : badGuys) guy->draw();
+	player.draw();
+	walls.draw();
+	for (auto& particle : particles) particle->draw();
 
-//	drawPoly(win, {{-1,-1}, {801, -1}, {801, 601}, {-1, 601}});
+
+	window.setView(window.getDefaultView());
+
+	font.setColor(sf::Color(255, 255, 255, 200));
+	font.print(Vec2(10, 10), "PLAYER 1");
+	font.print(Vec2(790 - 8 * 16, 10), "%8d", player.getScore());
+
+
+//	drawPoly(window, {{-1,-1}, {801, -1}, {801, 601}, {-1, 601}});
 }
 
 
 int main(int argc, char** argv) {
 	srand((unsigned)time(nullptr));
 
-	sf::RenderWindow window(sf::VideoMode(800, 600), "sfml",
+	window.create(sf::VideoMode(800, 600), "sfml",
 							sf::Style::Titlebar || sf::Style::Close);
 	window.setFramerateLimit(60);
 	window.setMouseCursorVisible(false);
+	font.init();
+
+
 	walls.init();
 	player.init();
 
@@ -496,9 +570,13 @@ int main(int argc, char** argv) {
 				break;
 			}
 		}
-		update();
+
 		window.clear();
-		draw(window);
+
+		update();
+
+		draw();
+
 		window.display();
 	}
 	return 0;

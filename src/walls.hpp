@@ -3,17 +3,13 @@ class Walls {
 public:
 	void init();
 	void update();
-	void draw(sf::RenderWindow& win);
-	float checkCollision(const Poly& poly, Vec2* pnormal=nullptr, Vec2* pwhere=nullptr);
+	void draw();
 	bool findFreeWallSpot(Vec2& pos, float& ang);
 	bool findFreeSpot(Vec2& pos);
 
 
-	bool look(Vec2 src, Vec2 dst) {
-		// naive and bad
-		Poly line = { src, dst };
-		return checkCollision(line) == 0;
-	}
+	float checkCollision(const Poly& poly, Vec2* pnormal=nullptr, Vec2* pwhere=nullptr);
+	bool shootAt(Vec2 src, Vec2 dst, float* interpolation=nullptr);
 
 	int getTile(int y, int x) const {
 		return	y < 0 || y >= height ? 0 :

@@ -1,3 +1,4 @@
+
 class Object : public sf::Sprite {
 public:
 	Object() {};
@@ -16,9 +17,9 @@ public:
 		setTextureRect(sf::IntRect(spriteWidth * frame, 0, spriteWidth, spriteWidth));
 	}
 	virtual bool update() { return true; };
-	virtual void draw(sf::RenderWindow& win) {
-		win.draw(*this);
-//		drawPoly(win, poly);
+	virtual void draw() {
+		window.draw(*this);
+//		drawPoly(window, poly);
 	};
 	const Poly& getCollisionPoly() const { return poly; }
 

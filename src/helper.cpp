@@ -13,15 +13,35 @@
 
 using namespace std;
 
-void drawPoly(sf::RenderWindow& win, const Poly poly) {
+void drawPoly(const Poly poly) {
 	sf::VertexArray v(sf::Lines, 2);
 	v[0].color = v[1].color = sf::Color::Red;
 	for (size_t i = 0; i < poly.size(); i++) {
 		v[0].position = poly[i];
 		v[1].position = poly[(i + 1) % poly.size()];
-		win.draw(v);
+		window.draw(v);
 	}
 }
+
+
+bool checkLineIntersection(Vec2 a1, Vec2 a2, Vec2 b1, Vec2 b2, float& ai, float& bi) {
+
+	Vec2 da = a2 - a1;
+	Vec2 db = b2 - b1;
+	Vec2 ab = b1 - a1;
+
+	float det = cross(da, db);
+	if (abs(det) < 0.0001) return false; // parallel
+
+
+	ai = cross(ab, db) / det;
+	bi = cross(ab, da) / det;
+
+	if (ai < 0 || ai > 1) return false;
+	if (bi < 0 || bi > 1) return false;
+	return true;
+}
+
 
 
 float checkCollision(const Poly& a, const Poly& b, Vec2* pnormal, Vec2* pwhere) {

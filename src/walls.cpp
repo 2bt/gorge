@@ -46,7 +46,7 @@ void Walls::update() {
 	}
 }
 
-void Walls::draw(sf::RenderWindow& win) {
+void Walls::draw() {
 //	for (int y = 0; y < 22; y++) {
 	for (int y = 0; y < height; y++) {
 
@@ -54,7 +54,7 @@ void Walls::draw(sf::RenderWindow& win) {
 			int t =  tiles[y * width + x];
 			tileSprite.setTextureRect(sf::IntRect(t * 8, 0, 8, 8));
 			tileSprite.setPosition((x - 1) * 32, (19 - y) * 32 + offset);
-			win.draw(tileSprite);
+			window.draw(tileSprite);
 
 		}
 	}
@@ -117,6 +117,56 @@ bool Walls::findFreeWallSpot(Vec2& pos, float& ang) {
 	}
 	return false;
 }
+
+
+
+
+/*
+	check line src - dst for collision with walls
+	true:
+		0 <= interpolation <= 1 and
+		hit_point = src + (dst - src) * interpolation
+	false:
+		no collision
+*/
+bool Walls::shootAt(Vec2 src, Vec2 dst, float* interpolation) {
+	// very naive
+	bool found = false;
+	float inter = 0;
+
+	for (int y = 0; y < 24; y++) {
+		for (int x = 0; x < width; x++) {
+			const Poly& p = tileData[tiles[y * width + x]];
+			if (p.empty()) continue;
+
+
+			auto transform = [&](Vec2 v)->Vec2 {
+				return Vec2(
+					(v.x + x - 1) * 32,
+					(v.y + 19 - y) * 32 + offset
+				);
+			};
+
+			Vec2 a = transform(p[p.size() - 1]);
+			for (Vec2 b : p) {
+				b = transform(b);
+
+				float i, dummy;
+				if (checkLineIntersection(src, dst, a, b, i, dummy)) {
+					if (!found || i < inter) {
+						found = true;
+						inter = i;
+					}
+				}
+				a = b;
+			}
+		}
+	}
+
+	if (interpolation) *interpolation = inter;
+	return found;
+}
+
 
 
 float Walls::checkCollision(const Poly& poly, Vec2* pnormal, Vec2* pwhere) {

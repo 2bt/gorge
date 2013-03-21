@@ -23,6 +23,9 @@ public:
 	virtual void init();
 	virtual bool update();
 
+	void raiseScore(int x) { score += x; }
+	int getScore() { return score; }
+
 private:
 	bool checkCollisionWithBullets();
 	bool checkCollisionWithBadGuys();

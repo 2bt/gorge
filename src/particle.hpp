@@ -14,8 +14,8 @@ public:
 		if (getPosition().y > 632) reset();
 		return true;
 	}
-	virtual void draw(sf::RenderWindow& win) {
-		win.draw(*this, sf::BlendAdd);
+	virtual void draw() {
+		window.draw(*this, sf::BlendAdd);
 	}
 	float getSpeed() const { return speed; };
 private:

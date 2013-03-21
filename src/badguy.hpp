@@ -14,9 +14,9 @@ public:
 			makeParticle<Hit>(pos);
 			return false;
 		}
+
 		if (pos.x < -40 || pos.x > 840) return false;
 		if (pos.y < -40 || pos.y > 640) return false;
-
 		return alive;
 	}
 
@@ -52,10 +52,15 @@ void makeBullet(Args&&... args) {
 class BadGuy : public Object {
 public:
 
-	BadGuy(int shield) : shield(shield) {}
+	BadGuy(int shield, int score)
+	: shield(shield), score(score) {}
+
 	void takeHit(int damage) {
 		shield -= damage;
-		if (shield <= 0) makeParticle<Explosion>(getPosition());
+		if (shield <= 0) {
+			player.raiseScore(score);
+			makeParticle<Explosion>(getPosition());
+		}
 	}
 
 protected:
@@ -72,6 +77,7 @@ protected:
 	}
 private:
 	int shield;
+	const int score;
 };
 
 extern std::forward_list<std::unique_ptr<BadGuy>> badGuys;
