@@ -3,6 +3,7 @@ SRC = $(wildcard src/*.cpp)
 OBJ = $(SRC:src/%.cpp=obj/%.o)
 TARGET = gorge
 
+
 all: $(TARGET)
 
 
