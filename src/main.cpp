@@ -1,5 +1,5 @@
 #include <cstdio>
-#include <stdarg.h>
+#include <cstdarg>
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -20,33 +20,27 @@ sf::RenderWindow window;
 
 class : public sf::Sprite {
 public:
+	enum { width = 24 };
 	void init() {
 		sf::Texture& tex = loadTexture("media/font.png");
 		setTexture(tex);
-		setScale(2, 2);
+		setScale(width / 8.0, width / 8.0);
 	}
-
 	void print(Vec2 pos, const char* text, ...) {
-
 		char line[256];
 		va_list args;
 		va_start(args, text);
 		vsnprintf(line, 256, text, args);
 		va_end(args);
-
 		setPosition(pos);
 		for (char c : line) {
 			if (c <= 0) break;
-
 			setTextureRect(sf::IntRect(c % 8 * 8, c / 8 * 8, 8, 8));
 			window.draw(*this);
-			move(16, 0);
+			move(width, 0);
 		}
-
 	}
 } font;
-
-
 
 
 Walls walls;
@@ -57,6 +51,111 @@ forward_list<unique_ptr<BadGuy>> badGuys;
 forward_list<unique_ptr<Bullet>> bullets;
 
 
+
+class StrongGuy : public BadGuy {
+public:
+	StrongGuy(Vec2 pos) : BadGuy(5, 500) {
+		init("media/strong.png");
+		setPosition(pos);
+
+
+		float ang = randFloat(0, M_PI);
+		vel = Vec2(0, 0.3);
+	}
+
+
+	float angle = 0;
+
+	virtual bool update() {
+		move(0, walls.getSpeed());
+		move(vel);
+
+		Vec2 pos = getPosition();
+		Vec2 diff = player.getPosition() - getPosition();
+		Vec2 dir = normalized(diff);
+		float dst_ang = 0;
+		if (dir.y > 0.2) {
+			dst_ang = atan2(-dir.x, dir.y) * 180 / M_PI;
+		}
+		angle += (dst_ang - angle) * 0.02;
+
+
+		updateCollisionPoly();
+		tick++;
+
+
+
+		if (pos.x < -50 || pos.x > 850) return false;
+		if (pos.y < -100 || pos.y > 650) return false;
+		return checkCollisionWithLaser();
+	}
+
+	float t = 0;
+	int tick = 0;
+
+	virtual void draw() {
+		int flame = tick / 4 % 2;
+
+		t += 0.1;
+
+		Vec2 pos = getPosition();
+		move(10, 0);
+		Vec2 diff = player.getPosition() - getPosition();
+		float ang = atan2(-diff.x, diff.y) * 180 / M_PI;
+		if (ang < -20) ang = -20;
+		if (ang > 20) ang = 20;
+
+		setRotation(ang);
+		setFrame(4 + flame);
+		window.draw(*this);
+
+		move(-20, 0);
+		setScale(-4, 4);
+
+		setRotation(ang);
+		window.draw(*this);
+
+
+
+		setFrame(2 + flame);
+		setPosition(pos + Vec2(10, -10));
+		ang = -20 + sin(t) * 10;
+		setScale(4, 4);
+		setRotation(ang);
+		window.draw(*this);
+		setScale(-4, 4);
+		setRotation(-ang);
+		setPosition(pos + Vec2(-10, -10));
+		window.draw(*this);
+
+
+		setPosition(pos);
+		setScale(4, 4);
+		setRotation(angle);
+		setRotation(0);
+
+		setFrame(0 + flame);
+		window.draw(*this);
+	}
+
+
+private:
+	const float speed = 2;
+	int delay;
+	Vec2 vel;
+
+	virtual const Poly& getCollisionModel() const {
+		static const Poly model = {
+			Vec2( 6,  4),
+			Vec2( 6, -4),
+			Vec2(-6, -4),
+			Vec2(-6,  4),
+		};
+		return model;
+	}
+};
+
+
 class QueueGuy : public BadGuy {
 public:
 	QueueGuy(Vec2 pos) : BadGuy(1, 70) {
@@ -64,8 +163,10 @@ public:
 		setPosition(pos);
 
 		vel = Vec2(randFloat(-1, 1), 1);
-
 		tick = randInt(0, 200);
+		frame = 0;
+		turn = 0;
+		turnDelay = 0;
 	}
 
 	virtual bool update() {
@@ -105,7 +206,6 @@ public:
 		}
 
 
-
 		if (leader) { // follow
 			Vec2 dst = leader->getPosition() - normalized(leader->vel) * 50.0f;
 			Vec2 dir = dst - pos;
@@ -128,10 +228,6 @@ public:
 		}
 		else { // lead
 
-			Vec2 dir = normalized(vel);
-			Vec2 perp(dir.y, -dir.x);
-
-
 			if (--turnDelay <= 0) {
 				turn = randFloat(-1, 1) * 0.03;
 				turnDelay = randInt(30, 100);
@@ -139,8 +235,10 @@ public:
 
 			float dodge = turn;
 			float i1, i2;
-			bool s1 = walls.shootAt(pos + perp * 10.0f, pos + dir * 60.0f + perp * 40.0f, &i1);
-			bool s2 = walls.shootAt(pos - perp * 10.0f, pos + dir * 60.0f - perp * 40.0f, &i2);
+			Vec2 dir = normalized(vel);
+			Vec2 perp = Vec2(dir.y, -dir.x) * 10.0f;
+			bool s1 = walls.shootAt(pos + perp, pos + dir * 60.0f + perp * 4.0f, &i1);
+			bool s2 = walls.shootAt(pos - perp, pos + dir * 60.0f - perp * 4.0f, &i2);
 			if (s1 || s2) {
 				dodge = (s1 < s2 || i1 < i2) ? -0.2 * (1 - i2) : 0.2 * (1 - i1);
 				vel *= 0.98f;
@@ -176,11 +274,9 @@ public:
 	}
 
 private:
-	const float speed = 2;
-	int frame = 0;
-
-	float turn = 0;
-	int turnDelay = 0;
+	int frame;
+	float turn;
+	int turnDelay;
 	int tick;
 	Vec2 vel;
 
@@ -196,17 +292,15 @@ private:
 };
 
 
-
 class RingGuy : public BadGuy {
 public:
 	RingGuy(Vec2 pos) : BadGuy(1, 100) {
 		init("media/ring.png");
 		setPosition(pos);
-
-
-		float ang = randFloat(0, M_PI);
+		float ang = randFloat(0.2, M_PI - 0.2);
 		vel = Vec2(cos(ang), sin(ang)) * speed;
-
+		tick = 0;
+		delay = 0;
 	}
 
 	virtual bool update() {
@@ -220,7 +314,6 @@ public:
 			move(normal * -distance);
 			updateCollisionPoly();
 			delay = 0;
-
 			float ang = randFloat(0, 2 * M_PI);
 			vel = Vec2(cos(ang), sin(ang)) * speed;
 			if (dot(vel, normal) > 0) vel = -vel;
@@ -243,7 +336,7 @@ public:
 
 private:
 	const float speed = 2;
-	int tick = 0;
+	int tick;
 	int delay;
 	Vec2 vel;
 
@@ -261,7 +354,6 @@ private:
 		return model;
 	}
 };
-
 
 
 class RapidBullet : public Bullet {
@@ -293,6 +385,7 @@ public:
 		setPosition(pos);
 		vel = normalized(Vec2(randFloat(-1, 1), 1)) * speed;
 		tick = randInt(0, 100);
+		frame = 0;
 	}
 
 	virtual bool update() {
@@ -329,7 +422,7 @@ public:
 	}
 
 private:
-	int frame = 0;
+	int frame;
 	int tick;
 	Vec2 vel;
 	bool bounce;
@@ -359,7 +452,6 @@ private:
 		return bounce ? bounceModel : model;
 	}
 };
-
 
 
 class CannonGuy : public BadGuy {
@@ -447,14 +539,14 @@ void update() {
 	float ang;
 
 	static int i = 0;
-	i++;;
-	i %= 400;
+	i++; i %= 400;
 
+//	i %= 300; if (i == 1) if (walls.findFreeSpot(pos)) makeBadGuy<StrongGuy>(pos);
+//	i %= 15; if (i == 1) if (walls.findFreeSpot(pos)) makeBadGuy<QueueGuy>(pos);
+//*
 	if (i == 0) {
-
 		if (walls.findFreeWallSpot(pos, ang)) makeBadGuy<CannonGuy>(pos, ang);
 		if (walls.findFreeSpot(pos)) makeBadGuy<RingGuy>(pos);
-
 	}
 	if (i == 50) {
 		if (walls.findFreeSpot(pos)) makeBadGuy<SquareGuy>(pos);
@@ -475,9 +567,7 @@ void update() {
 		}
 		if (walls.findFreeSpot(pos)) makeBadGuy<QueueGuy>(pos);
 	}
-
-
-
+//*/
 
 
 	for (auto& star: stars) star.update();
@@ -502,14 +592,14 @@ void triggerQuake() {
 
 void draw() {
 /*
-	sf::View view = win.getDefaultView();
-	view.zoom(2);
-	view.move(0, -220);
+	sf::View view = window.getDefaultView();
+	view.zoom(3.5);
+	//view.move(0, -220);
+	view.move(0, -420);
 	window.setView(view);
-*/
+//*/
 
-	window.setView(window.getDefaultView());
-
+//	window.setView(window.getDefaultView());
 	for (auto& star : stars) star.draw();
 
 /*
@@ -518,7 +608,7 @@ void draw() {
 	sf::View view = window.getDefaultView();
 	view.move(int(sin(ang) * quakeAmp), int(cos(ang) * quakeAmp));
 	window.setView(view);
-*/
+//*/
 
 	for (auto& laser : lasers) laser->draw();
 	for (auto& bullet : bullets) bullet->draw();
@@ -527,39 +617,31 @@ void draw() {
 	walls.draw();
 	for (auto& particle : particles) particle->draw();
 
+	drawPoly({{-1,-1}, {801, -1}, {801, 601}, {-1, 601}});
 
 	window.setView(window.getDefaultView());
+	font.setColor(sf::Color(255, 255, 255, 130));
+	font.print(Vec2(790 - 8 * font.width, 10), "%8d", player.getScore());
 
-	font.setColor(sf::Color(255, 255, 255, 200));
-	font.print(Vec2(10, 10), "PLAYER 1");
-	font.print(Vec2(790 - 8 * 16, 10), "%8d", player.getScore());
-
-
-//	drawPoly(window, {{-1,-1}, {801, -1}, {801, 601}, {-1, 601}});
 }
 
 
 int main(int argc, char** argv) {
 	srand((unsigned)time(nullptr));
-
-	window.create(sf::VideoMode(800, 600), "sfml",
-							sf::Style::Titlebar || sf::Style::Close);
-	window.setFramerateLimit(60);
+	window.create(sf::VideoMode(800, 600), "sfml", sf::Style::Close);
 	window.setMouseCursorVisible(false);
-
-	sf::Listener::setPosition(400, 300, -400);
-
-	font.init();
-
-
-	walls.init();
-	player.init();
+//	window.setFramerateLimit(60);
+	window.setVerticalSyncEnabled(true);
 
 	stars.resize(100);
 	sort(stars.begin(), stars.end(), [](const Star& a, const Star& b) {
 		return a.getSpeed() < b.getSpeed();
 	});
 
+	sf::Listener::setPosition(400, 300, -400);
+	font.init();
+	walls.init();
+	player.init();
 
 	while (window.isOpen()) {
 		sf::Event e;
@@ -577,11 +659,8 @@ int main(int argc, char** argv) {
 		}
 
 		window.clear();
-
 		update();
-
 		draw();
-
 		window.display();
 	}
 	return 0;

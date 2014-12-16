@@ -6,7 +6,7 @@ public:
 	int getDamage() { return 1; }
 private:
 	Vec2 vel;
-	bool alive = true;
+	bool alive;
 	virtual const Poly& getCollisionModel() const;
 };
 
@@ -28,8 +28,9 @@ private:
 	bool checkCollisionWithBullets();
 	bool checkCollisionWithBadGuys();
 	virtual const Poly& getCollisionModel() const;
+	void takeHit();
 
-	int tick = 0;
+	int tick;
 	int shootDelay;
 	int score;
 };

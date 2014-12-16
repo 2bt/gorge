@@ -22,6 +22,7 @@ Laser::Laser(Vec2 pos) {
 	init("media/laser.png");
 	setPosition(pos);
 	vel = Vec2(0, -16);
+	alive = true;
 	playSound("media/laser.wav", pos);
 }
 
@@ -73,18 +74,28 @@ void Player::init() {
 	Object::init("media/ship.png");
 	setPosition(400, 500);
 	score = 0;
+	tick = 0;
 }
+
+
+
+void Player::takeHit() {
+	printf("%d\n", score);
+//	window.close();
+}
+
 
 
 bool Player::checkCollisionWithBullets() {
 	Vec2 normal;
 	for (auto& bullet : bullets) {
-		float distance = ::checkCollision(poly, bullet->getCollisionPoly(), &normal);
+		float distance = checkCollision(*bullet, &normal);
 		if (distance > 0) {
 			makeParticle<Hit>(bullet->getPosition());
 			bullet->die();
 			makeParticle<Explosion>(getPosition());
 			move(normal * (distance + 5.0f));
+			takeHit();
 			return false;
 		}
 	}
@@ -95,12 +106,13 @@ bool Player::checkCollisionWithBullets() {
 bool Player::checkCollisionWithBadGuys() {
 	Vec2 normal, pos;
 	for (auto& guy : badGuys) {
-		float distance = ::checkCollision(poly, guy->getCollisionPoly(), &normal, &pos);
+		float distance = checkCollision(*guy, &normal, &pos);
 		if (distance > 0) {
 			makeParticle<Hit>(pos);
 			guy->takeHit(1);
 			makeParticle<Explosion>(getPosition());
 			move(normal * (distance + 15.0f));
+			takeHit();
 			return false;
 		}
 	}
@@ -130,9 +142,9 @@ bool Player::update() {
 	float distance = walls.checkCollision(poly, &normal);
 	if (distance > 0) {
 		makeParticle<Explosion>(pos);
-
 		move(normal * -(distance + 25.0f));
 		pos = getPosition();
+		takeHit();
 	}
 
 
@@ -155,8 +167,6 @@ bool Player::update() {
 
 	checkCollisionWithBullets();
 	checkCollisionWithBadGuys();
-
-
 
 	return true;
 }

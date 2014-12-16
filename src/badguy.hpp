@@ -5,6 +5,7 @@ public:
 		setPosition(pos);
 		vel = velocity;
 		playSound("media/bullet.wav", pos);
+		alive = true;
 	}
 
 	virtual bool update() {
@@ -24,10 +25,10 @@ public:
 	void die() { alive = false; }
 
 protected:
-	Bullet() {}
+	Bullet() { alive = true; }
 
 	Vec2 vel;
-	bool alive = true;
+	bool alive;
 
 	virtual const Poly& getCollisionModel() const {
 		static const Poly model = {
@@ -40,6 +41,7 @@ protected:
 	}
 };
 
+
 extern std::forward_list<std::unique_ptr<Bullet>> bullets;
 
 template<typename T, typename... Args>
@@ -49,14 +51,13 @@ void makeBullet(Args&&... args) {
 
 
 
-
 class BadGuy : public Object {
 public:
 
 	BadGuy(int shield, int score)
 	: shield(shield), score(score) {}
 
-	void takeHit(int damage) {
+	virtual void takeHit(int damage) {
 		shield -= damage;
 		if (shield <= 0) {
 			player.raiseScore(score);
@@ -65,9 +66,10 @@ public:
 	}
 
 protected:
+	int shield;
 	bool checkCollisionWithLaser() {
 		for (auto& laser : lasers) {
-			if (::checkCollision(poly, laser->getCollisionPoly()) > 0) {
+			if (checkCollision(*laser) > 0) {
 				makeParticle<Hit>(laser->getPosition());
 				laser->die();
 				takeHit(laser->getDamage());
@@ -77,7 +79,6 @@ protected:
 		return shield > 0;
 	}
 private:
-	int shield;
 	const int score;
 };
 
