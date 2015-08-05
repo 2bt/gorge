@@ -3,7 +3,7 @@ GORGE
 
 Endless shoot 'em up game in development.
 It's probably not good.
-You'll need SFML 2.0 for this.
+You'll need LÖVE 0.10.
 
 ### controls ###
 <table>
