@@ -630,7 +630,7 @@ int main(int argc, char** argv) {
 	srand((unsigned)time(nullptr));
 	window.create(sf::VideoMode(800, 600), "sfml", sf::Style::Close);
 	window.setMouseCursorVisible(false);
-//	window.setFramerateLimit(60);
+	window.setFramerateLimit(60);
 	window.setVerticalSyncEnabled(true);
 
 	stars.resize(100);
@@ -659,7 +659,10 @@ int main(int argc, char** argv) {
 		}
 
 		window.clear();
-		update();
+
+//		for (int i = 0; i < 10; i++)
+			update();
+
 		draw();
 		window.display();
 	}

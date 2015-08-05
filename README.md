@@ -1,4 +1,5 @@
-# gorge #
+GORGE
+=====
 
 Endless shoot 'em up game in development.
 It's probably not good.
