@@ -133,3 +133,27 @@ function makeExplosion(x, y)
 end
 
 
+SparkleParticle = Particle:new {
+	img = G.newImage("media/sparkle.png")
+}
+genQuads(SparkleParticle, 8)
+function SparkleParticle:init(x, y)
+	table.insert(self.list, self)
+	self.x = x
+	self.y = y
+	self.tick = 0
+	self.alive = true
+end
+function SparkleParticle:update()
+	self.tick = self.tick + 1
+	if not self.alive then return "kill" end
+end
+function SparkleParticle:draw()
+	G.setColor(255, 255, 255)
+	local f = math.floor(self.tick / 3) + 1
+	if self.quads[f] then
+		G.draw(self.img, self.quads[f], self.x, self.y, 0, 4, 4, 4, 4)
+	else
+		self.alive = false
+	end
+end

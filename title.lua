@@ -12,11 +12,19 @@ function Title:reset()
 	self.blend = 1
 	self.action = false
 	self.tick = 0
+	Particle.list = {}
 end
 function Title:update()
 	self.tick = self.tick + 1
 
 	self.stars:update(1.25)
+	updateList(Particle.list)
+	if math.random() < 0.3 then
+		SparkleParticle(
+			math.random(200, 600),
+			math.random(116, 210))
+	end
+
 
 	if not self.action then
 		if self.blend > 0 then
@@ -52,10 +60,13 @@ function Title:draw()
 	self.stars:draw()
 
 
+
 	G.setColor(255, 255, 255)
 	G.origin()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.draw(self.img, 400, 120, 0, 4, 4, self.img:getWidth() / 2)
+
+	drawList(Particle.list)
 
 --	font:printCentered("START GAME", 	400, 320 + 40 * 0, 3)
 --	font:printCentered("WATCH REPLAY",	400, 320 + 40 * 1, 3)
