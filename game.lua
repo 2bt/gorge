@@ -1,7 +1,7 @@
 local G = love.graphics
 local isDown = love.keyboard.isDown
 
-Game = Object:new { seed = 2 }
+Game = Object:new { seed = 7 }
 
 function Game:init(seed)
 	self.stars = Stars()

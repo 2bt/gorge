@@ -21,6 +21,7 @@ function Player:reset()
 	self.x = 0
 	self.y = 350
 	self.alive = true
+	self.invincible = 0
 	self.score = 0
 
 	self.tick = 0
@@ -31,21 +32,33 @@ function Player:reset()
 	self.flash = 0
 end
 function Player:hit(d, n, w)
-	self.shield = self.shield - 1
-	if self.shield <= 0 then
-		self.alive = false
-		makeExplosion(self.x, self.y)
-	end
-	self.flash = 5
+	-- collision
 	if d then
 		self.x = self.x + n[1] * d
 		self.y = self.y + n[2] * d
+
+		-- instand death
+		if self.y > 284 then
+			self.invincible = 0
+			self.shield = 0
+		end
+
 		self.blast_x = n[1] * 7
 		self.blast_y = n[2] * 7
 		self.blast = 15
 		transform(self)
 		for i = 1, 10 do
 			ExplosionSparkParticle(w[1], w[2])
+		end
+	end
+	-- damage
+	if self.invincible == 0 then
+		self.invincible = 100
+		self.flash = 5
+		self.shield = self.shield - 1
+		if self.shield <= 0 then
+			self.alive = false
+			makeExplosion(self.x, self.y)
 		end
 	end
 end
@@ -96,19 +109,28 @@ function Player:update(input)
 	end
 
 
-
+	-- collision with enemies
 	for _, e in ipairs(Enemy.list) do
 		local d, n, w = polygonCollision(self.trans_model, e.trans_model)
 		if d > 0 then
 			e:hit(1)
 			self:hit(d, n, w)
 		end
+	end
 
+	-- TODO: collision with bullets
+	if self.invincible == 0 then
+
+
+	else
+		self.invincible = self.invincible - 1
 	end
 
 end
 function Player:draw()
 	if not self.alive then return end
+
+	if self.invincible % 8 >= 4 then return end
 
 	if self.flash > 0 then G.setShader(flash_shader) end
 

@@ -59,7 +59,7 @@ function Stars:resetStar(s)
 end
 function Stars:reset(rand)
 	self.rand = rand
-	self.xx = self.rand.int(0, 100)
+	self.xx = self.rand.int(0, 999999)
 	for _, s in ipairs(self.list) do
 		self:resetStar(s)
 		s.y = self.rand.float(-310, 310)

@@ -5,7 +5,7 @@ Title = Object()
 Title.img = G.newImage("media/title.png")
 function Title:init()
 	self.stars = Stars()
-	self.stars:reset(makeRandomGenerator(23))
+	self.stars:reset(makeRandomGenerator(32))
 	self:reset()
 end
 function Title:reset()
