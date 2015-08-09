@@ -21,9 +21,7 @@ require "player"
 require "enemy"
 require "boom"
 require "game"
-require "title"
-
-
+require "menu"
 
 DEBUG = false
 
@@ -32,10 +30,10 @@ DEBUG = false
 font = Font()
 
 game = Game()
-title = Title()
+menu = Menu()
 
 
-state = title
+state = menu
 
 
 function love.update()

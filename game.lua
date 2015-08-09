@@ -2,6 +2,8 @@ local G = love.graphics
 local isDown = love.keyboard.isDown
 
 Game = Object:new { seed = 7 }
+Game.health_img = G.newImage("media/health.png")
+Game.health_quads = makeQuads(16, 8, 8)
 
 function Game:init(seed)
 	self.stars = Stars()
@@ -88,8 +90,8 @@ function Game:update()
 	if not self.player.alive then
 		self.outro = self.outro + 1
 		if self.outro > 250 then
-			state = title
-			title:reset()
+			state = menu
+			state:reset()
 			self:rewind()
 		end
 	end
@@ -153,11 +155,21 @@ end
 
 
 
-	if not self.is_demo then
-		G.origin()
-		G.scale(G.getWidth() / 800, G.getHeight() / 600)
-		G.setColor(255, 255, 255)
-		font:print(("%8d"):format(self.player.score), 800 - 8*24, 0, 3)
+	-- hud
+	G.origin()
+	G.scale(G.getWidth() / 800, G.getHeight() / 600)
+	G.setColor(255, 255, 255)
+	font:print(("%08d"):format(self.player.score), 796 - 6 * 32 - 4, 0, 4)
+
+	for i = 1, 3 do
+		local f = 1
+		if i > self.player.shield
+		or (self.player.shield == 1 and self.tick % 32 < 8) then
+			f = 2
+		end
+		G.draw(self.health_img, self.health_quads[f],
+			8 + (i - 1) * 32,
+			4, 0, 4)
 	end
 
 

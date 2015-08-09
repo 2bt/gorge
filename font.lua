@@ -20,7 +20,8 @@ function Font:init()
 		self.quads[c] = love.graphics.newQuad(x, y, cw, ch, w, h)
 	end
 
-	self.char_width = cw
+--	self.char_width = cw
+	self.char_width = 6
 	self.char_height = ch
 
 end

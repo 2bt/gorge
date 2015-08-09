@@ -46,16 +46,21 @@ end
 
 
 function genQuads(obj, size)
-	local w = obj.img:getWidth()
-	local h = obj.img:getHeight()
+	obj.quads = makeQuads(
+		obj.img:getWidth(),
+		obj.img:getHeight(),
+		size)
+end
+
+function makeQuads(w, h, s)
 	local quads = {}
-	for y = 0, h - size, size do
-		for x = 0, w - size, size do
+	for y = 0, h - s, s do
+		for x = 0, w - s, s do
 			table.insert(quads,
-				love.graphics.newQuad(x, y, size, size, w, h))
+				love.graphics.newQuad(x, y, s, s, w, h))
 		end
 	end
-	obj.quads = quads
+	return quads
 end
 
 

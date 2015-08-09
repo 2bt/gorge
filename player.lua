@@ -31,14 +31,14 @@ function Player:reset()
 	self.blast_y = 0
 	self.flash = 0
 end
-function Player:hit(d, n, w)
+function Player:hit(d, n, w, e)
 	-- collision
 	if d then
 		self.x = self.x + n[1] * d
 		self.y = self.y + n[2] * d
 
 		-- instand death
-		if self.y > 284 then
+		if self.y > 284 and (not e or e.alive) then
 			self.invincible = 0
 			self.shield = 0
 		end
@@ -114,7 +114,7 @@ function Player:update(input)
 		local d, n, w = polygonCollision(self.trans_model, e.trans_model)
 		if d > 0 then
 			e:hit(1)
-			self:hit(d, n, w)
+			self:hit(d, n, w, e)
 		end
 	end
 
