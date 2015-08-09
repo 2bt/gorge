@@ -119,36 +119,43 @@ function Menu:draw()
 	G.translate(400, 300)
 	self.stars:draw()
 
-
-	G.setColor(255, 255, 255)
 	G.origin()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
+
 	if self.state == "main" then
-		G.draw(self.img, 400, 120, 0, 4, 4, self.img:getWidth() / 2)
+		G.setColor(255, 255, 255)
+		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
 	end
 
 	drawList(Particle.list)
 
---	for i = 1, 10 do
---		font:printCentered(
---			("%2d - %08d - %-12s"):format(i, (11 - i) * 1E6, "TWOBIT______"),
---			400,
---			240 + 24 * i, 3)
---	end
+	if self.state == "score" then
+		G.setColor(255, 255, 0)
+		font:printCentered("HIGHSCORE", 400, 100, 4)
+
+		G.setColor(255, 255, 255)
+		for i = 1, 10 do
+			font:printCentered(
+				("%2d - %08d - %-12s"):format(i, (11 - i) * 1E4, "TWOBIT"),
+				400,
+				140 + 32 * i, 4)
+		end
+	end
 
 
-	if self.options[self.state] then
+--	if self.options[self.state] then
+	if self.state == "main" then
 		for i, m in ipairs(self.options[self.state]) do
-			font:print(m, 400 - 140, 320 + 40 * (i - 1), 4)
+			font:print(m, 280, 320 + 40 * (i - 1), 4)
 		end
 		if self.tick % 32 < 24 then
-			font:print(">", 228, 320 + 40 * (self.select - 1), 4)
+			font:print(">", 280-32, 320 + 40 * (self.select - 1), 4)
 		end
 	end
 
 
 
-	G.setColor(255, 255, 255, 30)
+	G.setColor(40, 40, 40)
 	font:printCentered("\0 2015 DANIEL LANGNER", 400, 360 + 40 * 5, 4)
 
 	if self.blend > 0 then

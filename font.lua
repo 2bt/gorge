@@ -33,6 +33,14 @@ function Font:printCentered(text, x, y, s)
 end
 
 function Font:print(text, x, y, s)
+	r, g, b, a = love.graphics.getColor()
+	love.graphics.setColor(r/3, g/3, b/3, a)
+	self:print_(text, x, y + 4, s)
+	love.graphics.setColor(r, g, b, a)
+	self:print_(text, x, y, s)
+end
+
+function Font:print_(text, x, y, s)
 	s = s or self.scale
 	local dx = s * self.char_width
 	local img = self.img
