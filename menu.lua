@@ -54,10 +54,6 @@ local function saveStats()
 	f:close()
 end
 
--- saveStats()
-
-
-
 
 Menu = Object()
 Menu.img = G.newImage("media/title.png")
@@ -96,7 +92,6 @@ function Menu:gameOver(game)
 			if not stats.record or i == 1 then
 				stats.record = game.record
 			end
-			saveStats()
 			self:swapState("highscore")
 			self.entry = entry
 			return
@@ -150,6 +145,7 @@ function Menu:keypressed(key, isrepeat)
 			self.entry[1] = self.entry[1]:sub(1, -2)
 			self.blink = 0
 		elseif key == "return" or key == "escape" then
+			saveStats()
 			self.entry = false
 			return
 		end
