@@ -12,6 +12,11 @@ function Game:init(seed)
 
 	self:reset()
 end
+function Game:playBack(record)
+	self:reset()
+	self.record = record
+	self.is_demo = true
+end
 function Game:rewind()
 	local r = self.record
 	self:reset()
@@ -69,6 +74,7 @@ function Game:update()
 
 
 
+	-- TEST
 	if isDown("s") then
 		local d = self.walls.data
 		local r = d[#d - 1]
@@ -83,21 +89,20 @@ function Game:update()
 			RingEnemy(self:makeRG(), x, y)
 		end
 
---		makeExplosion(math.random(-100, 100), math.random(-100, 100))
 	end
 
 
+	-- game over
 	if not self.player.alive then
 		self.outro = self.outro + 1
 		if self.outro > 250 then
+			menu:gameOver(self)
 			state = menu
-			state:reset()
-			self:rewind()
 		end
 	end
 
 
-	-- replay
+	-- loop replay
 	if self.is_demo and not self.record[self.tick] then
 		self:rewind()
 	end

@@ -20,7 +20,6 @@ function Font:init()
 		self.quads[c] = love.graphics.newQuad(x, y, cw, ch, w, h)
 	end
 
---	self.char_width = cw
 	self.char_width = 6
 	self.char_height = ch
 
@@ -34,7 +33,7 @@ end
 
 function Font:print(text, x, y, s)
 	r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(r/3, g/3, b/3, a)
+	love.graphics.setColor(r/4, g/4, b/4, a)
 	self:print_(text, x, y + 4, s)
 	love.graphics.setColor(r, g, b, a)
 	self:print_(text, x, y, s)

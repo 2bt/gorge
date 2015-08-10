@@ -1,6 +1,7 @@
 local G = love.graphics
 local isDown = love.keyboard.isDown
 
+love.keyboard.setKeyRepeat(true)
 love.mouse.setVisible(false)
 G.setDefaultFilter("nearest", "nearest")
 canvas = G.newCanvas()
@@ -35,6 +36,10 @@ menu = Menu()
 
 state = menu
 
+-- TEST
+--game.player.score = 999
+--menu:gameOver(game)
+
 
 function love.update()
 	state:update()
@@ -50,6 +55,9 @@ function love.resize()
 	canvas = G.newCanvas()
 end
 
-function love.keypressed(key)
-	if key == "d" then DEBUG = not DEBUG end
+function love.keypressed(key, isrepeat)
+	if state.keypressed then
+		state:keypressed(key, isrepeat)
+	end
+--	if key == "d" then DEBUG = not DEBUG end
 end
