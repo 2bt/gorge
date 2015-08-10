@@ -1,9 +1,17 @@
 local G = love.graphics
 local isDown = love.keyboard.isDown
 
+flash_shader = G.newShader([[
+vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
+	vec4 tc = texture2D(tex, tex_coords) * col;
+	return tc + vec4(max(max(tc.rgb, tc.gbr), tc.brg), 0);
+}]])
+
+
 Game = Object:new { seed = 7 }
 Game.health_img = G.newImage("media/health.png")
 Game.health_quads = makeQuads(16, 8, 8)
+Game.canvas = G.newCanvas()
 
 function Game:init(seed)
 	self.stars = Stars()
@@ -17,12 +25,6 @@ function Game:playBack(record)
 	self.record = record
 	self.is_demo = true
 end
-function Game:rewind()
-	local r = self.record
-	self:reset()
-	self.record = r
-	self.is_demo = true
-end
 function Game:makeRG()
 	return makeRandomGenerator(self.rand.int(0xffffff))
 end
@@ -32,6 +34,8 @@ function Game:reset()
 	self.is_demo = false
 	self.tick = 0
 	self.outro = 0
+	self.blend = 1
+	self.action = false
 
 	self.player:reset()
 	self.stars:reset(self:makeRG())
@@ -92,6 +96,8 @@ function Game:update()
 	end
 
 
+
+
 	-- game over
 	if not self.player.alive then
 		self.outro = self.outro + 1
@@ -102,11 +108,32 @@ function Game:update()
 	end
 
 
-	-- loop replay
 	if self.is_demo and not self.record[self.tick] then
-		self:rewind()
+		self.action = "BACK"
 	end
 
+	if not self.action then
+		if self.blend > 0 then
+			self.blend = self.blend - 0.1
+		end
+	else
+		if self.blend < 1 then
+			self.blend = self.blend + 0.1
+		end
+		if self.blend >= 1 then
+			if self.action == "BACK" then
+				state = menu
+				menu:swapState("main")
+			end
+		end
+	end
+
+end
+function Game:keypressed(key, isrepeat)
+	if key == "escape"
+	or self.is_demo and (key == "return" or key == "space" or key == "x") then
+		self.action = "BACK"
+	end
 end
 function Game:draw()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
@@ -127,7 +154,7 @@ end
 
 
 
-	G.setCanvas(canvas)
+	G.setCanvas(self.canvas)
 	G.clear()
 
 	self.stars:draw()
@@ -143,7 +170,7 @@ end
 	G.setShader(Boom.shader)
 	G.setColor(255, 255, 255)
 	G.setBlendMode("replace")
-	G.draw(canvas)
+	G.draw(self.canvas)
 	G.setBlendMode("alpha")
 	G.setShader()
 
@@ -178,11 +205,9 @@ end
 	end
 
 
-	local blend = 0
-	if self.tick < 10 then
-		blend = 1 - self.tick / 10
-	elseif not self.player.alive and self.outro > 200 then
-		blend = math.min(1, (self.outro - 200) / 50)
+	local blend = self.blend
+	if not self.player.alive and self.outro > 200 then
+		blend = math.max(blend, math.min(1, (self.outro - 200) / 50))
 	end
 	if blend > 0 then
 		G.setColor(0, 0, 0, blend * 255)

@@ -2,26 +2,24 @@ local G = love.graphics
 local isDown = love.keyboard.isDown
 
 
-local stats
+local stats = {
+	record = false,
+	highscore = {
+		{ "TWOBIT", 1000 },
+		{ "TWOBIT",  900 },
+		{ "TWOBIT",  800 },
+		{ "TWOBIT",  700 },
+		{ "TWOBIT",  600 },
+		{ "TWOBIT",  500 },
+		{ "TWOBIT",  400 },
+		{ "TWOBIT",  300 },
+		{ "TWOBIT",  200 },
+		{ "TWOBIT",  100 },
+	}
+}
 
 if love.filesystem.isFile("stats") then
 	stats = loadstring("return " .. love.filesystem.read("stats"))()
-else
-	stats = {
-		record = false,
-		highscore = {
-			{ "TWOBIT", 1000 },
-			{ "TWOBIT",  900 },
-			{ "TWOBIT",  800 },
-			{ "TWOBIT",  700 },
-			{ "TWOBIT",  600 },
-			{ "TWOBIT",  500 },
-			{ "TWOBIT",  400 },
-			{ "TWOBIT",  300 },
-			{ "TWOBIT",  200 },
-			{ "TWOBIT",  100 },
-		}
-	}
 end
 
 local function saveStats()
@@ -77,7 +75,6 @@ function Menu:swapState(state)
 	self.action = false
 	self.select = 1
 	self.tick = 0
-	self.blink = 0
 	self.blend = 1
 	self.entry = false
 	Particle.list = {}
@@ -101,7 +98,6 @@ function Menu:gameOver(game)
 end
 function Menu:update()
 	self.tick = self.tick + 1
-	self.blink = (self.blink + 1) % 32
 
 	self.stars:update(1.25)
 	updateList(Particle.list)
@@ -117,25 +113,32 @@ function Menu:update()
 		if self.blend > 0 then
 			self.blend = self.blend - 0.1
 		end
+
+		-- start demo mode
+		if self.state == "main" and self.tick > 60 * 10 and stats.record then
+			self.action = "DEMO"
+		end
 	else
 		if self.blend < 1 then
 			self.blend = self.blend + 0.1
 		end
-	end
+		if self.blend >= 1 then
+			if self.action == "EXIT" then
+				love.event.quit()
+			elseif self.action == "BACK" then
+					self:swapState("main")
+			elseif self.action == "START GAME" then
+				state = game
+				game:reset()
+			elseif self.action == "HIGHSCORE" then
+				self:swapState("highscore")
+			elseif self.action == "CREDITS" then
+				self:swapState("credits")
 
-
-	if self.blend >= 1 then
-		if self.action == "EXIT" then
-			love.event.quit()
-		elseif self.action == "BACK" then
-				self:swapState("main")
-		elseif self.action == "START GAME" then
-			state = game
-			game:reset()
-		elseif self.action == "HIGHSCORE" then
-			self:swapState("highscore")
-		elseif self.action == "CREDITS" then
-			self:swapState("credits")
+			elseif self.action == "DEMO" then
+				state = game
+				game:playBack(stats.record)
+			end
 		end
 	end
 end
@@ -143,7 +146,7 @@ function Menu:keypressed(key, isrepeat)
 	if self.state == "highscore" and self.entry then
 		if key == "backspace" then
 			self.entry[1] = self.entry[1]:sub(1, -2)
-			self.blink = 0
+			self.tick = 0
 		elseif key == "return" or key == "escape" then
 			saveStats()
 			self.entry = false
@@ -152,12 +155,12 @@ function Menu:keypressed(key, isrepeat)
 
 		if #self.entry[1] >= 12 then return end
 
-		if #key == 1 and key:match("[%a%d]") then
+		if #key == 1 and key:match("[%a%d.-]") then
 			self.entry[1] = self.entry[1] .. key:upper()
-			self.blink = 0
+			self.tick = 0
 		elseif key == "space" then
 			self.entry[1] = self.entry[1] .. " "
-			self.blink = 0
+			self.tick = 0
 		end
 		return
 	end
@@ -172,7 +175,7 @@ function Menu:keypressed(key, isrepeat)
 			self.select = self.select + dy
 			self.select = math.max(self.select, 1)
 			self.select = math.min(self.select, #self.options[self.state])
-			if self.select ~= s then self.blink = 0 end
+			if self.select ~= s then self.tick = 0 end
 		end
 		if key == "return" or key == "space" or key == "x" then
 			self.action = self.options[self.state][self.select]
@@ -216,7 +219,7 @@ function Menu:draw()
 					e[1], e[2]),
 				400 - 24 * 13,
 				140 + 32 * i, 4)
-			if e == self.entry and self.blink < 24 then
+			if e == self.entry and self.tick % 32 < 24 then
 				font:print("\x7f",
 					400 + 24 * (#self.entry[1] - 9),
 					140 + 32 * i, 4)
@@ -226,12 +229,11 @@ function Menu:draw()
 
 
 	-- draw options
---	if self.options[self.state] then
 	if self.state == "main" then
 		for i, m in ipairs(self.options[self.state]) do
 			font:print(m, 280, 320 + 40 * (i - 1), 4)
 		end
-		if self.blink < 24 then
+		if self.tick % 32 < 24 then
 			font:print(">", 280-32, 320 + 40 * (self.select - 1), 4)
 		end
 	end
