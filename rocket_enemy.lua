@@ -18,15 +18,13 @@ function RocketEnemy:init(rand, x, y, wall)
 	if wall == "down"	then self.ny =-1  end
 	if wall == "left"	then self.nx =1  end
 	if wall == "right"	then self.nx =-1  end
-
 	self.ang = math.atan2(-self.nx, -self.ny)
-
 	self.active = false
 end
 function RocketEnemy:subUpdate()
 	self.y = self.y + game.walls.speed
 
-	if not self.action then
+	if not self.active and game.player.alive then
 		transform(self)
 		local dx = game.player.x - self.x
 		local dy = game.player.y - self.y
@@ -34,10 +32,11 @@ function RocketEnemy:subUpdate()
 		if dot > 0 then
 			local cross = self.nx * dy - self.ny * dx
 			if math.abs(cross) < 50 then
-				self.action = true
+				self.active = true
 			end
 		end
-	else
+	end
+	if self.active then
 		if self.tick % 4 == 0 then
 			local sm = SmokeParticle(self.x - self.nx * 16, self.y - self.ny * 16)
 			sm.dx = 0
