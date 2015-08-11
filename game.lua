@@ -90,7 +90,7 @@ function Game:update()
 
 	-- TODO
 --	if isDown("s") then
-	if self.rand.float(-5, 1) > 0.99995^self.tick then
+	if self.rand.float(-5, 1) > 0.99995^(self.tick + 500) then
 		local d = self.walls.data
 		local r = d[#d - 1]
 		local s = {}
