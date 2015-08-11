@@ -19,7 +19,7 @@ public:
 	virtual bool update() { return true; };
 	virtual void draw() {
 		window.draw(*this);
-//		drawPoly(poly);
+		drawPoly(poly);
 	};
 	virtual float checkCollision(const Poly& poly, Vec2* pnormal=nullptr, Vec2* pwhere=nullptr) const {
 		return ::checkCollision(this->poly, poly, pnormal, pwhere);

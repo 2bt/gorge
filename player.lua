@@ -114,7 +114,7 @@ function Player:update(input)
 		local d, n, w = polygonCollision(self.trans_model, e.trans_model)
 		if d > 0 then
 			e:hit(1)
-			self:hit(d, n, w, e)
+--			self:hit(d, n, w, e)
 		end
 	end
 

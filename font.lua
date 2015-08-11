@@ -34,7 +34,7 @@ end
 function Font:print(text, x, y, s)
 	r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(r/4, g/4, b/4, a)
-	self:print_(text, x, y + 4, s)
+	self:print_(text, x, y+4, s)
 	love.graphics.setColor(r, g, b, a)
 	self:print_(text, x, y, s)
 end

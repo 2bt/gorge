@@ -3,7 +3,7 @@ local G = love.graphics
 
 Walls = Object:new {
 	img = G.newImage("media/walls.png"),
-	speed = 1.25,
+	speed = 1,
 	W = 26,
 	H = 32,
 	polys = {
@@ -43,8 +43,6 @@ function Walls:reset(rand)
 	self.cy = 17
 	for i = 1, 20 do self:generate() end
 
-
---	for i = 1, 2320 do self:generate() end
 end
 function Walls:update()
 	self.tick = self.tick + 1
@@ -246,8 +244,8 @@ function Walls:checkCollision(poly)
 				if p then
 					local q = {}
 					for i = 1, #p, 2 do
-						q[i] = p[i] + x * 32 - 448
-						q[i + 1] = p[i + 1] + 300 + self.offset - y * 32
+						q[i]   = p[i] + x * 32 - 448
+						q[i+1] = p[i+1] + 300 + self.offset - y * 32
 					end
 					local d, n, w = polygonCollision(q, poly)
 					if d > dist then
@@ -262,5 +260,67 @@ function Walls:checkCollision(poly)
 	return dist, norm, where
 end
 
+local function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
 
+	local abx = bx - ax
+	local aby = by - ay
+	local qwx = wx - qx
+	local qwy = wy - qy
+	local aqx = qx - ax
+	local aqy = qy - ay
 
+	local det = abx*qwy - aby*qwx;
+	if math.abs(det) < 0.0001 then -- parallel
+		return
+	end
+
+	local abi = (aqx*qwy - aqy*qwx) / det
+	local qwi = (aqx*aby - aqy*abx) / det
+
+	if abi < 0 or abi > 1
+	or qwi < 0 or qwi > 1 then
+		return
+	end
+	return abi, qwi
+
+end
+
+function Walls:checkSight(ax, ay, bx, by)
+
+--	local dx = bx - ax
+--	local dy = by - ay
+--	local l = (dx*dx + dy*dy) ^ 0.5
+--	dx = dx / l
+--	dy = dy / l
+
+	local result
+
+	local x1, y1 = self:getTileAddress(ax, ay)
+	local x2, y2 = self:getTileAddress(bx, by)
+
+	for y = math.min(y1, y2), math.max(y1, y2) do
+		local row = self.data[y]
+		if row then
+			for x = math.min(x1, x2), math.max(x1, x2) do
+				local p = self.polys[row[x]]
+				if p then
+
+					local qx = p[#p-1] + x * 32 - 448
+					local qy = p[#p] + 300 + self.offset - y * 32
+					for i = 1, #p, 2 do
+						local wx = p[i] + x * 32 - 448
+						local wy = p[i+1] + 300 + self.offset - y * 32
+
+						local u, v = checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
+						if u then
+							result = math.min(u, result or 1)
+						end
+
+						qx, qy = wx, wy
+					end
+				end
+			end
+		end
+	end
+	return result
+end

@@ -64,12 +64,13 @@ function makeQuads(w, h, s)
 end
 
 
-function transform(obj)
+function transform(obj, model)
+	model = model or obj.model
 	local nx = math.sin(obj.ang or 0)
 	local ny = math.cos(obj.ang or 0)
-	for i = 1, #obj.model, 2 do
-		local x = obj.model[i]
-		local y = obj.model[i + 1]
+	for i = 1, #model, 2 do
+		local x = model[i]
+		local y = model[i + 1]
 		obj.trans_model[i] 		= obj.x + y * nx - x * ny
 		obj.trans_model[i + 1]	= obj.y + x * nx + y * ny
 	end

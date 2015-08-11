@@ -56,12 +56,7 @@ end
 Menu = Object()
 Menu.img = G.newImage("media/title.png")
 Menu.options = {
-	main = {
-		"START GAME",
-		"HIGHSCORE",
-		"CREDITS",
-		"EXIT"
-	},
+	main = { "START GAME", "HIGHSCORE", "CREDITS", "EXIT" },
 	credits = { "BACK" },
 	highscore = { "BACK" }
 }
@@ -99,7 +94,7 @@ end
 function Menu:update()
 	self.tick = self.tick + 1
 
-	self.stars:update(1.25)
+	self.stars:update(1)
 	updateList(Particle.list)
 
 	if self.state == "main" then
@@ -215,8 +210,7 @@ function Menu:draw()
 		G.setColor(255, 255, 255)
 		for i, e in ipairs(stats.highscore) do
 			font:print(
-				("%2d  %-12s  %08d"):format(i,
-					e[1], e[2]),
+				("%2d. %-12s  %08d"):format(i, e[1], e[2]),
 				400 - 24 * 13,
 				140 + 32 * i, 4)
 			if e == self.entry and self.tick % 32 < 24 then
@@ -234,7 +228,7 @@ function Menu:draw()
 			font:print(m, 280, 320 + 40 * (i - 1), 4)
 		end
 		if self.tick % 32 < 24 then
-			font:print(">", 280-32, 320 + 40 * (self.select - 1), 4)
+			font:print(">", 248, 320 + 40 * (self.select - 1), 4)
 		end
 	end
 

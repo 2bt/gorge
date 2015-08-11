@@ -46,6 +46,8 @@ function Game:reset()
 	Laser.list = {}
 	Enemy.list = {}
 
+	for i = 1, 720 do self.walls:generate() end
+
 end
 function Game:update()
 	self.tick = self.tick + 1
@@ -66,6 +68,8 @@ function Game:update()
 	end
 
 
+	-- update entities
+
 	self.stars:update(self.walls.speed)
 	self.walls:update()
 
@@ -78,8 +82,11 @@ function Game:update()
 
 
 
+	-- spawn enemies
+
 	-- TEST
 	if isDown("s") then
+--	if self.rand.float(-1, 1) > 0.9999^self.tick then
 		local d = self.walls.data
 		local r = d[#d - 1]
 		local s = {}
@@ -90,7 +97,7 @@ function Game:update()
 		end
 		if #s > 0 then
 			local x, y = self.walls:getTilePosition(s[self.rand.int(1, #s)], #d - 1)
-			RingEnemy(self:makeRG(), x, y)
+			SquareEnemy(self:makeRG(), x, y)
 		end
 
 	end
@@ -102,16 +109,17 @@ function Game:update()
 	if not self.player.alive then
 		self.outro = self.outro + 1
 		if self.outro > 250 then
-			menu:gameOver(self)
 			state = menu
+			if self.is_demo then
+				menu:swapState("main")
+			else
+				menu:gameOver(self)
+			end
 		end
 	end
-
-
 	if self.is_demo and not self.record[self.tick] then
 		self.action = "BACK"
 	end
-
 	if not self.action then
 		if self.blend > 0 then
 			self.blend = self.blend - 0.1
@@ -127,12 +135,16 @@ function Game:update()
 			end
 		end
 	end
-
 end
 function Game:keypressed(key, isrepeat)
 	if key == "escape"
 	or self.is_demo and (key == "return" or key == "space" or key == "x") then
 		self.action = "BACK"
+	end
+
+
+	if key == "-" then
+		self.walls.speed = self.walls.speed - 0.1
 	end
 end
 function Game:draw()
@@ -185,6 +197,17 @@ end
 
 	drawList(Particle.list)
 
+
+--	local mx = love.mouse.getX() - 400
+--	local my = love.mouse.getY() - 300
+--	G.line(self.player.x, self.player.y, mx, my)
+--	local u = self.walls:checkSight(self.player.x, self.player.y, mx, my)
+--	if u then
+--		G.rectangle("line",
+--		self.player.x + (mx - self.player.x) * u - 10,
+--		self.player.y + (my - self.player.y) * u - 10,
+--		20, 20)
+--	end
 
 
 	-- hud
