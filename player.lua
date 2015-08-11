@@ -3,14 +3,7 @@ local G = love.graphics
 
 Player = Object:new {
 	img = G.newImage("media/player.png"),
-	model = {
-		-16, 16,
-		-16, 0,
-		-4, -12,
-		4, -12,
-		16, 0,
-		16, 16,
-	}
+	model = { -16, 16, -16, 0, -4, -12, 4, -12, 16, 0, 16, 16 }
 }
 genQuads(Player, 16)
 function Player:init()
@@ -32,6 +25,9 @@ function Player:reset()
 	self.flash = 0
 end
 function Player:hit(d, n, w, e)
+	-- FIXME
+--	if 1 then return end
+
 	-- collision
 	if d then
 		self.x = self.x + n[1] * d
@@ -101,7 +97,7 @@ function Player:update(input)
 
 	-- shoot
 	if input.shoot and self.shoot_delay == 0 then
-		self.shoot_delay = 15
+		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
 	end
 	if self.shoot_delay > 0 then
@@ -114,15 +110,12 @@ function Player:update(input)
 		local d, n, w = polygonCollision(self.trans_model, e.trans_model)
 		if d > 0 then
 			e:hit(1)
---			self:hit(d, n, w, e)
+			self:hit(d, n, w, e)
 		end
 	end
 
-	-- TODO: collision with bullets
-	if self.invincible == 0 then
 
-
-	else
+	if self.invincible > 0 then
 		self.invincible = self.invincible - 1
 	end
 
@@ -142,7 +135,6 @@ function Player:draw()
 
 	if self.flash > 0 then G.setShader() end
 
---	G.setColor(255, 0, 0)
 --	G.polygon("line", self.trans_model)
 end
 
@@ -150,14 +142,9 @@ end
 
 
 Laser = Object:new {
+	list = {},
 	img = G.newImage("media/laser.png"),
-	model = {
-		-2, -10,
-		2, -10,
-		2, 10,
-		-2, 10,
-	},
-	list = {}
+	model = { -2, -10, 2, -10, 2, 10, -2, 10 }
 }
 function Laser:init(x, y)
 	table.insert(self.list, self)
@@ -190,11 +177,10 @@ function Laser:update()
 			end
 
 		end
-
-
 	end
 end
 function Laser:draw()
 	G.setColor(255, 255, 255)
 	G.draw(self.img, self.x, self.y, 0, 4, 4, 1.5, 3)
+--	G.polygon("line", self.trans_model)
 end

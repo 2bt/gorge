@@ -72,6 +72,7 @@ function Menu:swapState(state)
 	self.tick = 0
 	self.blend = 1
 	self.entry = false
+	self.stats_changed = false
 	Particle.list = {}
 end
 function Menu:gameOver(game)
@@ -121,7 +122,8 @@ function Menu:update()
 			if self.action == "EXIT" then
 				love.event.quit()
 			elseif self.action == "BACK" then
-					self:swapState("main")
+				if self.stats_changed then saveStats() end
+				self:swapState("main")
 			elseif self.action == "START GAME" then
 				state = game
 				game:reset()
@@ -143,8 +145,8 @@ function Menu:keypressed(key, isrepeat)
 			self.entry[1] = self.entry[1]:sub(1, -2)
 			self.tick = 0
 		elseif key == "return" or key == "escape" then
-			saveStats()
 			self.entry = false
+			self.stats_changed = true
 			return
 		end
 

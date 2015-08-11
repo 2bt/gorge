@@ -45,8 +45,11 @@ function Game:reset()
 	Particle.list = {}
 	Laser.list = {}
 	Enemy.list = {}
+	Bullet.list = {}
 
-	for i = 1, 720 do self.walls:generate() end
+
+	-- TODO
+--	for i = 1, 720 do self.walls:generate() end
 
 end
 function Game:update()
@@ -79,14 +82,15 @@ function Game:update()
 	self.player:update(input)
 	updateList(Enemy.list)
 	updateList(Laser.list)
+	updateList(Bullet.list)
 
 
 
 	-- spawn enemies
 
-	-- TEST
-	if isDown("s") then
---	if self.rand.float(-1, 1) > 0.9999^self.tick then
+	-- TODO
+--	if isDown("s") then
+	if self.rand.float(-5, 1) > 0.99995^self.tick then
 		local d = self.walls.data
 		local r = d[#d - 1]
 		local s = {}
@@ -97,7 +101,11 @@ function Game:update()
 		end
 		if #s > 0 then
 			local x, y = self.walls:getTilePosition(s[self.rand.int(1, #s)], #d - 1)
-			SquareEnemy(self:makeRG(), x, y)
+			if self.rand.int(1, 4) == 1 then
+				SquareEnemy(self:makeRG(), x, y)
+			else
+				RingEnemy(self:makeRG(), x, y)
+			end
 		end
 
 	end
@@ -144,7 +152,9 @@ function Game:keypressed(key, isrepeat)
 
 
 	if key == "-" then
-		self.walls.speed = self.walls.speed - 0.1
+		self.walls.speed = self.walls.speed - 1
+	elseif key == "+" then
+		self.walls.speed = self.walls.speed + 1
 	end
 end
 function Game:draw()
@@ -171,8 +181,9 @@ end
 
 	self.stars:draw()
 	self.walls:draw()
-	drawList(Laser.list)
 	drawList(Enemy.list)
+	drawList(Bullet.list)
+	drawList(Laser.list)
 	self.player:draw()
 
 
@@ -197,17 +208,6 @@ end
 
 	drawList(Particle.list)
 
-
---	local mx = love.mouse.getX() - 400
---	local my = love.mouse.getY() - 300
---	G.line(self.player.x, self.player.y, mx, my)
---	local u = self.walls:checkSight(self.player.x, self.player.y, mx, my)
---	if u then
---		G.rectangle("line",
---		self.player.x + (mx - self.player.x) * u - 10,
---		self.player.y + (my - self.player.y) * u - 10,
---		20, 20)
---	end
 
 
 	-- hud

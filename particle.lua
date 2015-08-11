@@ -33,7 +33,6 @@ function SparkParticle:draw()
 	G.draw(self.img, self.x, self.y, 0, 4, 4, 1.5, 1.5)
 end
 
-
 LaserParticle = SparkParticle:new {
 	color = {0, 155, 155},
 	friction = 0.7,
