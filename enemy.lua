@@ -15,6 +15,7 @@ function Enemy:init(rand, x, y)
 	self.x = x
 	self.y = y
 	self.tick = 0
+	transform(self)
 end
 function Enemy:hit(damage)
 	self.flash = 5
@@ -52,18 +53,21 @@ function Enemy:subDraw()
 end
 
 
-Bullet = Object:new { list = {} }
+Bullet = Object:new {
+	list = {},
+	model = { -4, 4, -4, -4, 4, -4, 4, 4 },
+	color = { 255, 36, 36 },
+}
 function Bullet:init(x, y, dx, dy)
 	table.insert(self.list, self)
 	self.trans_model = {}
 	self.x = x
 	self.y = y
-
-
 	self.dx = dx
 	self.dy = dy
 end
 function Bullet:makeSparks(x, y)
+	for i = 1, 10 do BulletParticle(x, y) end
 end
 function Bullet:update()
 	for i = 1, 2 do
@@ -93,10 +97,15 @@ function Bullet:update()
 	end
 end
 function Bullet:draw()
-	G.setColor(146, 255, 146)
+	G.setColor(unpack(self.color))
 	G.polygon("fill", self.trans_model)
 end
+BulletParticle = SparkParticle:new {
+	color = { 155, 22, 22 },
+	friction = 0.9,
+}
 
 require "ring_enemy"
 require "square_enemy"
 require "rocket_enemy"
+require "cannon_enemy"

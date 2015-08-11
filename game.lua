@@ -49,8 +49,8 @@ function Game:reset()
 
 	-- TODO
 --	for i = 1, 720 do self.walls:generate() end
---	RocketEnemy(self:makeRG(), 0, 0, "left")
---	RocketEnemy(self:makeRG(), 50, -100, "up")
+--	CannonEnemy(self:makeRG(), 0, 0, "left")
+--	CannonEnemy(self:makeRG(), 50, -100, "up")
 
 
 end
@@ -113,19 +113,26 @@ function Game:update()
 
 
 
-		local r = self.rand.int(1, 5)
+		local r = self.rand.int(1, 6)
 		if #s > 0 then
-			local x, y = self.walls:getTilePosition(s[self.rand.int(1, #s)], #d - 1)
+			local t = s[self.rand.int(1, #s)]
+			d[j][t] = -1
+			local x, y = self.walls:getTilePosition(t, #d - 1)
 			if r == 1 then
 				SquareEnemy(self:makeRG(), x, y)
 			elseif r < 5 then
 				RingEnemy(self:makeRG(), x, y)
 			end
 		end
-		if #w > 0 and r == 5 then
+		if #w > 0 and r >= 5 then
 			local t = w[self.rand.int(1, #w)]
+			d[j][t[1]] = -1
 			local x, y = self.walls:getTilePosition(t[1], #d - 1)
-			RocketEnemy(self:makeRG(), x, y, t[2])
+			if r == 5 then
+				RocketEnemy(self:makeRG(), x, y, t[2])
+			else
+				CannonEnemy(self:makeRG(), x, y, t[2])
+			end
 		end
 
 	end

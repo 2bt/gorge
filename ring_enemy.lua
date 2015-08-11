@@ -11,7 +11,6 @@ function RingEnemy:init(rand, x, y)
 	self:super(rand, x, y)
 	self:turnTo(0.2, math.pi - 0.2)
 	self.delay = self.rand.int(200)
-	transform(self)
 end
 function RingEnemy:turnTo(ang1, ang2)
 	local ang = self.rand.float(ang1, ang2)

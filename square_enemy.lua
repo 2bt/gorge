@@ -15,7 +15,6 @@ function SquareEnemy:init(rand, x, y)
 	self.vx = self.rand.float(-4, 4)
 	self.vy = 1
 	self:normVel()
-	transform(self)
 end
 function SquareEnemy:normVel()
 	local f = 1.1 / (self.vx*self.vx + self.vy*self.vy) ^ 0.5
@@ -67,6 +66,7 @@ function SquareEnemy:subUpdate()
 	end
 end
 RapidBullet = Bullet:new {
+	color = { 146, 255, 146 },
 	model = { -2, 6, -2, -6, 2, -6, 2, 6 }
 }
 function RapidBullet:init(x, y, dx, dy)
@@ -79,6 +79,6 @@ function RapidBullet:makeSparks(x, y)
 	end
 end
 RapidParticle = SparkParticle:new {
-	color = {88, 155, 88},
+	color = { 88, 155, 88 },
 	friction = 0.9,
 }

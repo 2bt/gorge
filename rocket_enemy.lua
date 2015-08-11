@@ -9,7 +9,6 @@ RocketEnemy = Enemy:new {
 genQuads(RocketEnemy, 16)
 function RocketEnemy:init(rand, x, y, wall)
 	self:super(rand, x, y)
-	transform(self)
 	self.vx = 0
 	self.vy = 0
 	self.nx = 0
@@ -19,6 +18,7 @@ function RocketEnemy:init(rand, x, y, wall)
 	if wall == "left"	then self.nx =1  end
 	if wall == "right"	then self.nx =-1  end
 	self.ang = math.atan2(-self.nx, -self.ny)
+	transform(self)
 	self.active = false
 end
 function RocketEnemy:subUpdate()
