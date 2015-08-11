@@ -47,9 +47,11 @@ function Game:reset()
 	Enemy.list = {}
 	Bullet.list = {}
 
+	RocketEnemy(self:makeRG(), 0, 0, "left")
+	RocketEnemy(self:makeRG(), 50, -100, "up")
 
 	-- TODO
---	for i = 1, 720 do self.walls:generate() end
+	for i = 1, 720 do self.walls:generate() end
 
 end
 function Game:update()
@@ -86,29 +88,48 @@ function Game:update()
 
 
 
-	-- spawn enemies
-
-	-- TODO
---	if isDown("s") then
+	-- TODO: spawn enemies
 	if self.rand.float(-5, 1) > 0.99995^(self.tick + 500) then
+
 		local d = self.walls.data
-		local r = d[#d - 1]
+		local j = #d - 1
+		local w = {}
 		local s = {}
-		for i, c in ipairs(r) do
+		for i, c in ipairs(d[j]) do
 			if c == 0 then
-				s[#s + 1] = i
+				s[#s+1] = i
+				if     d[j][i-1] == 1 then
+					w[#w+1] = { i, "left"}
+				elseif d[j][i+1] == 1 then
+					w[#w+1] = { i, "right"}
+				elseif d[j+1][i] == 1 then
+					w[#w+1] = { i, "up"}
+				elseif d[j-1][i] == 1 then
+					w[#w+1] = { i, "down"}
+				end
 			end
 		end
+
+
+
+
+		local r = self.rand.int(1, 5)
 		if #s > 0 then
 			local x, y = self.walls:getTilePosition(s[self.rand.int(1, #s)], #d - 1)
-			if self.rand.int(1, 4) == 1 then
+			if r == 1 then
 				SquareEnemy(self:makeRG(), x, y)
-			else
+			elseif r < 5 then
 				RingEnemy(self:makeRG(), x, y)
 			end
 		end
+		if #w > 0 and r == 5 then
+			local t = w[self.rand.int(1, #w)]
+			local x, y = self.walls:getTilePosition(t[1], #d - 1)
+			RocketEnemy(self:makeRG(), x, y, t[2])
+		end
 
 	end
+
 
 
 
@@ -156,6 +177,33 @@ function Game:keypressed(key, isrepeat)
 	elseif key == "+" then
 		self.walls.speed = self.walls.speed + 1
 	end
+
+
+
+--	if key == "r" then
+--		local d = self.walls.data
+--		local j = #d - 1
+--		local s = {}
+--		for i, c in ipairs(d[j]) do
+--			if c == 0 then
+--				if d[j][i-1] == 1 then
+--					s[#s+1] = { i, "left"}
+--				elseif d[j][i+1] == 1 then
+--					s[#s+1] = { i, "right"}
+--				elseif d[j+1][i] == 1 then
+--					s[#s+1] = { i, "up"}
+--				elseif d[j-1][i] == 1 then
+--					s[#s+1] = { i, "down"}
+--				end
+--			end
+--		end
+--		if #s > 0 then
+--			local t = s[self.rand.int(1, #s)]
+--			local x, y = self.walls:getTilePosition(t[1], #d - 1)
+--			RocketEnemy(self:makeRG(), x, y, t[2])
+--		end
+--	end
+
 end
 function Game:draw()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
@@ -180,11 +228,11 @@ end
 	G.clear()
 
 	self.stars:draw()
-	self.walls:draw()
 	drawList(Enemy.list)
 	drawList(Bullet.list)
 	drawList(Laser.list)
 	self.player:draw()
+	self.walls:draw()
 
 
 	G.setCanvas()

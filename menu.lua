@@ -205,9 +205,16 @@ function Menu:draw()
 
 
 	-- draw highscore
-	if self.state == "highscore" then
+	if self.state == "main" then
+		for i, m in ipairs(self.options[self.state]) do
+			font:print(m, 280, 320 + 40 * (i - 1), 4)
+		end
+		if self.tick % 32 < 24 then
+			font:print(">", 248, 320 + 40 * (self.select - 1), 4)
+		end
+	elseif self.state == "highscore" then
 		G.setColor(255, 255, 0)
-		font:print("HIGHSCORE", 280 - 24 * 4, 140 - 32, 4)
+		font:print("HIGHSCORE", 184, 108, 4)
 
 		G.setColor(255, 255, 255)
 		for i, e in ipairs(stats.highscore) do
@@ -221,18 +228,13 @@ function Menu:draw()
 					140 + 32 * i, 4)
 			end
 		end
+	elseif self.state == "credits" then
+		G.setColor(255, 255, 0)
+		font:print("CREDITS", 184, 108, 4)
+		G.setColor(255, 255, 255)
+		font:print("TODO", 184, 172, 4)
 	end
 
-
-	-- draw options
-	if self.state == "main" then
-		for i, m in ipairs(self.options[self.state]) do
-			font:print(m, 280, 320 + 40 * (i - 1), 4)
-		end
-		if self.tick % 32 < 24 then
-			font:print(">", 248, 320 + 40 * (self.select - 1), 4)
-		end
-	end
 
 
 
