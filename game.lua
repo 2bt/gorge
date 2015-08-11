@@ -47,11 +47,11 @@ function Game:reset()
 	Enemy.list = {}
 	Bullet.list = {}
 
-	RocketEnemy(self:makeRG(), 0, 0, "left")
-	RocketEnemy(self:makeRG(), 50, -100, "up")
-
 	-- TODO
-	for i = 1, 720 do self.walls:generate() end
+--	for i = 1, 720 do self.walls:generate() end
+--	RocketEnemy(self:makeRG(), 0, 0, "left")
+--	RocketEnemy(self:makeRG(), 50, -100, "up")
+
 
 end
 function Game:update()
