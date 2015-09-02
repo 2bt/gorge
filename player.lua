@@ -25,6 +25,8 @@ function Player:reset()
 	self.shield = 3
 	self.x = 0
 	self.y = 350
+	self.balls_x = self.x
+	self.balls_y = self.y
 	self.alive = true
 	self.invincible = 0
 	self.score = 0
@@ -77,6 +79,7 @@ function Player:update(input)
 	self.blast_x = self.blast_x * 0.85
 	self.blast_y = self.blast_y * 0.85
 
+	-- move
 	local speed = 3
 	if self.shoot_delay > 0 or input.shoot then
 		speed = speed * 0.5
@@ -97,9 +100,8 @@ function Player:update(input)
 		if self.y > 284 then self.y = 284 end
 		if self.y <-284 then self.y =-284 end
 	end
-
+	-- collision with walls
 	transform(self)
-
 	local d, n, w = game.walls:checkCollision(self.trans_model)
 	if d > 0 then
 		n[1] = -n[1]
@@ -107,6 +109,12 @@ function Player:update(input)
 		self:hit(d, n, w)
 	end
 
+
+	-- balls
+	local bx = self.x - self.balls_x
+	local by = self.y - self.balls_y
+	self.balls_x = self.balls_x + bx * 0.3
+	self.balls_y = self.balls_y + by * 0.3
 	if input.dy > 0 then
 		self.shoot_to_sides = false
 	elseif input.dy < 0 then
@@ -117,13 +125,12 @@ function Player:update(input)
 	if input.shoot and self.shoot_delay == 0 then
 		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
-
 		if self.shoot_to_sides then
-			SmallLaser(self.x - 28, self.y + 8, -4, -0.4)
-			SmallLaser(self.x + 28, self.y + 8, 4, -0.4)
+			SmallLaser(self.balls_x - 28, self.balls_y + 8, -4, -0.4)
+			SmallLaser(self.balls_x + 28, self.balls_y + 8, 4, -0.4)
 		else
-			SmallLaser(self.x - 28, self.y + 24, -0.4, -4)
-			SmallLaser(self.x + 28, self.y + 24, 0.4, -4)
+			SmallLaser(self.balls_x - 28, self.balls_y + 24, -0.4, -4)
+			SmallLaser(self.balls_x + 28, self.balls_y + 24, 0.4, -4)
 		end
 	end
 	if self.shoot_delay > 0 then
@@ -154,13 +161,11 @@ function Player:draw()
 	if self.flash > 0 then G.setShader(flash_shader) end
 
 	G.setColor(255, 255, 255)
-	G.draw(
-		self.img,
+	Ball:draw(self.balls_x - 28, self.balls_y + 8, self.tick)
+	Ball:draw(self.balls_x + 28, self.balls_y + 8, self.tick, true)
+	G.draw(self.img,
 		self.quads[1 + math.floor(self.tick / 8 % 2)],
 		self.x, self.y, 0, 4, 4, 8, 8)
-
-	Ball:draw(self.x - 28, self.y + 8, self.tick)
-	Ball:draw(self.x + 28, self.y + 8, self.tick, true)
 
 	if self.flash > 0 then G.setShader() end
 

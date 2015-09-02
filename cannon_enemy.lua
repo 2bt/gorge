@@ -36,13 +36,12 @@ function CannonEnemy:subUpdate()
 		local speed = 0.05
 		local d = (self.cannon_ang - ang + math.pi * 3) % (2 * math.pi) - math.pi
 
-
 		if     d >  speed then self.cannon_ang = self.cannon_ang - speed
 		elseif d < -speed then self.cannon_ang = self.cannon_ang + speed
 		else
 			self.cannon_ang = self.cannon_ang - d
 			if self.delay == 0 then
-				self.delay = self.rand.int(100, 150)
+				self.delay = self.rand.int(150, 250)
 				local l = (dx*dx + dy*dy) ^ 0.5
 				dx = dx / l
 				dy = dy / l
