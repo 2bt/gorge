@@ -32,10 +32,15 @@ function Ball:shoot(side_shoot)
 	end
 end
 function Ball:hit()
+	if not self.alive then return end
 	self.alive = false
 	for i = 1, 10 do
 		ExplosionSparkParticle(self.x, self.y)
 	end
+	local sm = SmokeParticle(self.x, self.y)
+	sm.dx = 0
+	sm.dy = 0
+	sm.ttl = 8
 end
 function Ball:update()
 	if not self.alive then return end
@@ -130,6 +135,8 @@ function Player:hit(d, n, w, e)
 		self.shield = self.shield - 1
 		if self.shield <= 0 then
 			self.alive = false
+			self.balls[1]:hit()
+			self.balls[2]:hit()
 			makeExplosion(self.x, self.y)
 		end
 	end
