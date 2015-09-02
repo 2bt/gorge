@@ -72,7 +72,7 @@ end
 function Ball:draw()
 	if not self.alive then return end
 	G.setColor(255, 255, 255)
-	local f = math.floor(self.player.tick / 6) % #self.quads + 1
+	local f = math.floor(self.player.tick / 4) % #self.quads + 1
 	G.draw(self.img, self.quads[f], self.x, self.y, 0, 4 * self.dir, 4, 4, 4)
 --	G.polygon("line", self.trans_model)
 end
