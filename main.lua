@@ -25,6 +25,10 @@ game = Game()
 menu = Menu()
 state = menu
 
+bg_music = love.audio.newSource("media/music.ogg", "stream")
+bg_music:setLooping(true)
+
+
 -- TEST
 --game.player.score = 999
 --menu:gameOver(game)

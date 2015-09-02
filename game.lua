@@ -7,7 +7,6 @@ vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 	return tc + vec4(max(max(tc.rgb, tc.gbr), tc.brg), 0);
 }]])
 
-
 Game = Object:new { seed = 7 }
 Game.health_img = G.newImage("media/health.png")
 Game.health_quads = makeQuads(16, 8, 8)
@@ -146,6 +145,7 @@ function Game:update()
 		self.outro = self.outro + 1
 		if self.outro > 250 then
 			state = menu
+			bg_music:stop()
 			if self.is_demo then
 				menu:swapState("main")
 			else
@@ -167,6 +167,7 @@ function Game:update()
 		if self.blend >= 1 then
 			if self.action == "BACK" then
 				state = menu
+				bg_music:stop()
 				menu:swapState("main")
 			end
 		end
@@ -178,13 +179,16 @@ function Game:keypressed(key, isrepeat)
 		self.action = "BACK"
 	end
 
-
-	if key == "-" then
-		self.walls.speed = self.walls.speed - 1
-	elseif key == "+" then
-		self.walls.speed = self.walls.speed + 1
+	if self.is_demo and key == "p" then
+		self.is_demo = false
 	end
 
+
+--	if key == "-" then
+--		self.walls.speed = self.walls.speed - 1
+--	elseif key == "+" then
+--		self.walls.speed = self.walls.speed + 1
+--	end
 
 
 --	if key == "r" then

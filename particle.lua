@@ -156,3 +156,4 @@ function SparkleParticle:draw()
 		self.alive = false
 	end
 end
+

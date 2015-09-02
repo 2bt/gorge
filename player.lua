@@ -1,6 +1,18 @@
 local G = love.graphics
 
 
+Ball = Object:new {
+	img = G.newImage("media/ball.png")
+}
+genQuads(Ball, 8)
+function Ball:draw(x, y, tick, flip)
+	G.setColor(255, 255, 255)
+	local f = math.floor(tick / 6) % #self.quads + 1
+	G.draw(self.img, self.quads[f], x, y, 0, flip and -4 or 4, 4, 4, 4)
+end
+
+
+
 Player = Object:new {
 	img = G.newImage("media/player.png"),
 	model = { -16, 16, -16, 0, -4, -12, 4, -12, 16, 0, 16, 16 }
@@ -19,15 +31,14 @@ function Player:reset()
 
 	self.tick = 0
 	self.shoot_delay = 0
+	self.shoot_to_sides = false
 	self.blast = 0
 	self.blast_x = 0
 	self.blast_y = 0
 	self.flash = 0
+
 end
 function Player:hit(d, n, w, e)
-	-- FIXME
---	if 1 then return end
-
 	-- collision
 	if d then
 		self.x = self.x + n[1] * d
@@ -77,6 +88,7 @@ function Player:update(input)
 
 	if self.tick < 60 then
 		self.y = self.y - 3
+		input.shoot = false
 	else
 		self.x = self.x + self.blast_x + input.dx * speed
 		self.y = self.y + self.blast_y + input.dy * speed
@@ -95,10 +107,24 @@ function Player:update(input)
 		self:hit(d, n, w)
 	end
 
+	if input.dy > 0 then
+		self.shoot_to_sides = false
+	elseif input.dy < 0 then
+		self.shoot_to_sides = true
+	end
+
 	-- shoot
 	if input.shoot and self.shoot_delay == 0 then
 		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
+
+		if self.shoot_to_sides then
+			SmallLaser(self.x - 28, self.y + 8, -4, -0.4)
+			SmallLaser(self.x + 28, self.y + 8, 4, -0.4)
+		else
+			SmallLaser(self.x - 28, self.y + 24, -0.4, -4)
+			SmallLaser(self.x + 28, self.y + 24, 0.4, -4)
+		end
 	end
 	if self.shoot_delay > 0 then
 		self.shoot_delay = self.shoot_delay - 1
@@ -133,6 +159,9 @@ function Player:draw()
 		self.quads[1 + math.floor(self.tick / 8 % 2)],
 		self.x, self.y, 0, 4, 4, 8, 8)
 
+	Ball:draw(self.x - 28, self.y + 8, self.tick)
+	Ball:draw(self.x + 28, self.y + 8, self.tick, true)
+
 	if self.flash > 0 then G.setShader() end
 
 --	G.polygon("line", self.trans_model)
@@ -144,18 +173,23 @@ end
 Laser = Object:new {
 	list = {},
 	img = G.newImage("media/laser.png"),
-	model = { -2, -10, 2, -10, 2, 10, -2, 10 }
+	model = { -2, -10, 2, -10, 2, 10, -2, 10 },
+	damage = 1
 }
-function Laser:init(x, y)
+function Laser:init(x, y, dx, dy)
 	table.insert(self.list, self)
 	self.x = x
 	self.y = y
+	self.dx = dx or 0
+	self.dy = dy or -4
 	self.trans_model = {}
 end
 function Laser:update()
 	for i = 1, 4 do
-		self.y = self.y - 4
-		if self.y < -300 then return "kill" end
+		self.x = self.x + self.dx
+		self.y = self.y + self.dy
+		if self.y < -300 or self.y > 300
+		or self.x < -400 or self.x > 400 then return "kill" end
 		transform(self)
 
 		local d, n, w = game.walls:checkCollision(self.trans_model)
@@ -169,7 +203,7 @@ function Laser:update()
 		for _, e in ipairs(Enemy.list) do
 			local d, n, w = polygonCollision(self.trans_model, e.trans_model)
 			if d > 0 then
-				e:hit(1)
+				e:hit(self.damage)
 				for i = 1, 10 do
 					LaserParticle(w[1], w[2])
 				end
@@ -180,7 +214,14 @@ function Laser:update()
 	end
 end
 function Laser:draw()
+	local rot = math.atan2(-self.dx, self.dy)
 	G.setColor(255, 255, 255)
-	G.draw(self.img, self.x, self.y, 0, 4, 4, 1.5, 3)
+	G.draw(self.img, self.x, self.y, rot, 4, 4, 1.5, 3)
 --	G.polygon("line", self.trans_model)
 end
+
+SmallLaser = Laser:new {
+	img = G.newImage("media/small_laser.png"),
+	model = { -2, -5, 2, -5, 2, 5, -2, 5 },
+	damage = 0.5
+}
