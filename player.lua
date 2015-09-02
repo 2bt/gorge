@@ -2,13 +2,74 @@ local G = love.graphics
 
 
 Ball = Object:new {
+	model = { -6, 6, -6, -6, 6, -6, 6, 6 },
 	img = G.newImage("media/ball.png")
 }
 genQuads(Ball, 8)
-function Ball:draw(x, y, tick, flip)
+function Ball:init(player, dir)
+	self.player = player
+	self.dir = dir
+	self.ox = 28 * dir
+	self.oy = 8
+	self.alive = false
+	self.trans_model = {}
+--	self.x = 0
+--	self.y = 0
+--	transform(self)
+end
+function Ball:activate()
+	self.alive = true
+	self.x = self.player.x
+	self.y = self.player.y
+	self.glide = 0
+end
+function Ball:shoot(side_shoot)
+	if not self.alive then return end
+	if side_shoot then
+		SmallLaser(self.x - 16 * self.dir, self.y, 4 * self.dir, -0.4)
+	else
+		SmallLaser(self.x, self.y + 16, 0.4 * self.dir, -4)
+	end
+end
+function Ball:hit()
+	self.alive = false
+	for i = 1, 10 do
+		ExplosionSparkParticle(self.x, self.y)
+	end
+end
+function Ball:update()
+	if not self.alive then return end
+	local dx = self.player.x + self.ox - self.x
+	local dy = self.player.y + self.oy - self.y
+	if self.glide < 0.3 then
+		self.glide = self.glide + 0.02
+	end
+	self.x = self.x + dx * self.glide
+	self.y = self.y + dy * self.glide
+	transform(self)
+
+	-- collision with wall
+	local d, n, w = game.walls:checkCollision(self.trans_model)
+	if d > 0 then
+		self:hit()
+		return
+	end
+	-- collision with enemies
+	for _, e in ipairs(Enemy.list) do
+		local d, n, w = polygonCollision(self.trans_model, e.trans_model)
+		if d > 0 then
+			e:hit(1)
+			self:hit()
+			return
+		end
+	end
+end
+function Ball:draw()
+	if not self.alive then return end
 	G.setColor(255, 255, 255)
-	local f = math.floor(tick / 6) % #self.quads + 1
-	G.draw(self.img, self.quads[f], x, y, 0, flip and -4 or 4, 4, 4, 4)
+	local f = math.floor(self.player.tick / 6) % #self.quads + 1
+	G.draw(self.img, self.quads[f], self.x, self.y, 0, 4 * self.dir, 4, 4, 4)
+--	G.polygon("line", self.trans_model)
 end
 
 
@@ -20,25 +81,27 @@ Player = Object:new {
 genQuads(Player, 16)
 function Player:init()
 	self.trans_model = {}
+	self.balls = { Ball(self, -1), Ball(self, 1) }
 end
 function Player:reset()
 	self.shield = 3
 	self.x = 0
 	self.y = 350
-	self.balls_x = self.x
-	self.balls_y = self.y
 	self.alive = true
 	self.invincible = 0
 	self.score = 0
-
 	self.tick = 0
 	self.shoot_delay = 0
-	self.shoot_to_sides = false
+	self.side_shoot = false
 	self.blast = 0
 	self.blast_x = 0
 	self.blast_y = 0
 	self.flash = 0
 
+	self.balls[1].alive = false
+	self.balls[2].alive = false
+
+--	transform(self)
 end
 function Player:hit(d, n, w, e)
 	-- collision
@@ -89,9 +152,14 @@ function Player:update(input)
 		speed = 0
 	end
 
+	if self.tick == 60 then
+		self.balls[1]:activate()
+		self.balls[2]:activate()
+	end
+
 	if self.tick < 60 then
 		self.y = self.y - 3
-		input.shoot = false
+		return
 	else
 		self.x = self.x + self.blast_x + input.dx * speed
 		self.y = self.y + self.blast_y + input.dy * speed
@@ -109,29 +177,21 @@ function Player:update(input)
 		self:hit(d, n, w)
 	end
 
-
 	-- balls
-	local bx = self.x - self.balls_x
-	local by = self.y - self.balls_y
-	self.balls_x = self.balls_x + bx * 0.3
-	self.balls_y = self.balls_y + by * 0.3
-	if input.dy > 0 then
-		self.shoot_to_sides = false
-	elseif input.dy < 0 then
-		self.shoot_to_sides = true
-	end
+	self.balls[1]:update()
+	self.balls[2]:update()
 
 	-- shoot
+	if input.dy > 0 then
+		self.side_shoot = false
+	elseif input.dy < 0 then
+		self.side_shoot = true
+	end
 	if input.shoot and self.shoot_delay == 0 then
 		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
-		if self.shoot_to_sides then
-			SmallLaser(self.balls_x - 28, self.balls_y + 8, -4, -0.4)
-			SmallLaser(self.balls_x + 28, self.balls_y + 8, 4, -0.4)
-		else
-			SmallLaser(self.balls_x - 28, self.balls_y + 24, -0.4, -4)
-			SmallLaser(self.balls_x + 28, self.balls_y + 24, 0.4, -4)
-		end
+		self.balls[1]:shoot(self.side_shoot)
+		self.balls[2]:shoot(self.side_shoot)
 	end
 	if self.shoot_delay > 0 then
 		self.shoot_delay = self.shoot_delay - 1
@@ -151,18 +211,18 @@ function Player:update(input)
 	if self.invincible > 0 then
 		self.invincible = self.invincible - 1
 	end
-
 end
 function Player:draw()
 	if not self.alive then return end
+
+	G.setColor(255, 255, 255)
+	self.balls[1]:draw()
+	self.balls[2]:draw()
 
 	if self.invincible % 8 >= 4 then return end
 
 	if self.flash > 0 then G.setShader(flash_shader) end
 
-	G.setColor(255, 255, 255)
-	Ball:draw(self.balls_x - 28, self.balls_y + 8, self.tick)
-	Ball:draw(self.balls_x + 28, self.balls_y + 8, self.tick, true)
 	G.draw(self.img,
 		self.quads[1 + math.floor(self.tick / 8 % 2)],
 		self.x, self.y, 0, 4, 4, 8, 8)
@@ -193,8 +253,8 @@ function Laser:update()
 	for i = 1, 4 do
 		self.x = self.x + self.dx
 		self.y = self.y + self.dy
-		if self.y < -300 or self.y > 300
-		or self.x < -400 or self.x > 400 then return "kill" end
+		if self.y < -310 or self.y > 310
+		or self.x < -410 or self.x > 410 then return "kill" end
 		transform(self)
 
 		local d, n, w = game.walls:checkCollision(self.trans_model)

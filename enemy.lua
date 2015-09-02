@@ -86,12 +86,24 @@ function Bullet:update()
 			return "kill"
 		end
 
-		if game.player.alive and game.player.invincible == 0 then
-			local d, n, w = polygonCollision(self.trans_model, game.player.trans_model)
-			if d > 0 then
-				game.player:hit()
-				self:makeSparks(w[1], w[2])
-				return "kill"
+		if game.player.alive then
+			if game.player.invincible == 0 then
+				local d, n, w = polygonCollision(self.trans_model, game.player.trans_model)
+				if d > 0 then
+					game.player:hit()
+					self:makeSparks(w[1], w[2])
+					return "kill"
+				end
+			end
+			for _, ball in ipairs(game.player.balls) do
+				if ball.alive then
+					local d, n, w = polygonCollision(self.trans_model, ball.trans_model)
+					if d > 0 then
+						ball:hit()
+						self:makeSparks(w[1], w[2])
+						return "kill"
+					end
+				end
 			end
 		end
 	end
