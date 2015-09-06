@@ -51,7 +51,6 @@ function Game:reset()
 --	CannonEnemy(self:makeRG(), 0, 0, "left")
 --	CannonEnemy(self:makeRG(), 50, -100, "up")
 
-
 end
 function Game:update()
 	self.tick = self.tick + 1
@@ -88,7 +87,7 @@ function Game:update()
 
 
 	-- TODO: spawn enemies
-	if self.rand.float(-5, 1) > 0.99995^(self.tick + 500) then
+	if self.rand.float(-5, 1) > 0.99996^(self.tick/20 + 1000 + self.tick % 1000 * 3) then
 
 		local d = self.walls.data
 		local j = #d - 1
@@ -135,7 +134,6 @@ function Game:update()
 		end
 
 	end
-
 
 
 

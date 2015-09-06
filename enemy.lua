@@ -65,11 +65,13 @@ function Bullet:init(x, y, dx, dy)
 	self.y = y
 	self.dx = dx
 	self.dy = dy
+	self.tick = 0
 end
 function Bullet:makeSparks(x, y)
 	for i = 1, 10 do BulletParticle(x, y) end
 end
 function Bullet:update()
+	self.tick = self.tick + 1
 	for i = 1, 2 do
 		self.x = self.x + self.dx / 2
 		self.y = self.y + self.dy / 2
@@ -116,6 +118,16 @@ BulletParticle = SparkParticle:new {
 	color = { 155, 22, 22 },
 	friction = 0.9,
 }
+
+PlasmaBullet = Bullet:new {
+	img = G.newImage("media/plasma.png")
+}
+genQuads(PlasmaBullet, 7)
+function PlasmaBullet:draw()
+	G.setColor(255, 255, 255)
+	G.draw(self.img, self.quads[math.floor(self.tick / 2) % #self.quads + 1],
+		self.x, self.y, 0, 4, 4, 3.5, 3.5)
+end
 
 require "ring_enemy"
 require "square_enemy"

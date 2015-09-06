@@ -127,7 +127,7 @@ function Menu:update()
 			elseif self.action == "START GAME" then
 				state = game
 				game:reset()
-				bg_music:play()
+--				bg_music:play()
 			elseif self.action == "HIGHSCORE" then
 				self:swapState("highscore")
 			elseif self.action == "CREDITS" then

@@ -45,7 +45,7 @@ function CannonEnemy:subUpdate()
 				local l = (dx*dx + dy*dy) ^ 0.5
 				dx = dx / l
 				dy = dy / l
-				Bullet(self.x + dx * 16, self.y + dy * 16, dx * 4, dy * 4)
+				PlasmaBullet(self.x + dx * 16, self.y + dy * 16, dx * 4, dy * 4)
 			end
 		end
 	end
