@@ -159,11 +159,6 @@ function Player:update(input)
 		speed = 0
 	end
 
-	if self.tick == 60 then
-		self.balls[1]:activate()
-		self.balls[2]:activate()
-	end
-
 	if self.tick < 60 then
 		self.y = self.y - 3
 		return

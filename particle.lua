@@ -2,13 +2,38 @@ local G = love.graphics
 
 
 Particle = Object:new {
-	list = {}
+	list = {},
+	frame_length = 3,
+	alive = true,
+	size = 8
 }
+function Particle:init(x, y)
+	table.insert(self.list, self)
+	self.x = x
+	self.y = y
+	self.tick = 0
+end
+function Particle:draw()
+	G.setColor(255, 255, 255)
+	local f = math.floor(self.tick / self.frame_length) + 1
+	if self.quads[f] then
+		G.draw(self.img, self.quads[f], self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
+	else
+		self.alive = false
+	end
+end
+function Particle:update()
+	self.y = self.y + game.walls.speed
+	self.tick = self.tick + 1
+	if not self.alive then return "kill" end
+end
+
+
 
 SparkParticle = Particle:new {
 	img = G.newImage("media/spark.png"),
 	color = {255, 255, 255},
-	friction = 1,
+	friction = 1
 }
 function SparkParticle:init(x, y)
 	table.insert(self.list, self)
@@ -33,10 +58,13 @@ function SparkParticle:draw()
 	G.draw(self.img, self.x, self.y, 0, 4, 4, 1.5, 1.5)
 end
 
+
 LaserParticle = SparkParticle:new {
 	color = {0, 155, 155},
 	friction = 0.7,
 }
+
+
 
 ExplosionSparkParticle = SparkParticle:new {
 	friction = 0.95,
@@ -60,10 +88,12 @@ end
 
 
 
+
 SmokeParticle = Particle:new {
-	img = G.newImage("media/smoke.png")
+	img = G.newImage("media/smoke.png"),
+	size = 8
 }
-genQuads(SmokeParticle, 8)
+genQuads(SmokeParticle)
 function SmokeParticle:init(x, y)
 	table.insert(self.list, self)
 	self.x = x
@@ -85,37 +115,16 @@ end
 function SmokeParticle:draw()
 	G.setColor(30, 30, 30, 150)
 	local f = math.max(1, #self.quads - math.floor(self.ttl / 3))
-	G.draw(self.img, self.quads[f], self.x, self.y, 0, 4, 4, 4, 4)
+	G.draw(self.img, self.quads[f], self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
 end
 
 
 
 ExplosionParticle = Particle:new {
-	img = G.newImage("media/explosion.png")
+	img = G.newImage("media/explosion.png"),
+	size = 16
 }
-genQuads(ExplosionParticle, 16)
-function ExplosionParticle:init(x, y)
-	table.insert(self.list, self)
-	self.x = x
-	self.y = y
-	self.tick = 0
-	self.alive = true
-end
-function ExplosionParticle:update()
-	self.y = self.y + game.walls.speed
-	self.tick = self.tick + 1
-	if not self.alive then return "kill" end
-end
-function ExplosionParticle:draw()
-	G.setColor(255, 255, 255)
-	local f = math.floor(self.tick / 3) + 1
-	if self.quads[f] then
-		G.draw(self.img, self.quads[f], self.x, self.y, 0, 4, 4, 8, 8)
-	else
-		self.alive = false
-	end
-end
-
+genQuads(ExplosionParticle)
 
 
 function makeExplosion(x, y)
@@ -135,25 +144,8 @@ end
 SparkleParticle = Particle:new {
 	img = G.newImage("media/sparkle.png")
 }
-genQuads(SparkleParticle, 8)
-function SparkleParticle:init(x, y)
-	table.insert(self.list, self)
-	self.x = x
-	self.y = y
-	self.tick = 0
-	self.alive = true
-end
+genQuads(SparkleParticle)
 function SparkleParticle:update()
 	self.tick = self.tick + 1
 	if not self.alive then return "kill" end
 end
-function SparkleParticle:draw()
-	G.setColor(255, 255, 255)
-	local f = math.floor(self.tick / 3) + 1
-	if self.quads[f] then
-		G.draw(self.img, self.quads[f], self.x, self.y, 0, 4, 4, 4, 4)
-	else
-		self.alive = false
-	end
-end
-

@@ -6,7 +6,7 @@ RocketEnemy = Enemy:new {
 	img = G.newImage("media/rocket.png"),
 	model = { -16, 16, -4, -20, 4, -20, 16, 16 }
 }
-genQuads(RocketEnemy, 16)
+genQuads(RocketEnemy)
 function RocketEnemy:init(rand, x, y, wall)
 	self:super(rand, x, y)
 	self.vx = 0

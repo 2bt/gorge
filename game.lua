@@ -45,6 +45,10 @@ function Game:reset()
 	Laser.list = {}
 	Enemy.list = {}
 	Bullet.list = {}
+	Item.list = {}
+
+	RingEnemy.counter = 0
+
 
 	-- TODO
 --	for i = 1, 720 do self.walls:generate() end
@@ -83,11 +87,12 @@ function Game:update()
 	updateList(Enemy.list)
 	updateList(Laser.list)
 	updateList(Bullet.list)
+	updateList(Item.list)
 
 
 
 	-- TODO: spawn enemies
-	if self.rand.float(-5, 1) > 0.99996^(self.tick/20 + 1000 + self.tick % 1000 * 3) then
+	if self.rand.float(-5, 1) > 0.99996^(self.tick/10 + 1000 + self.tick % 1000 * 3) then
 
 		local d = self.walls.data
 		local j = #d - 1
@@ -238,6 +243,7 @@ end
 
 	self.stars:draw()
 	drawList(Enemy.list)
+	drawList(Item.list)
 	drawList(Bullet.list)
 	drawList(Laser.list)
 	self.player:draw()

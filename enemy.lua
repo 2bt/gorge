@@ -7,6 +7,7 @@ Enemy = Object:new {
 	flash = 0,
 	score = 0,
 	frame_length = 4,
+	size = 16,
 }
 function Enemy:init(rand, x, y)
 	table.insert(self.list, self)
@@ -25,9 +26,12 @@ function Enemy:hit(damage)
 		game.player.score = game.player.score + self.score
 	end
 end
+function Enemy:die()
+end
 function Enemy:update()
 	if not self.alive then
 		makeExplosion(self.x, self.y)
+		self:die()
 		return "kill"
 	end
 	if self.x > 440 or self.x < -440
@@ -48,7 +52,7 @@ end
 function Enemy:subDraw()
 	G.setColor(255, 255, 255)
 	G.draw(self.img, self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
-		self.x, self.y, -self.ang or 0, 4, 4, 8, 8)
+		self.x, self.y, -self.ang or 0, 4, 4, self.size / 2, self.size / 2)
 --	G.polygon("line", self.trans_model)
 end
 

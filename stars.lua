@@ -30,14 +30,12 @@ float perlin(sampler2D n, vec2 p) {
 uniform sampler2D noise;
 uniform float xx;
 vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
-]]..
-(COMPATIBILITY and "screen_coords.y = 150 - screen_coords.y;" or "")..
-[[
+]]..(COMPATIBILITY and "screen_coords.y = 150 - screen_coords.y;" or "")..[[
 	vec2 p = (screen_coords - vec2(0, xx)) * 0.00005;
-	float f = max(0, pow(perlin(noise, p), 1) - 0.475);
+	float f = max(0, pow(perlin(noise, p), 1) - 0.41);
 	f = floor(f * 16.0) / 16.0;
-	if (f > 0) f += 0.3;
-	f = f * f * f;
+	if (f > 0) f += 0.1;
+	f = f * f * 1.2;
 	vec3 c = vec3(0.4, 0.5, 0.5) * f;
 	return vec4(c, 1);
 }]])

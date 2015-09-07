@@ -46,6 +46,7 @@ end
 
 
 function genQuads(obj, size)
+	size = size or obj.size
 	obj.quads = makeQuads(
 		obj.img:getWidth(),
 		obj.img:getHeight(),

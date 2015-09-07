@@ -5,12 +5,24 @@ RingEnemy = Enemy:new {
 	shield = 1,
 	score = 100,
 	model = { -8, 16, -12, 8, -12, -8, -8, -16, 8, -16, 12, -8, 12, 8, 8, 16 },
+	counter = 0
 }
-genQuads(RingEnemy, 16)
+genQuads(RingEnemy)
 function RingEnemy:init(rand, x, y)
 	self:super(rand, x, y)
 	self:turnTo(0.2, math.pi - 0.2)
 	self.delay = self.rand.int(200)
+end
+function RingEnemy:die()
+	RingEnemy.counter = RingEnemy.counter + 1
+	if self.counter > 0 and self.counter % 50 == 0 then
+		if not game.player.balls[1].active
+		or not game.player.balls[2].active then
+			BallItem(self.x, self.y)
+		else
+			HealthItem(self.x, self.y)
+		end
+	end
 end
 function RingEnemy:turnTo(ang1, ang2)
 	local ang = self.rand.float(ang1, ang2)

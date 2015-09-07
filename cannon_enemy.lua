@@ -6,7 +6,7 @@ CannonEnemy = Enemy:new {
 	img = G.newImage("media/cannon.png"),
 	model = { -16, 16, -16, 0, -8, -16, 8, -16, 16, 0, 16, 16 }
 }
-genQuads(CannonEnemy, 16)
+genQuads(CannonEnemy)
 function CannonEnemy:init(rand, x, y, wall)
 	self:super(rand, x, y)
 	self.nx = 0

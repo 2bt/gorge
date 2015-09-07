@@ -7,7 +7,7 @@ SquareEnemy = Enemy:new {
 	model = { -8, 16, -16, 8, -16, -8, -8, -16, 8, -16, 16, -8, 16, 8, 8, 16 },
 	bounce_model = { -16, 32, -32, 16, -32, -16, -16, -32, 16, -32, 32, -16, 32, 16, 16, 32 },
 }
-genQuads(SquareEnemy, 16)
+genQuads(SquareEnemy)
 function SquareEnemy:init(rand, x, y)
 	self:super(rand, x, y)
 	self.tick = self.rand.int(1, 100)
@@ -15,6 +15,8 @@ function SquareEnemy:init(rand, x, y)
 	self.vx = self.rand.float(-4, 4)
 	self.vy = 1
 	self:normVel()
+end
+function SquareEnemy:die()
 end
 function SquareEnemy:normVel()
 	local f = 1.1 / (self.vx*self.vx + self.vy*self.vy) ^ 0.5
