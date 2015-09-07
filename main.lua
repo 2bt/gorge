@@ -1,6 +1,21 @@
+local G = love.graphics
+
+
+-- compatibility
+local a, b, c = love.getVersion()
+local v = a * 10000 + b * 100 + c
+if v < 1000 then
+	COMPATIBILITY = true
+	local b = G.setBlendMode
+	G.setBlendMode = function(m)
+		b(({ ["add"] = "additive" })[m] or m)
+	end
+
+end
+
+
 DEBUG = false
 
-local G = love.graphics
 
 love.keyboard.setKeyRepeat(true)
 love.mouse.setVisible(false)
