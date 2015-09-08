@@ -7,6 +7,8 @@ Walls = Object:new {
 	W = 26,
 	H = 32,
 	polys = {
+		[-2] = { 0, 4, 0, 28, 32, 28, 32, 4 },
+
 		{ 0, 0, 0, 32, 32, 32, 32, 0 },
 		{ 0, 0, 32, 32, 32, 0 },
 		{ 0, 32, 32, 32, 32, 0 },
@@ -51,6 +53,7 @@ function Walls:update()
 	while self.offset >= 32 do
 		self.offset = self.offset - 32
 		self:generate()
+		game:next_wall_row()
 	end
 
 end
@@ -139,7 +142,7 @@ function Walls:generate()
 
 
 		if cell == 0 then
-			if s >=3 then
+			if s >= 3 then
 				row[x] = 1
 			elseif s == 2 then
 				for i = 1, 4 do
@@ -189,6 +192,7 @@ end
 					x * 32 - 448,
 					300 - y * 32 + self.offset, 0, 4, 4)
 			end
+--			G.print(cell, x * 32 - 448, 300 - y * 32 + self.offset)
 		end
 	end
 
@@ -219,7 +223,7 @@ function Walls:getTilePosition(x, y)
 			300 - y * 32 + self.offset + 16
 end
 
-function Walls:checkCollision(poly)
+function Walls:checkCollision(poly, skip_meta)
 	local dist = 0, norm, where
 
 	local x1 = poly[1]
@@ -240,8 +244,9 @@ function Walls:checkCollision(poly)
 		local row = self.data[y]
 		if row then
 			for x = x1, x2 do
-				local p = self.polys[row[x]]
-				if p then
+				cell = row[x]
+				local p = self.polys[cell]
+				if p and not (skip_meta and cell < 0) then
 					local q = {}
 					for i = 1, #p, 2 do
 						q[i]   = p[i] + x * 32 - 448

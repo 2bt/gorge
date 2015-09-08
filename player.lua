@@ -54,7 +54,7 @@ function Ball:update()
 	transform(self)
 
 	-- collision with wall
-	local d, n, w = game.walls:checkCollision(self.trans_model)
+	local d, n, w = game.walls:checkCollision(self.trans_model, true)
 	if d > 0 then
 		self:hit()
 		return
@@ -79,6 +79,9 @@ end
 
 
 
+
+
+
 Player = Object:new {
 	img = G.newImage("media/player.png"),
 	model = { -16, 16, -16, 0, -4, -12, 4, -12, 16, 0, 16, 16 }
@@ -90,6 +93,7 @@ function Player:init()
 end
 function Player:reset()
 	self.shield = 3
+	self.max_shield = self.shield
 	self.x = 0
 	self.y = 350
 	self.alive = true
@@ -172,7 +176,7 @@ function Player:update(input)
 	end
 	-- collision with walls
 	transform(self)
-	local d, n, w = game.walls:checkCollision(self.trans_model)
+	local d, n, w = game.walls:checkCollision(self.trans_model, true)
 	if d > 0 then
 		n[1] = -n[1]
 		n[2] = -n[2]
@@ -259,7 +263,7 @@ function Laser:update()
 		or self.x < -410 or self.x > 410 then return "kill" end
 		transform(self)
 
-		local d, n, w = game.walls:checkCollision(self.trans_model)
+		local d, n, w = game.walls:checkCollision(self.trans_model, true)
 		if d > 0 then
 			for i = 1, 10 do
 				LaserParticle(w[1], w[2])

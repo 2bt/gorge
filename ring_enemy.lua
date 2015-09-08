@@ -15,9 +15,9 @@ function RingEnemy:init(rand, x, y)
 end
 function RingEnemy:die()
 	RingEnemy.counter = RingEnemy.counter + 1
-	if self.counter > 0 and self.counter % 50 == 0 then
-		if not game.player.balls[1].active
-		or not game.player.balls[2].active then
+	if self.counter % 20 == 0 then
+		if not game.player.balls[1].alive
+		or not game.player.balls[2].alive then
 			BallItem(self.x, self.y)
 		else
 			HealthItem(self.x, self.y)

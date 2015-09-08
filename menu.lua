@@ -3,7 +3,6 @@ local isDown = love.keyboard.isDown
 
 
 local stats = {
-	record = false,
 	highscore = {
 		{ "TWOBIT", 1000 },
 		{ "TWOBIT",  900 },
@@ -18,12 +17,12 @@ local stats = {
 	}
 }
 
-if love.filesystem.isFile("stats") then
-	stats = loadstring("return " .. love.filesystem.read("stats"))()
+if love.filesystem.isFile(VERSION) then
+	stats = loadstring("return " .. love.filesystem.read(VERSION))()
 end
 
 local function saveStats()
-	local f = love.filesystem.newFile("stats", "w")
+	local f = love.filesystem.newFile(VERSION, "w")
 	local function w(t)
 		if type(t) == "table" then
 			f:write("{")
@@ -82,8 +81,11 @@ function Menu:gameOver(game)
 		if e[2] < entry[2] then
 			table.insert(stats.highscore, i, entry)
 			table.remove(stats.highscore)
-			if not stats.record or i == 1 then
-				stats.record = game.record
+			if not stats.demo or i == 1 then
+				stats.demo = {
+					record = game.record,
+					seed = game.seed
+				}
 			end
 			self:swapState("highscore")
 			self.entry = entry
@@ -111,7 +113,7 @@ function Menu:update()
 		end
 
 		-- start demo mode
-		if self.state == "main" and self.tick > 60 * 10 and stats.record then
+		if self.state == "main" and self.tick > 60 * 10 and stats.demo then
 			self.action = "DEMO"
 		end
 	else
@@ -126,7 +128,7 @@ function Menu:update()
 				self:swapState("main")
 			elseif self.action == "START GAME" then
 				state = game
-				game:reset()
+				game:start(love.math.random(0xfffffff))
 --				bg_music:play()
 			elseif self.action == "HIGHSCORE" then
 				self:swapState("highscore")
@@ -135,7 +137,7 @@ function Menu:update()
 
 			elseif self.action == "DEMO" then
 				state = game
-				game:playBack(stats.record)
+				game:playBack(stats.demo)
 			end
 		end
 	end

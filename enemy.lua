@@ -35,7 +35,7 @@ function Enemy:update()
 		return "kill"
 	end
 	if self.x > 440 or self.x < -440
-	or self.y > 340 or self.y < -370 then
+	or self.y > 340 or self.y < -388 then
 		return "kill"
 	end
 
@@ -137,3 +137,4 @@ require "ring_enemy"
 require "square_enemy"
 require "rocket_enemy"
 require "cannon_enemy"
+require "blockade_enemy"
