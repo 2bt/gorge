@@ -3,7 +3,7 @@ GORGE
 
 Endless shoot 'em up game in development.
 It's probably not good.
-You'll need LÖVE 0.10.
+You'll need LÖVE 0.9.1 or newer.
 
 ### Controls ###
 <table>
