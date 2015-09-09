@@ -11,10 +11,10 @@ function CannonEnemy:init(rand, x, y, wall)
 	self:super(rand, x, y)
 	self.nx = 0
 	self.ny = 0
-	if wall == "up"		then self.ny =1  end
-	if wall == "down"	then self.ny =-1  end
-	if wall == "left"	then self.nx =1  end
-	if wall == "right"	then self.nx =-1  end
+	if wall == "up"		then self.ny =  1 end
+	if wall == "down"	then self.ny = -1 end
+	if wall == "left"	then self.nx =  1 end
+	if wall == "right"	then self.nx = -1 end
 	self.ang = math.atan2(-self.nx, -self.ny)
 	transform(self)
 	self.cannon_ang = self.ang + self.rand.float(-1.3, 1.3)

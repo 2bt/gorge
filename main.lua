@@ -19,12 +19,12 @@ end
 DEBUG = false
 
 
-love.keyboard.setKeyRepeat(true)
 love.mouse.setVisible(false)
 G.setDefaultFilter("nearest", "nearest")
 
 
 require "helper"
+require "input"
 require "font"
 require "stars"
 require "walls"
@@ -35,6 +35,8 @@ require "enemy"
 require "boom"
 require "game"
 require "menu"
+
+
 
 
 font = Font()
@@ -50,7 +52,10 @@ bg_music:setLooping(true)
 local record = 0
 local i = 0
 
-function love.update() state:update() end
+function love.update()
+	updateList(Input.list)
+	state:update()
+end
 function love.draw()
 	state:draw()
 	if record > 0 then
@@ -59,13 +64,18 @@ function love.draw()
 		record = record - 1
 	end
 end
-function love.keypressed(key, isrepeat)
-	state:keypressed(key, isrepeat)
-	if key == "tab" then DEBUG = not DEBUG end
-	if key == "r" then record = 120 end
+function love.keypressed(key)
+	if state.keypressed then state:keypressed(key) end
+--	if key == "tab" then DEBUG = not DEBUG end
+--	if key == "r" then record = 120 end
 end
 
 function love.resize()
 	Boom.canvas = G.newCanvas()
 	Game.canvas = G.newCanvas()
+end
+
+local joys = {}
+function love.joystickadded(j)
+	if not joys[j] then Input(j) end
 end

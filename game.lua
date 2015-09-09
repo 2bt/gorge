@@ -176,8 +176,6 @@ function Game:update()
 	end
 
 
-
-
 	-- game over
 	if not self.player.alive then
 		self.outro = self.outro + 1
@@ -192,6 +190,10 @@ function Game:update()
 		end
 	end
 	if self.is_demo and not self.record[self.tick] then
+		self.action = "BACK"
+	end
+	if Input:gotAnyPressed("back")
+	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("shoot")) then
 		self.action = "BACK"
 	end
 	if not self.action then
@@ -210,49 +212,6 @@ function Game:update()
 			end
 		end
 	end
-end
-function Game:keypressed(key, isrepeat)
-	if key == "escape"
-	or self.is_demo and (key == "return" or key == "space" or key == "x") then
-		self.action = "BACK"
-	end
-
-	if self.is_demo and key == "p" then
-		self.is_demo = false
-	end
-
-
---	if key == "-" then
---		self.walls.speed = self.walls.speed - 1
---	elseif key == "+" then
---		self.walls.speed = self.walls.speed + 1
---	end
-
-
---	if key == "r" then
---		local d = self.walls.data
---		local j = #d - 1
---		local s = {}
---		for i, c in ipairs(d[j]) do
---			if c == 0 then
---				if d[j][i-1] == 1 then
---					s[#s+1] = { i, "left"}
---				elseif d[j][i+1] == 1 then
---					s[#s+1] = { i, "right"}
---				elseif d[j+1][i] == 1 then
---					s[#s+1] = { i, "up"}
---				elseif d[j-1][i] == 1 then
---					s[#s+1] = { i, "down"}
---				end
---			end
---		end
---		if #s > 0 then
---			local t = s[self.rand.int(1, #s)]
---			local x, y = self.walls:getTilePosition(t[1], #d - 1)
---			RocketEnemy(self:makeRG(), x, y, t[2])
---		end
---	end
-
 end
 function Game:draw()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
@@ -312,7 +271,7 @@ end
 	G.origin()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.setColor(255, 255, 255)
-	font:print(("%08d"):format(self.player.score), 796 - 6 * 32 - 4, 0, 4)
+	font:print(("%07d"):format(self.player.score), 796 - 6 * 32 - 4, 0, 4)
 
 	for i = 1, self.player.max_shield do
 		local f = 1

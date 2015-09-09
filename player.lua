@@ -92,14 +92,14 @@ function Player:init()
 	self.balls = { Ball(self, -1), Ball(self, 1) }
 end
 function Player:reset()
-	self.shield = 3
-	self.max_shield = self.shield
+	self.tick = 0
 	self.x = 0
 	self.y = 350
+	self.shield = 3
+	self.max_shield = self.shield
 	self.alive = true
 	self.invincible = 0
 	self.score = 0
-	self.tick = 0
 	self.shoot_delay = 0
 	self.side_shoot = false
 	self.blast = 0

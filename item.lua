@@ -47,6 +47,7 @@ HealthItem = Item:new {
 }
 genQuads(HealthItem)
 function HealthItem:collect(player)
+	player.score = player.score + 2000
 	if player.shield < player.max_shield then
 		player.shield = player.shield + 1
 	end
@@ -57,6 +58,7 @@ BallItem = Item:new {
 }
 genQuads(BallItem)
 function BallItem:collect(player)
+	player.score = player.score + 1000
 	for _, ball in ipairs(player.balls) do
 		if not ball.alive then ball:activate() end
 	end

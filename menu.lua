@@ -1,5 +1,4 @@
 local G = love.graphics
-local isDown = love.keyboard.isDown
 
 
 local stats = {
@@ -23,28 +22,27 @@ end
 
 local function saveStats()
 	local f = love.filesystem.newFile(VERSION, "w")
-	local function w(t)
-		if type(t) == "table" then
+	local function w(o)
+		local t = type(o)
+		if t == "table" then
 			f:write("{")
-			local j = 1
-			for i, a in pairs(t) do
-				if i == j then
-					j = j + 1
-				else
-					if type(i) == "number" then
-						f:write("[" .. i .. "]=")
-					else
-						f:write(i .. "=")
-					end
+			if o[1] then
+				for _, a in ipairs(o) do
+					w(a)
+					f:write(",")
 				end
-				w(a)
-				f:write(",")
+			else
+				for k, a in pairs(o) do
+					f:write(k .. "=")
+					w(a)
+					f:write(",")
+				end
 			end
 			f:write("}")
-		elseif type(t) == "string" then
-			f:write(("%q"):format(t))
+		elseif t == "string" then
+			f:write(("%q"):format(o))
 		else
-			f:write(tostring(t))
+			f:write(tostring(o))
 		end
 	end
 	w(stats)
@@ -107,15 +105,48 @@ function Menu:update()
 	end
 
 
+	-- buttons
 	if not self.action then
-		if self.blend > 0 then
-			self.blend = self.blend - 0.1
-		end
 
 		-- start demo mode
 		if self.state == "main" and self.tick > 60 * 10 and stats.demo then
 			self.action = "DEMO"
+		elseif self.state == "highscore" and self.entry then
+			-- write name
+			if Input:gotAnyPressed("start") then
+				self.entry = false
+				self.stats_changed = true
+			end
+		else
+			-- select option
+			if self.options[self.state] then
+				local dy = bool[Input:gotAnyPressed("down")] - bool[Input:gotAnyPressed("up")]
+				if dy ~= 0 then
+					local s = self.select
+					self.select = self.select + dy
+					self.select = math.max(self.select, 1)
+					self.select = math.min(self.select, #self.options[self.state])
+					if self.select ~= s then self.tick = 0 end
+				end
+				if Input:gotAnyPressed("start") or Input:gotAnyPressed("shoot") then
+					self.action = self.options[self.state][self.select]
+				end
+			end
+
+			-- back
+			if Input:gotAnyPressed("back") then
+				if self.state == "main" then
+					self.action = "EXIT"
+				else
+					self.action = "BACK"
+				end
+			end
 		end
+
+		if self.blend > 0 then
+			self.blend = self.blend - 0.1
+		end
+
 	else
 		if self.blend < 1 then
 			self.blend = self.blend + 0.1
@@ -142,18 +173,19 @@ function Menu:update()
 		end
 	end
 end
-function Menu:keypressed(key, isrepeat)
+function Menu:keypressed(key)
 	if self.state == "highscore" and self.entry then
 		if key == "backspace" then
 			self.entry[1] = self.entry[1]:sub(1, -2)
 			self.tick = 0
+			return
 		elseif key == "return" or key == "escape" then
 			self.entry = false
 			self.stats_changed = true
 			return
 		end
 
-		if #self.entry[1] >= 12 then return end
+		if #self.entry[1] >= 13 then return end
 
 		if #key == 1 and key:match("[%a%d.-]") then
 			self.entry[1] = self.entry[1] .. key:upper()
@@ -161,32 +193,6 @@ function Menu:keypressed(key, isrepeat)
 		elseif key == "space" then
 			self.entry[1] = self.entry[1] .. " "
 			self.tick = 0
-		end
-		return
-	end
-
-
-	if self.action then return end
-
-	if self.options[self.state] then
-		local dy = bool[key == "down"] - bool[key == "up"]
-		if dy ~= 0 then
-			local s = self.select
-			self.select = self.select + dy
-			self.select = math.max(self.select, 1)
-			self.select = math.min(self.select, #self.options[self.state])
-			if self.select ~= s then self.tick = 0 end
-		end
-		if key == "return" or key == "space" or key == "x" then
-			self.action = self.options[self.state][self.select]
-		end
-	end
-
-	if key == "escape" then
-		if self.state == "main" then
-			self.action = "EXIT"
-		else
-			self.action = "BACK"
 		end
 	end
 
@@ -222,7 +228,7 @@ function Menu:draw()
 		G.setColor(255, 255, 255)
 		for i, e in ipairs(stats.highscore) do
 			font:print(
-				("%2d. %-12s  %08d"):format(i, e[1], e[2]),
+				("%2d. %-13s  %07d"):format(i, e[1], e[2]),
 				400 - 24 * 13,
 				140 + 32 * i, 4)
 			if e == self.entry and self.tick % 32 < 24 then
