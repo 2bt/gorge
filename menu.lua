@@ -128,7 +128,15 @@ function Menu:update()
 					self.select = math.min(self.select, #self.options[self.state])
 					if self.select ~= s then self.tick = 0 end
 				end
-				if Input:gotAnyPressed("start") or Input:gotAnyPressed("shoot") then
+
+
+				-- remember who started the game
+				local start
+				start, self.input = Input:gotAnyPressed("start")
+				if not start then
+					start, self.input = Input:gotAnyPressed("shoot")
+				end
+				if start then
 					self.action = self.options[self.state][self.select]
 				end
 			end
@@ -159,7 +167,7 @@ function Menu:update()
 				self:swapState("main")
 			elseif self.action == "START GAME" then
 				state = game
-				game:start(love.math.random(0xfffffff))
+				game:start(love.math.random(0xfffffff), self.input)
 --				bg_music:play()
 			elseif self.action == "HIGHSCORE" then
 				self:swapState("highscore")

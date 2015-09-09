@@ -10,11 +10,13 @@ end
 function Input:update()
 	local s
 	if self.joy then
+
+		local x, y = self.joy:getAxes()
 		s = {
-			left	= self.joy:isGamepadDown("dpleft"),
-			right	= self.joy:isGamepadDown("dpright"),
-			up		= self.joy:isGamepadDown("dpup"),
-			down	= self.joy:isGamepadDown("dpdown"),
+			left	= self.joy:isGamepadDown("dpleft")	or x < -0.1,
+			right	= self.joy:isGamepadDown("dpright")	or x >  0.1,
+			up		= self.joy:isGamepadDown("dpup")	or y < -0.1,
+			down	= self.joy:isGamepadDown("dpdown")	or y >  0.1,
 			shoot	= self.joy:isGamepadDown("a"),
 			start	= self.joy:isGamepadDown("start"),
 			back	= self.joy:isGamepadDown("back"),
@@ -51,4 +53,4 @@ function Input:isConnected()
 	return true
 end
 
-Input()
+Input() -- keyboard

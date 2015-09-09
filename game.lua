@@ -1,5 +1,4 @@
 local G = love.graphics
-local isDown = love.keyboard.isDown
 
 flash_shader = G.newShader([[
 vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
@@ -25,7 +24,8 @@ end
 function Game:makeRG()
 	return makeRandomGenerator(self.rand.int(0xffffff))
 end
-function Game:start(seed)
+function Game:start(seed, input)
+	self.input = input
 	self:reset(seed)
 end
 function Game:reset(seed)
@@ -101,9 +101,7 @@ function Game:update()
 		input.dy = math.floor(i / 4) % 4 - 1
 		input.shoot = math.floor(i / 16) > 0
 	else
-		input.dx = bool[isDown("right")] - bool[isDown("left")]
-		input.dy = bool[isDown("down")] - bool[isDown("up")]
-		input.shoot = isDown("x")
+		input = self.input.state
 		self.record[self.tick]	= (1 + input.dx)
 								+ (1 + input.dy) * 4
 								+ bool[input.shoot] * 16
