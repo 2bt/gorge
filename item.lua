@@ -3,6 +3,7 @@ local G = love.graphics
 
 Item = Object:new {
 	model = { -12, 12, -12, -12, 12, -12, 12, 12 },
+	bounce_model = { -16, 32, -32, 16, -32, -16, -16, -32, 16, -32, 32, -16, 32, 16, 16, 32 },
 	list = {},
 	size = 8,
 	frame_length = 6,
@@ -22,6 +23,12 @@ function Item:update()
 	self.x = self.x + math.cos(self.tick * 0.1)
 	if self.y > 310 then return "kill" end
 
+	transform(self, self.bounce_model)
+	local d, n, w = game.walls:checkCollision(self.trans_model)
+	if d > 0 then
+		self.x = self.x - n[1] * 0.1
+		self.y = self.y - n[2] * 0.1
+	end
 	transform(self)
 
 	if game.player.alive then

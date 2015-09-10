@@ -75,6 +75,9 @@ function transform(obj, model)
 		obj.trans_model[i] 		= obj.x + y * nx - x * ny
 		obj.trans_model[i + 1]	= obj.y + x * nx + y * ny
 	end
+	for i = #model + 1, #obj.trans_model do
+		obj.trans_model[i] = nil
+	end
 end
 
 function polygonCollision(a, b)
