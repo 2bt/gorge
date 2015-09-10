@@ -18,7 +18,8 @@ function Item:collect(player)
 end
 function Item:update()
 	self.tick = self.tick + 1
-	self.y = self.y + game.walls.speed
+	self.y = self.y + game.walls.speed + math.sin(self.tick * 0.1)
+	self.x = self.x + math.cos(self.tick * 0.1)
 	if self.y > 310 then return "kill" end
 
 	transform(self)
