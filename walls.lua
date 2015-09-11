@@ -5,7 +5,7 @@ Walls = Object:new {
 	img = G.newImage("media/walls.png"),
 	speed = 1,
 	W = 26,
-	H = 32,
+	H = 35,
 	polys = {
 		[-2] = { 0, 4, 0, 28, 32, 28, 32, 4 },
 
@@ -22,21 +22,16 @@ function Walls:reset(rand)
 	self.tick = 0
 	self.data = {}
 	self.gen_data = {}
-	self.fg_data = {}
-	self.fg_gen_data = {}
 
 	for y = 1, self.H do
 		self.gen_data[y] = {}
-		self.fg_gen_data[y] = {}
 		for x = 1, self.W do
 			self.gen_data[y][x] = y < 13 and 0 or 1
-			self.fg_gen_data[y][x] = y < 13 and 0 or 1
 		end
 	end
 
-	for y = 1, 22 do
+	for y = 1, 23 do
 		self.data[y] = {}
-		self.fg_data[y] = {}
 	end
 
 	self.offset = 0
@@ -60,26 +55,19 @@ end
 function Walls:generate()
 
 	local row = table.remove(self.gen_data, 1)
-	local fg_row = table.remove(self.fg_gen_data, 1)
 	table.insert(self.gen_data, row)
-	table.insert(self.fg_gen_data, fg_row)
 	for x in ipairs(row) do
 		row[x] = 1
-		fg_row[x] = 1
 	end
 
 	self.cy = self.cy - 1
 	while self.cy < 23 do
 		for y, row in ipairs(self.gen_data) do
-			local fg_row = self.fg_gen_data[y]
 			for x in ipairs(row) do
 				local dx = x - self.cx
 				local dy = y - self.cy
-				if dx * dx + dy * dy < self.radius^2 then
+				if dx * dx + dy * dy < self.radius ^ 2 then
 					row[x] = 0
-				end
-				if dx * dx + dy * dy < self.radius^2 + 30 then
-					fg_row[x] = 0
 				end
 			end
 		end
@@ -89,9 +77,9 @@ function Walls:generate()
 
 		self.cy = self.cy + math.cos(ang) * self.radius
 		self.cx = self.cx + math.sin(ang) * self.radius
-		self.cx = math.max(1 + 5, self.cx)
-		self.cx = math.min(self.W - 5, self.cx)
-		self.radius = self.rand.float(2, 8)
+		self.cx = math.max(1 + 6, self.cx)
+		self.cx = math.min(self.W - 6, self.cx)
+		self.radius = self.rand.float(3, 10)
 
 	end
 
@@ -123,51 +111,21 @@ function Walls:generate()
 					+ (self.gen_data[3][x + 1] or 1)
 			if t == 0 then row[x] = 0 end
 		end
+
+		if row[x] == 1 and s == 4 then
+			if self.rand.int(2, 10) <= 8 then
+				row[x] = self.rand.int(9, 24)
+			else
+				row[x] = 6
+			end
+		end
 	end
 	table.insert(self.data, row)
 	table.remove(self.data, 1)
 
-
-
-	local row = {}
-	for x, cell in ipairs(self.fg_gen_data[2]) do
-		local n = {
-			self.fg_gen_data[1][x],
-			self.fg_gen_data[2][x - 1] or 1,
-			self.fg_gen_data[3][x],
-			self.fg_gen_data[2][x + 1] or 1,
-		}
-		local s = n[1] + n[2] + n[3] + n[4]
-		row[x] = cell
-
-
-		if cell == 0 then
-			if s >= 3 then
-				row[x] = 1
-			elseif s == 2 then
-				for i = 1, 4 do
-					if n[i] + n[i % 4 + 1] == 0 then
-						row[x] = i + 1
-					end
-				end
-			end
-		elseif s == 0 then
-			local t = (self.fg_gen_data[1][x - 1] or 1)
-					+ (self.fg_gen_data[1][x + 1] or 1)
-					+ (self.fg_gen_data[3][x - 1] or 1)
-					+ (self.fg_gen_data[3][x + 1] or 1)
-			if t == 0 then row[x] = 0 end
-		end
-	end
-	table.insert(self.fg_data, row)
-	table.remove(self.fg_data, 1)
-
-
---	f = (f or 0) + 1 print(f)
 end
 function Walls:draw()
 
-	G.setColor(30, 15, 50)
 
 	-- debug
 if DEBUG then
@@ -183,44 +141,63 @@ if DEBUG then
 	end
 end
 
-
-
-	for y, row in ipairs(self.data) do
-		for x, cell in ipairs(row) do
+	for iy, row in ipairs(self.data) do
+		local next_row = self.data[iy + 1] or {}
+		local prev_row = self.data[iy - 1] or {}
+		for ix, cell in ipairs(row) do
 			if cell > 0 then
-				G.draw(self.img, self.quads[cell],
-					x * 32 - 448,
-					300 - y * 32 + self.offset, 0, 4, 4)
+
+				G.setColor(55, 25, 60)
+				local x = ix * 32 - 448
+				local y = 332 - iy * 32 + self.offset
+
+				G.draw(self.img, self.quads[cell], x, y, 0, 4, 4)
+
+				-- smooth corners
+				if cell >= 6 then
+					if row[ix - 1] == 1 and next_row[ix] == 1 then
+						G.draw(self.img, self.quads[7], x, y, 0, 4, 4)
+					end
+					if row[ix + 1] == 1 and next_row[ix] == 1 then
+						G.draw(self.img, self.quads[7], x, y, 0, -4, 4, 8)
+					end
+					if row[ix - 1] == 1 and prev_row[ix] == 1 then
+						G.draw(self.img, self.quads[7], x, y, 0, 4, -4, 0, 8)
+					end
+					if row[ix + 1] == 1 and prev_row[ix] == 1 then
+						G.draw(self.img, self.quads[7], x, y, 0, -4, -4, 8, 8)
+					end
+				elseif cell == 1 then
+					if (next_row[ix] or 6) >= 6 and (row[ix - 1] or 6) >= 6 then
+						G.draw(self.img, self.quads[8], x, y, 0, 4, 4)
+					end
+					if (next_row[ix] or 6) >= 6 and (row[ix + 1] or 6) >= 6 then
+						G.draw(self.img, self.quads[8], x, y, 0, -4, 4, 8)
+					end
+					if (prev_row[ix] or 6) >= 6 and (row[ix - 1] or 6) >= 6 then
+						G.draw(self.img, self.quads[8], x, y, 0, 4, -4, 0, 8)
+					end
+					if (prev_row[ix] or 6) >= 6 and (row[ix + 1] or 6) >= 6 then
+						G.draw(self.img, self.quads[8], x, y, 0, -4, -4, 8, 8)
+					end
+				end
+
+
+
 			end
---			G.print(cell, x * 32 - 448, 300 - y * 32 + self.offset)
 		end
 	end
 
 
-	-- draw foreground
-	G.setColor(65, 30, 70)
-	G.push()
-	G.scale(1.05)
-	for y, row in ipairs(self.fg_data) do
-		for x, cell in ipairs(row) do
-			if cell > 0 then
-				G.draw(self.img, self.quads[cell],
-					x * 32 - 448,
-					300 - y * 32 + self.offset, 0, 4, 4)
-			end
-		end
-	end
-	G.pop()
-	G.setColor(255, 255, 255)
 end
 
 function Walls:getTileAddress(x, y)
 	return	math.floor((x + 448) / 32),
-			math.ceil((self.offset - y + 300) / 32)
+			math.ceil((self.offset - y + 332) / 32)
 end
 function Walls:getTilePosition(x, y)
 	return	x * 32 - 448 + 16,
-			300 - y * 32 + self.offset + 16
+			332 - y * 32 + self.offset + 16
 end
 
 function Walls:checkCollision(poly, skip_meta)
@@ -250,7 +227,7 @@ function Walls:checkCollision(poly, skip_meta)
 					local q = {}
 					for i = 1, #p, 2 do
 						q[i]   = p[i] + x * 32 - 448
-						q[i+1] = p[i+1] + 300 + self.offset - y * 32
+						q[i+1] = p[i+1] + 332 + self.offset - y * 32
 					end
 					local d, n, w = polygonCollision(q, poly)
 					if d > dist then
@@ -291,18 +268,9 @@ local function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
 end
 
 function Walls:checkSight(ax, ay, bx, by)
-
---	local dx = bx - ax
---	local dy = by - ay
---	local l = (dx*dx + dy*dy) ^ 0.5
---	dx = dx / l
---	dy = dy / l
-
-	local result
-
+	local result = nil
 	local x1, y1 = self:getTileAddress(ax, ay)
 	local x2, y2 = self:getTileAddress(bx, by)
-
 	for y = math.min(y1, y2), math.max(y1, y2) do
 		local row = self.data[y]
 		if row then
@@ -311,10 +279,10 @@ function Walls:checkSight(ax, ay, bx, by)
 				if p then
 
 					local qx = p[#p-1] + x * 32 - 448
-					local qy = p[#p] + 300 + self.offset - y * 32
+					local qy = p[#p] + 332 + self.offset - y * 32
 					for i = 1, #p, 2 do
 						local wx = p[i] + x * 32 - 448
-						local wy = p[i+1] + 300 + self.offset - y * 32
+						local wy = p[i+1] + 332 + self.offset - y * 32
 
 						local u, v = checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
 						if u then

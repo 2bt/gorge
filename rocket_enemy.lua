@@ -23,9 +23,11 @@ function RocketEnemy:init(rand, x, y, wall)
 end
 function RocketEnemy:subUpdate()
 	self.y = self.y + game.walls.speed
+	transform(self)
 
-	if not self.active and game.player.alive then
-		transform(self)
+
+	if not self.active and game.player.alive
+	and not game.walls:checkSight(self.x, self.y, game.player.x, game.player.y) then
 		local dx = game.player.x - self.x
 		local dy = game.player.y - self.y
 		local dot = self.nx * dx + self.ny * dy

@@ -69,11 +69,15 @@ function Game:next_wall_row()
 	if self.blockades > 0 then
 		local d = self.walls.data
 		local r = d[#d]
-		i = 1
-		while r[i] == 1 do i = i + 1 end
-		while r[i] == 0 do i = i + 1 end
-		while r[i] == 1 do i = i + 1 end
-		if i == #r + 1 then
+
+		local i = 1
+		while r[i] > 0 do i = i + 1 end
+		local j = i
+		while r[j] == 0 do j = j + 1 end
+		local k = j
+		while (r[k] or 0) > 0 do k = k + 1 end
+		if k == #r + 1
+		and (r[i - 1] or 1) == 1 and (r[j] or 1) == 1 then
 			self.blockades = self.blockades - 1
 			local prev
 			for ix, c in ipairs(r) do
@@ -235,7 +239,6 @@ end
 
 	self.stars:draw()
 	drawList(Enemy.list)
-	drawList(Item.list)
 	drawList(Bullet.list)
 	drawList(Laser.list)
 	self.player:draw()
@@ -262,6 +265,7 @@ if DEBUG then
 end
 
 	drawList(Particle.list)
+	drawList(Item.list)
 
 
 
@@ -269,7 +273,7 @@ end
 	G.origin()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.setColor(255, 255, 255)
-	font:print(("%07d"):format(self.player.score), 796 - 6 * 32 - 4, 0, 4)
+	font:print(("%07d"):format(self.player.score), 800 - 6 * 4 * 7 - 8, 0, 4)
 
 	for i = 1, self.player.max_shield do
 		local f = 1

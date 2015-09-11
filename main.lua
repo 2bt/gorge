@@ -66,8 +66,8 @@ function love.draw()
 end
 function love.keypressed(key)
 	if state.keypressed then state:keypressed(key) end
---	if key == "tab" then DEBUG = not DEBUG end
---	if key == "r" then record = 120 end
+	if key == "tab" then DEBUG = not DEBUG end
+	if key == "r" then record = 120 end
 end
 
 function love.resize()
