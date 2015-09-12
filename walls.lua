@@ -141,17 +141,30 @@ if DEBUG then
 	end
 end
 
+--	G.setColor(55, 25, 60)
+	G.setColor(93, 42, 100)
+
 	for iy, row in ipairs(self.data) do
 		local next_row = self.data[iy + 1] or {}
 		local prev_row = self.data[iy - 1] or {}
 		for ix, cell in ipairs(row) do
 			if cell > 0 then
 
-				G.setColor(55, 25, 60)
 				local x = ix * 32 - 448
 				local y = 332 - iy * 32 + self.offset
 
-				G.draw(self.img, self.quads[cell], x, y, 0, 4, 4)
+				if cell == 1 then
+					local n = 33
+					if (row[ix - 1] or 1) <= 0 and (next_row[ix] or 1) <= 0 then n = n + 1 end
+					if (row[ix + 1] or 1) <= 0 and (next_row[ix] or 1) <= 0 then n = n + 2 end
+					if (row[ix - 1] or 1) <= 0 and (prev_row[ix] or 1) <= 0 then n = n + 4 end
+					if (row[ix + 1] or 1) <= 0 and (prev_row[ix] or 1) <= 0 then n = n + 8 end
+
+
+					G.draw(self.img, self.quads[n], x, y, 0, 4, 4)
+				else
+					G.draw(self.img, self.quads[cell], x, y, 0, 4, 4)
+				end
 
 				-- smooth corners
 				if cell >= 6 then

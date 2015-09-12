@@ -37,6 +37,7 @@ function Game:reset(seed)
 	self.outro = 0
 	self.blend = 1
 	self.action = false
+	self.pause = false
 
 	self.wall_rows = 0
 	self.blockades = 0
@@ -96,20 +97,54 @@ function Game:next_wall_row()
 	end
 end
 function Game:update()
+
+	if Input:gotAnyPressed("back")
+	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("shoot")) then
+		self.action = "BACK"
+	end
+	if not self.action and Input:gotAnyPressed("start") then
+		self.pause = not self.pause
+	end
+
+	-- blend
+	if not self.action then
+		if self.blend > 0 then
+			self.blend = self.blend - 0.1
+		end
+	else
+		if self.blend < 1 then
+			self.blend = self.blend + 0.1
+		end
+		if self.blend >= 1 then
+			if self.action == "BACK" then
+				state = menu
+				bg_music:stop()
+				menu:swapState("main")
+			end
+		end
+	end
+
+	-- pause
+	if self.pause then return end
+
+
 	self.tick = self.tick + 1
 
+	-- input
 	local input = {}
 	if self.is_demo then
 		local i = self.record[self.tick] or 5
 		input.dx = i % 4 - 1
 		input.dy = math.floor(i / 4) % 4 - 1
 		input.shoot = math.floor(i / 16) > 0
+		if not self.record[self.tick] then self.action = "BACK" end
 	else
 		input = self.input.state
 		self.record[self.tick]	= (1 + input.dx)
 								+ (1 + input.dy) * 4
 								+ bool[input.shoot] * 16
 	end
+
 
 
 	-- update entities
@@ -191,29 +226,6 @@ function Game:update()
 			end
 		end
 	end
-	if self.is_demo and not self.record[self.tick] then
-		self.action = "BACK"
-	end
-	if Input:gotAnyPressed("back")
-	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("shoot")) then
-		self.action = "BACK"
-	end
-	if not self.action then
-		if self.blend > 0 then
-			self.blend = self.blend - 0.1
-		end
-	else
-		if self.blend < 1 then
-			self.blend = self.blend + 0.1
-		end
-		if self.blend >= 1 then
-			if self.action == "BACK" then
-				state = menu
-				bg_music:stop()
-				menu:swapState("main")
-			end
-		end
-	end
 end
 function Game:draw()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
@@ -273,7 +285,7 @@ end
 	G.origin()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.setColor(255, 255, 255)
-	font:print(("%07d"):format(self.player.score), 800 - 6 * 4 * 7 - 8, 0, 4)
+	font:print(("%07d"):format(self.player.score), 800 - 6 * 4 * 7 - 8, 0)
 
 	for i = 1, self.player.max_shield do
 		local f = 1
@@ -284,6 +296,12 @@ end
 		G.draw(self.health_img, self.health_quads[f],
 			8 + (i - 1) * 32,
 			4, 0, 4)
+	end
+
+
+	-- pause
+	if self.pause then
+		font:printCentered("PAUSE", 398, 300 - 20)
 	end
 
 

@@ -4,7 +4,7 @@ function Font:init()
 
 	self.img = love.graphics.newImage("media/font.png")
 	self.img:setFilter("nearest", "nearest")
-	self.scale = 2
+	self.scale = 4
 
 	self.quads = {}
 

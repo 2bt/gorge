@@ -224,39 +224,39 @@ function Menu:draw()
 	-- draw highscore
 	if self.state == "main" then
 		for i, m in ipairs(self.options[self.state]) do
-			font:print(m, 280, 320 + 40 * (i - 1), 4)
+			font:print(m, 280, 320 + 40 * (i - 1))
 		end
 		if self.tick % 32 < 24 then
-			font:print(">", 248, 320 + 40 * (self.select - 1), 4)
+			font:print(">", 248, 320 + 40 * (self.select - 1))
 		end
 	elseif self.state == "highscore" then
 		G.setColor(255, 255, 0)
-		font:print("HIGHSCORE", 184, 108, 4)
+		font:print("HIGHSCORE", 184, 108)
 
 		G.setColor(255, 255, 255)
 		for i, e in ipairs(stats.highscore) do
 			font:print(
 				("%2d. %-13s  %07d"):format(i, e[1], e[2]),
 				400 - 24 * 13,
-				140 + 32 * i, 4)
+				140 + 32 * i)
 			if e == self.entry and self.tick % 32 < 24 then
 				font:print("\x7f",
 					400 + 24 * (#self.entry[1] - 9),
-					140 + 32 * i, 4)
+					140 + 32 * i)
 			end
 		end
 	elseif self.state == "credits" then
 		G.setColor(255, 255, 0)
-		font:print("CREDITS", 184, 108, 4)
+		font:print("CREDITS", 184, 108)
 		G.setColor(255, 255, 255)
-		font:print("TODO", 184, 172, 4)
+		font:print("TODO", 184, 172)
 	end
 
 
 
 
 	G.setColor(40, 40, 40)
-	font:printCentered("\0 2015 DANIEL LANGNER", 400, 360 + 40 * 5, 4)
+	font:printCentered("\0 2015 DANIEL LANGNER", 400, 360 + 40 * 5)
 
 	if self.blend > 0 then
 		G.setColor(0, 0, 0, 255 * self.blend)
