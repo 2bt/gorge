@@ -142,7 +142,7 @@ if DEBUG then
 end
 
 --	G.setColor(55, 25, 60)
-	G.setColor(93, 42, 100)
+	G.setColor(84, 38, 90)
 
 	for iy, row in ipairs(self.data) do
 		local next_row = self.data[iy + 1] or {}

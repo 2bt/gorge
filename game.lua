@@ -60,6 +60,7 @@ function Game:reset(seed)
 --	for i = 1, 720 do self.walls:generate() end
 --	CannonEnemy(self:makeRG(), 0, 0, "left")
 --	CannonEnemy(self:makeRG(), 50, -100, "up")
+--	BallItem(0, 0)
 
 end
 function Game:next_wall_row()
