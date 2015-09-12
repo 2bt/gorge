@@ -57,8 +57,7 @@ function makeQuads(w, h, s)
 	local quads = {}
 	for y = 0, h - s, s do
 		for x = 0, w - s, s do
-			table.insert(quads,
-				love.graphics.newQuad(x, y, s, s, w, h))
+			table.insert(quads, love.graphics.newQuad(x, y, s, s, w, h))
 		end
 	end
 	return quads
@@ -72,8 +71,8 @@ function transform(obj, model)
 	for i = 1, #model, 2 do
 		local x = model[i]
 		local y = model[i + 1]
-		obj.trans_model[i] 		= obj.x + y * nx - x * ny
-		obj.trans_model[i + 1]	= obj.y + x * nx + y * ny
+		obj.trans_model[i] 		= obj.x + y * nx + x * ny
+		obj.trans_model[i + 1]	= obj.y - x * nx + y * ny
 	end
 	for i = #model + 1, #obj.trans_model do
 		obj.trans_model[i] = nil
@@ -90,7 +89,7 @@ function polygonCollision(a, b)
 		local p1y = a[#a]
 		for i = 1, #a, 2 do
 			local p2x = a[i]
-			local p2y = a[i+1]
+			local p2y = a[i + 1]
 
 			local c_d = 0
 			local c_n = {}
@@ -101,7 +100,7 @@ function polygonCollision(a, b)
 
 			for j = 1, #b, 2 do
 				local wx = b[j]
-				local wy = b[j+1]
+				local wy = b[j + 1]
 
 				local d = (p1x - wx) * nx + (p1y - wy) * ny
 				if d > c_d then
@@ -112,17 +111,13 @@ function polygonCollision(a, b)
 					c_w[2] = wy
 				end
 			end
-			if c_d == 0 then
-				return 0
-			end
+			if c_d == 0 then return 0 end
 			local l = math.sqrt(nx * nx + ny * ny)
 			c_d = c_d /  l
 
 			if c_d < distance then
 				distance = c_d
-				if m == 1 then
-					l = -l
-				end
+				if m == 1 then l = -l end
 				normal[1] = nx / l
 				normal[2] = ny / l
 				where = c_w
@@ -135,3 +130,27 @@ function polygonCollision(a, b)
 	return distance, normal, where
 end
 
+function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
+
+	local abx = bx - ax
+	local aby = by - ay
+	local qwx = wx - qx
+	local qwy = wy - qy
+	local aqx = qx - ax
+	local aqy = qy - ay
+
+	local det = abx*qwy - aby*qwx;
+	if math.abs(det) < 0.0001 then -- parallel
+		return
+	end
+
+	local abi = (aqx*qwy - aqy*qwx) / det
+	local qwi = (aqx*aby - aqy*abx) / det
+
+	if abi < 0 or abi > 1
+	or qwi < 0 or qwi > 1 then
+		return
+	end
+	return abi, qwi
+
+end

@@ -4,7 +4,7 @@ RocketEnemy = Enemy:new {
 	shield = 1,
 	score = 150,
 	img = G.newImage("media/rocket.png"),
-	model = { -16, 16, -4, -20, 4, -20, 16, 16 }
+	model = { 16, 16, 4, -20, -4, -20, -16, 16, }
 }
 genQuads(RocketEnemy)
 function RocketEnemy:init(rand, x, y, wall)
@@ -13,10 +13,10 @@ function RocketEnemy:init(rand, x, y, wall)
 	self.vy = 0
 	self.nx = 0
 	self.ny = 0
-	if wall == "up"		then self.ny =1  end
-	if wall == "down"	then self.ny =-1  end
-	if wall == "left"	then self.nx =1  end
-	if wall == "right"	then self.nx =-1  end
+	if wall == "up"		then self.ny =  1 end
+	if wall == "down"	then self.ny = -1 end
+	if wall == "left"	then self.nx =  1 end
+	if wall == "right"	then self.nx = -1 end
 	self.ang = math.atan2(-self.nx, -self.ny)
 	transform(self)
 	self.active = false

@@ -4,12 +4,12 @@ SquareEnemy = Enemy:new {
 	img = G.newImage("media/square.png"),
 	shield = 2,
 	score = 350,
-	model = { -8, 16, -16, 8, -16, -8, -8, -16, 8, -16, 16, -8, 16, 8, 8, 16 },
-	bounce_model = { -16, 32, -32, 16, -32, -16, -16, -32, 16, -32, 32, -16, 32, 16, 16, 32 },
+	model = { 8, 16, 16, 8, 16, -8, 8, -16, -8, -16, -16, -8, -16, 8, -8, 16, },
+	bounce_model = { 16, 32, 32, 16, 32, -16, 16, -32, -16, -32, -32, -16, -32, 16, -16, 32, },
 }
 genQuads(SquareEnemy)
-function SquareEnemy:init(rand, x, y)
-	self:super(rand, x, y)
+function SquareEnemy:init(...)
+	self:super(...)
 	self.tick = self.rand.int(1, 100)
 	self.delay = self.rand.int(30, 300)
 	self.vx = self.rand.float(-4, 4)
@@ -69,7 +69,7 @@ function SquareEnemy:subUpdate()
 end
 RapidBullet = Bullet:new {
 	color = { 146, 255, 146 },
-	model = { -2, 6, -2, -6, 2, -6, 2, 6 }
+	model = { 2, 6, 2, -6, -2, -6, -2, 6, }
 }
 function RapidBullet:init(x, y, dx, dy)
 	self:super(x, y, dx, dy)

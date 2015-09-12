@@ -4,18 +4,18 @@ RingEnemy = Enemy:new {
 	img = G.newImage("media/ring.png"),
 	shield = 1,
 	score = 100,
-	model = { -8, 16, -12, 8, -12, -8, -8, -16, 8, -16, 12, -8, 12, 8, 8, 16 },
+	model = { 8, 16, 12, 8, 12, -8, 8, -16, -8, -16, -12, -8, -12, 8, -8, 16, },
 	counter = 0
 }
 genQuads(RingEnemy)
-function RingEnemy:init(rand, x, y)
-	self:super(rand, x, y)
+function RingEnemy:init(...)
+	self:super(...)
 	self:turnTo(0.2, math.pi - 0.2)
 	self.delay = self.rand.int(200)
 end
 function RingEnemy:die()
 	RingEnemy.counter = RingEnemy.counter + 1
-	if self.counter % 20 == 0 then
+	if RingEnemy.counter % 25 == 0 then
 		if not game.player.balls[1].alive
 		or not game.player.balls[2].alive then
 			BallItem(self.x, self.y)

@@ -4,7 +4,7 @@ CannonEnemy = Enemy:new {
 	shield = 1,
 	score = 300,
 	img = G.newImage("media/cannon.png"),
-	model = { -16, 16, -16, 0, -8, -16, 8, -16, 16, 0, 16, 16 }
+	model = { 16, 16, 16, 0, 8, -16, -8, -16, -16, 0, -16, 16, }
 }
 genQuads(CannonEnemy)
 function CannonEnemy:init(rand, x, y, wall)
@@ -57,4 +57,5 @@ function CannonEnemy:subDraw()
 	G.setColor(255, 255, 255)
 	G.draw(self.img, self.quads[2], self.x, self.y, -self.cannon_ang or 0, 4, 4, 8, 8)
 	G.draw(self.img, self.quads[1], self.x, self.y, -self.ang or 0, 4, 4, 8, 8)
+--	G.polygon("line", self.trans_model)
 end

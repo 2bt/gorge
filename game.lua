@@ -11,6 +11,7 @@ Game.health_img = G.newImage("media/health.png")
 Game.health_quads = makeQuads(16, 8, 8)
 Game.canvas = G.newCanvas()
 
+
 function Game:init()
 	self.stars = Stars()
 	self.walls = Walls()
@@ -69,8 +70,8 @@ function Game:next_wall_row()
 		self.blockades = self.blockades + 1
 	end
 	if self.blockades > 0 then
-		local d = self.walls.data
-		local r = d[#d]
+		local data = self.walls.data
+		local r = data[#data]
 
 		local i = 1
 		while r[i] > 0 do i = i + 1 end
@@ -85,7 +86,7 @@ function Game:next_wall_row()
 			for ix, c in ipairs(r) do
 				if c == 0 then
 					r[ix] = -2
-					local x, y = self.walls:getTilePosition(ix, #d)
+					local x, y = self.walls:getTilePosition(ix, #data)
 					block = BlockadeEnemy(x, y, r, ix)
 					if prev then
 						block.neighbors[1] = prev
@@ -98,6 +99,7 @@ function Game:next_wall_row()
 	end
 end
 function Game:update()
+--	love.timer.sleep(0.1)
 
 	if Input:gotAnyPressed("back")
 	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("shoot")) then
@@ -167,47 +169,77 @@ function Game:update()
 	-- TODO: spawn enemies
 	if self.rand.float(-5, 1) > 0.99996^(self.tick/10 + 1000 + self.tick % 1000 * 3) then
 
-		local d = self.walls.data
-		local j = #d - 1
-		local w = {}
-		local s = {}
-		for i, c in ipairs(d[j]) do
+		local data = self.walls.data
+		local j = #data - 1
+		local wall_spot = {}
+		local spot = {}
+		for i, c in ipairs(data[j]) do
 			if c == 0 then
-				s[#s+1] = i
-				if     d[j][i-1] == 1 then
-					w[#w+1] = { i, "left"}
-				elseif d[j][i+1] == 1 then
-					w[#w+1] = { i, "right"}
-				elseif d[j+1][i] == 1 then
-					w[#w+1] = { i, "up"}
-				elseif d[j-1][i] == 1 then
-					w[#w+1] = { i, "down"}
+				table.insert(spot, i)
+				if     data[j][i-1] == 1 then
+					table.insert(wall_spot, { i, "left" })
+				elseif data[j][i+1] == 1 then
+					table.insert(wall_spot, { i, "right" })
+				elseif data[j+1][i] == 1 then
+					table.insert(wall_spot, { i, "up" })
+				elseif data[j-1][i] == 1 then
+					table.insert(wall_spot, { i, "down" })
 				end
 			end
 		end
 
 
+		local side_spot = {}
+		for i = 9, #data - 4 do
+			if	data[i    ][1] == 0
+			and data[i + 1][1] == 0
+			and data[i + 2][1] == 0 then
+				table.insert(side_spot, { 1, i + 1, 0 })
+			end
+			if	data[i    ][26] == 0
+			and data[i + 1][26] == 0
+			and data[i + 2][26] == 0 then
+				table.insert(side_spot, { 26, i + 1, math.pi })
+			end
+
+		end
 
 
-		local r = self.rand.int(1, 6)
-		if #s > 0 then
-			local t = s[self.rand.int(1, #s)]
-			d[j][t] = -1
-			local x, y = self.walls:getTilePosition(t, #d - 1)
+
+		local r = self.rand.int(1, 7)
+		if #spot > 0 and r <= 4 then
+			local t = spot[self.rand.int(1, #spot)]
+			data[j][t] = -1
+			local x, y = self.walls:getTilePosition(t, #data - 1)
 			if r == 1 then
 				SquareEnemy(self:makeRG(), x, y)
-			elseif r < 5 then
+			else
 				RingEnemy(self:makeRG(), x, y)
 			end
 		end
-		if #w > 0 and r >= 5 then
-			local t = w[self.rand.int(1, #w)]
-			d[j][t[1]] = -1
-			local x, y = self.walls:getTilePosition(t[1], #d - 1)
+		if #wall_spot > 0 and r >= 5 and r <= 6 then
+			local t = wall_spot[self.rand.int(1, #wall_spot)]
+			data[j][t[1]] = -1
+			local x, y = self.walls:getTilePosition(t[1], #data - 1)
 			if r == 5 then
 				RocketEnemy(self:makeRG(), x, y, t[2])
 			else
 				CannonEnemy(self:makeRG(), x, y, t[2])
+			end
+		end
+
+		-- twister
+		if r == 7 and self.rand.int(0, 1) == 0 then
+			if #side_spot > 0 then
+				local t = side_spot[self.rand.int(1, #side_spot)]
+				for iy = t[2] - 9, t[2] + 9 do
+					if data[iy] and data[iy][t[1]] == 0 then
+						data[iy][t[1]] = -1
+					end
+				end
+				local x, y = self.walls:getTilePosition(t[1], t[2])
+				x = x + (bool[x > 0] - bool[x < 0]) * 16
+				TwisterSpawn(self:makeRG(), x, y, t[3])
 			end
 		end
 

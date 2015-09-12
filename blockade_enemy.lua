@@ -3,7 +3,7 @@ local G = love.graphics
 BlockadeEnemy = Enemy:new {
 	size = 8,
 	img = G.newImage("media/blockade.png"),
-	model = { -16, 12, -16, -12, 16, -12, 16, 12 },
+	model = { 16, 12, 16, -12, -16, -12, -16, 12, },
 	shield = 10,
 	score = 1000,
 }

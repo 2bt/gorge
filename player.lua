@@ -2,7 +2,7 @@ local G = love.graphics
 
 
 Ball = Object:new {
-	model = { -6, 6, -6, -6, 6, -6, 6, 6 },
+	model = { 6, 6, 6, -6, -6, -6, -6, 6, },
 	img = G.newImage("media/ball.png")
 }
 genQuads(Ball, 8)
@@ -84,7 +84,7 @@ end
 
 Player = Object:new {
 	img = G.newImage("media/player.png"),
-	model = { -16, 16, -16, 0, -4, -12, 4, -12, 16, 0, 16, 16 }
+	model = { 16, 16, 16, 0, 4, -12, -4, -12, -16, 0, -16, 16, }
 }
 genQuads(Player, 16)
 function Player:init()
@@ -244,7 +244,7 @@ end
 Laser = Object:new {
 	list = {},
 	img = G.newImage("media/laser.png"),
-	model = { -2, -10, 2, -10, 2, 10, -2, 10 },
+	model = { -2, 10, 2, 10, 2, -10, -2, -10, },
 	damage = 1
 }
 function Laser:init(x, y, dx, dy)
@@ -293,6 +293,6 @@ end
 
 SmallLaser = Laser:new {
 	img = G.newImage("media/small_laser.png"),
-	model = { -2, -5, 2, -5, 2, 5, -2, 5 },
+	model = { -2, 5, 2, 5, 2, -5, -2, -5, },
 	damage = 0.5
 }

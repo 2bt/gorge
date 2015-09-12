@@ -8,7 +8,6 @@ Walls = Object:new {
 	H = 35,
 	polys = {
 		[-2] = { 0, 4, 0, 28, 32, 28, 32, 4 },
-
 		{ 0, 0, 0, 32, 32, 32, 32, 0 },
 		{ 0, 0, 32, 32, 32, 0 },
 		{ 0, 32, 32, 32, 32, 0 },
@@ -31,7 +30,9 @@ function Walls:reset(rand)
 	end
 
 	for y = 1, 23 do
-		self.data[y] = {}
+		local row = {}
+		for x = 1, self.W do row[x] = 0 end
+		self.data[y] = row
 	end
 
 	self.offset = 0
@@ -40,6 +41,10 @@ function Walls:reset(rand)
 	self.cy = 17
 	for i = 1, 20 do self:generate() end
 
+
+	-- DEBUG
+--	for i = 1, 400 do self:generate() end
+--	self.speed = 0
 end
 function Walls:update()
 	self.tick = self.tick + 1
@@ -95,7 +100,7 @@ function Walls:generate()
 		local s = n[1] + n[2] + n[3] + n[4]
 		row[x] = cell
 		if cell == 0 then
-			if s >=3 then
+			if s >= 3 then
 				row[x] = 1
 			elseif s == 2 then
 				for i = 1, 4 do
@@ -141,17 +146,19 @@ if DEBUG then
 	end
 end
 
---	G.setColor(55, 25, 60)
 	G.setColor(84, 38, 90)
 
 	for iy, row in ipairs(self.data) do
 		local next_row = self.data[iy + 1] or {}
 		local prev_row = self.data[iy - 1] or {}
 		for ix, cell in ipairs(row) do
-			if cell > 0 then
 
-				local x = ix * 32 - 448
-				local y = 332 - iy * 32 + self.offset
+			local x = ix * 32 - 448
+			local y = 332 - iy * 32 + self.offset
+
+--			G.rectangle("line", x, y, 32, 32)
+
+			if cell > 0 then
 
 				if cell == 1 then
 					local n = 33
@@ -168,16 +175,16 @@ end
 
 				-- smooth corners
 				if cell >= 6 then
-					if row[ix - 1] == 1 and next_row[ix] == 1 then
+					if row[ix - 1] == 1 and next_row[ix] == 1 and (next_row[ix - 1] or 0) < 6 then
 						G.draw(self.img, self.quads[7], x, y, 0, 4, 4)
 					end
-					if row[ix + 1] == 1 and next_row[ix] == 1 then
+					if row[ix + 1] == 1 and next_row[ix] == 1 and (next_row[ix + 1] or 0) < 6 then
 						G.draw(self.img, self.quads[7], x, y, 0, -4, 4, 8)
 					end
-					if row[ix - 1] == 1 and prev_row[ix] == 1 then
+					if row[ix - 1] == 1 and prev_row[ix] == 1 and (prev_row[ix - 1] or 0) < 6 then
 						G.draw(self.img, self.quads[7], x, y, 0, 4, -4, 0, 8)
 					end
-					if row[ix + 1] == 1 and prev_row[ix] == 1 then
+					if row[ix + 1] == 1 and prev_row[ix] == 1 and (prev_row[ix + 1] or 0) < 6 then
 						G.draw(self.img, self.quads[7], x, y, 0, -4, -4, 8, 8)
 					end
 				elseif cell == 1 then

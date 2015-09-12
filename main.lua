@@ -55,6 +55,11 @@ local i = 0
 function love.update()
 	updateList(Input.list)
 	state:update()
+	if love.keyboard.isDown("^") then -- fast forward
+		for i = 1, 7 do
+			state:update()
+		end
+	end
 end
 function love.draw()
 	state:draw()
@@ -67,7 +72,7 @@ end
 function love.keypressed(key)
 	if state.keypressed then state:keypressed(key) end
 	if key == "tab" then DEBUG = not DEBUG end
-	if key == "r" then record = 120 end
+--	if key == "r" then record = 120 end
 end
 
 function love.resize()

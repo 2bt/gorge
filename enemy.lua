@@ -59,7 +59,7 @@ end
 
 Bullet = Object:new {
 	list = {},
-	model = { -4, 4, -4, -4, 4, -4, 4, 4 },
+	model = { 4, 4, 4, -4, -4, -4, -4, 4, },
 	color = { 255, 36, 36 },
 }
 function Bullet:init(x, y, dx, dy)
@@ -138,3 +138,4 @@ require "square_enemy"
 require "rocket_enemy"
 require "cannon_enemy"
 require "blockade_enemy"
+require "twister_enemy"
