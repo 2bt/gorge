@@ -64,10 +64,10 @@ end
 function love.draw()
 	state:draw()
 --	if record then
-	if state == game then
-		love.graphics.newScreenshot():encode(("%06d.png"):format(i))
-		i = i + 1
-	end
+--	if state == game then
+--		love.graphics.newScreenshot():encode(("%06d.png"):format(i))
+--		i = i + 1
+--	end
 end
 function love.keypressed(key)
 	if state.keypressed then state:keypressed(key) end
