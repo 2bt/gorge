@@ -113,6 +113,7 @@ function Player:reset()
 --	transform(self)
 end
 function Player:hit(d, n, w, e)
+	if DEBUG then return end
 	-- collision
 	if d then
 		self.x = self.x + n[1] * d

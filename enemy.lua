@@ -16,6 +16,7 @@ function Enemy:init(rand, x, y)
 	self.x = x
 	self.y = y
 	self.tick = 0
+	self.clip = false
 	transform(self)
 end
 function Enemy:hit(damage)
@@ -34,8 +35,15 @@ function Enemy:update()
 		self:die()
 		return "kill"
 	end
-	if self.x > 440 or self.x < -440
-	or self.y > 340 or self.y < -388 then
+	-- in screen?
+	if not self.clip
+	and self.x < 420 and self.x > -420
+	and self.y < 320 and self.y > -320 then
+		self.clip = true
+	end
+	if self.clip and (self.y < -320 or self.y > 320)
+	or self.x > 420 or self.x < -420
+	or self.y > 500 then
 		return "kill"
 	end
 

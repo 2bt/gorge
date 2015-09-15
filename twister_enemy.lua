@@ -10,7 +10,7 @@ function TwisterSpawn:init(rand, x, y, ang)
 	self.tick = 0
 	self.ang = ang
 
-	self.count = 5
+	self.count = 4
 	self.seed = self.rand.int(0xffffff)
 end
 
@@ -70,6 +70,8 @@ function TwisterEnemy:init(rand, x, y, ang, path_rand)
 	self.cnt = self.path_rand.int(50, 200)
 end
 function TwisterEnemy:subUpdate()
+
+
 	local vx = math.cos(self.ang) * self.speed
 	local vy = -math.sin(self.ang) * self.speed
 	self.x = self.x + vx

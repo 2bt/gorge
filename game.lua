@@ -213,7 +213,7 @@ function Game:update()
 			local x, y = self.walls:getTilePosition(t, #data - 1)
 			if r == 1 then
 				SquareEnemy(self:makeRG(), x, y)
-			else
+			elseif r < 4 then
 				RingEnemy(self:makeRG(), x, y)
 			end
 		end
@@ -229,7 +229,7 @@ function Game:update()
 		end
 
 		-- twister
-		if r == 7 and self.rand.int(0, 1) == 0 then
+		if r == 7 and self.rand.int(0, 3) == 0 then
 			if #side_spot > 0 then
 				local t = side_spot[self.rand.int(1, #side_spot)]
 				for iy = t[2] - 9, t[2] + 9 do
@@ -265,8 +265,8 @@ function Game:draw()
 	G.translate(400, 300)
 
 if DEBUG then
-	G.scale(0.3)
-	G.translate(0, 500)
+	G.scale(0.25)
+	G.translate(0, 650)
 end
 
 
@@ -304,8 +304,8 @@ end
 	G.translate(400, 300)
 
 if DEBUG then
-	G.scale(0.3)
-	G.translate(0, 500)
+	G.scale(0.25)
+	G.translate(0, 650)
 	G.rectangle("line", -400, -300, 800, 600)
 end
 

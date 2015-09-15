@@ -29,7 +29,7 @@ function Walls:reset(rand)
 		end
 	end
 
-	for y = 1, 23 do
+	for y = 1, 30 do
 		local row = {}
 		for x = 1, self.W do row[x] = 0 end
 		self.data[y] = row
@@ -39,7 +39,7 @@ function Walls:reset(rand)
 	self.radius = self.W / 2 + 1
 	self.cx = self.W / 2 + 0.5
 	self.cy = 17
-	for i = 1, 20 do self:generate() end
+	for i = 1, 27 do self:generate() end
 
 
 	-- DEBUG
@@ -140,7 +140,7 @@ if DEBUG then
 			if cell > 0 then
 				G.draw(self.img, self.quads[cell],
 					x * 32 - 448,
-					300 - y * 32 + self.offset - 32 * 20, 0, 4, 4)
+					76 - y * 32 + self.offset - 32 * 20, 0, 4, 4)
 			end
 		end
 	end
