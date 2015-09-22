@@ -3,7 +3,7 @@ local G = love.graphics
 flash_shader = G.newShader([[
 vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 	vec4 tc = texture2D(tex, tex_coords) * col;
-	return tc + vec4(max(max(tc.rgb, tc.gbr), tc.brg), 0);
+	return tc + vec4(vec3(1, 1, 1) - tc.rgb, 0) * 0.75;
 }]])
 
 Game = Object:new {}
