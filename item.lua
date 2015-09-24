@@ -16,6 +16,11 @@ function Item:init(x, y)
 	self.trans_model = {}
 end
 function Item:collect(player)
+	makeFastSparkleParticle(self.x, self.y)
+	player.score = player.score + self.score
+	if self.subCollect then
+		self:subCollect(player)
+	end
 end
 function Item:update()
 	self.tick = self.tick + 1
@@ -43,19 +48,26 @@ function Item:draw()
 	G.setColor(255, 255, 255)
 	G.draw(self.img, self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
 		self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
---	G.polygon("line", self.trans_model)
 end
 
 
 
 
+MoneyItem = Item:new {
+	img = G.newImage("media/money_item.png"),
+	size = 9,
+	score = 10000,
+}
+genQuads(MoneyItem)
+
+
 HealthItem = Item:new {
 	img = G.newImage("media/health_item.png"),
 	size = 9,
+	score = 2500,
 }
 genQuads(HealthItem)
-function HealthItem:collect(player)
-	player.score = player.score + 2000
+function HealthItem:subCollect(player)
 	if player.shield < player.max_shield then
 		player.shield = player.shield + 1
 	end
@@ -63,11 +75,13 @@ end
 
 BallItem = Item:new {
 	img = G.newImage("media/ball_item.png"),
+	score = 1000,
 }
 genQuads(BallItem)
-function BallItem:collect(player)
-	player.score = player.score + 1000
+function BallItem:subCollect(player)
 	for _, ball in ipairs(player.balls) do
 		if not ball.alive then ball:activate() end
 	end
 end
+
+

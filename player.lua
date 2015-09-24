@@ -135,7 +135,7 @@ function Player:hit(d, n, w, e)
 	end
 	-- damage
 	if self.invincible == 0 then
-		self.invincible = 100
+		self.invincible = 120
 		self.flash = 5
 		self.shield = self.shield - 1
 		if self.shield <= 0 then

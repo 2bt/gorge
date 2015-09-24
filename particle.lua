@@ -3,9 +3,9 @@ local G = love.graphics
 
 Particle = Object:new {
 	list = {},
-	frame_length = 3,
 	alive = true,
-	size = 8
+	frame_length = 3,
+	size = 8,
 }
 function Particle:init(x, y)
 	table.insert(self.list, self)
@@ -14,6 +14,7 @@ function Particle:init(x, y)
 	self.tick = 0
 end
 function Particle:draw()
+	if self.tick < 0 then return end
 	G.setColor(255, 255, 255)
 	local f = math.floor(self.tick / self.frame_length) + 1
 	if self.quads[f] then
@@ -148,4 +149,20 @@ genQuads(SparkleParticle)
 function SparkleParticle:update()
 	self.tick = self.tick + 1
 	if not self.alive then return "kill" end
+end
+
+
+FastSparkleParticle = Particle:new {
+	img = SparkleParticle.img,
+	quads = SparkleParticle.quads,
+}
+function makeFastSparkleParticle(x, y)
+	local r = math.random() * 10
+	for i = 0, 2 do
+		local f = FastSparkleParticle(
+			x + math.sin(r) * 12,
+			y + math.cos(r) * 12)
+			r = r + 2/3 * math.pi
+		f.tick = i * -5
+	end
 end

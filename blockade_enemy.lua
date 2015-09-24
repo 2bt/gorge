@@ -5,7 +5,7 @@ BlockadeEnemy = Enemy:new {
 	img = G.newImage("media/blockade.png"),
 	model = { 16, 12, 16, -12, -16, -12, -16, 12, },
 	shield = 10,
-	score = 1000,
+	score = 2000,
 }
 genQuads(BlockadeEnemy)
 function BlockadeEnemy:init(x, y, wall_row, index)
