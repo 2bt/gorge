@@ -97,6 +97,7 @@ function Player:reset()
 	self.y = 350
 	self.shield = 3
 	self.max_shield = self.shield
+	self.speed_boost = 0
 	self.alive = true
 	self.invincible = 0
 	self.score = 0
@@ -155,13 +156,14 @@ function Player:update(input)
 	self.blast_y = self.blast_y * 0.85
 
 	-- move
-	local speed = 3
-	if self.shoot_delay > 0 or input.shoot then
-		speed = speed * 0.5
-	end
+	local speed = 0
 	if self.blast > 0 then
 		self.blast = self.blast - 1
-		speed = 0
+	else
+		speed = 3 + self.speed_boost * 0.2
+		if self.shoot_delay > 0 or input.shoot then
+			speed = speed - 1.5
+		end
 	end
 
 	if self.tick < 60 then

@@ -53,13 +53,16 @@ end
 
 
 
-MoneyItem = Item:new {
-	img = G.newImage("media/money_item.png"),
-	size = 9,
-	score = 10000,
+BallItem = Item:new {
+	img = G.newImage("media/ball_item.png"),
+	score = 1000,
 }
-genQuads(MoneyItem)
-
+genQuads(BallItem)
+function BallItem:subCollect(player)
+	for _, ball in ipairs(player.balls) do
+		if not ball.alive then ball:activate() end
+	end
+end
 
 HealthItem = Item:new {
 	img = G.newImage("media/health_item.png"),
@@ -73,15 +76,21 @@ function HealthItem:subCollect(player)
 	end
 end
 
-BallItem = Item:new {
-	img = G.newImage("media/ball_item.png"),
+
+SpeedItem = Item:new {
+	img = G.newImage("media/speed_item.png"),
 	score = 1000,
+	frame_length = 5,
 }
-genQuads(BallItem)
-function BallItem:subCollect(player)
-	for _, ball in ipairs(player.balls) do
-		if not ball.alive then ball:activate() end
-	end
+genQuads(SpeedItem)
+function SpeedItem:subCollect(player)
+	player.speed_boost = player.speed_boost + 1
 end
 
 
+MoneyItem = Item:new {
+	img = G.newImage("media/money_item.png"),
+	size = 9,
+	score = 10000,
+}
+genQuads(MoneyItem)
