@@ -62,10 +62,10 @@ function Game:reset(seed)
 --	for i = 1, 720 do self.walls:generate() end
 --	CannonEnemy(self:makeRG(), 0, 0, "left")
 --	CannonEnemy(self:makeRG(), 50, -100, "up")
-	MoneyItem(0, 0)
-	SpeedItem(0, -100)
-	SpeedItem(0, -200)
-	SpeedItem(0, -300)
+--	MoneyItem(0, 0)
+--	SpeedItem(0, -100)
+--	SpeedItem(0, -200)
+--	SpeedItem(0, -300)
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1
