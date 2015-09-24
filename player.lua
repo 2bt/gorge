@@ -155,17 +155,20 @@ function Player:update(input)
 	self.blast_x = self.blast_x * 0.85
 	self.blast_y = self.blast_y * 0.85
 
-	-- move
+	-- calc speed
 	local speed = 0
 	if self.blast > 0 then
 		self.blast = self.blast - 1
 	else
-		speed = 3 + self.speed_boost * 0.2
+--		speed = 3 + self.speed_boost * 0.2
+		speed = math.sqrt(self.speed_boost + 9)
+
 		if self.shoot_delay > 0 or input.shoot then
-			speed = speed - 1.5
+			speed = speed * 0.5
 		end
 	end
 
+	-- move
 	if self.tick < 60 then
 		self.y = self.y - 3
 		return
@@ -196,7 +199,7 @@ function Player:update(input)
 	elseif input.dy < 0 then
 		self.side_shoot = true
 	end
-	if input.shoot and self.shoot_delay == 0 then
+	if input.shoot and self.shoot_delay == 0 and self.blast == 0 then
 		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
 		self.balls[1]:shoot(self.side_shoot)

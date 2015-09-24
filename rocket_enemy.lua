@@ -26,7 +26,7 @@ end
 function RocketEnemy:die()
 	if self.active and not self.wall_death then
 		RocketEnemy.counter = RocketEnemy.counter + 1
-		if RocketEnemy.counter % 5 == 0 then
+		if RocketEnemy.counter % 10 == 0 then
 			SpeedItem(self.x, self.y)
 		end
 	end
