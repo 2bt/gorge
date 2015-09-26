@@ -16,11 +16,11 @@ function Enemy:init(rand, x, y)
 	self.x = x
 	self.y = y
 	self.tick = 0
-	self.clip = false
+	self.entered_screen = false
 	transform(self)
 end
 function Enemy:hit(damage)
-	self.flash = 5
+	self.flash = 3
 	self.shield = self.shield - damage
 	if self.shield <= 0 then
 		self.alive = false
@@ -36,12 +36,12 @@ function Enemy:update()
 		return "kill"
 	end
 	-- in screen?
-	if not self.clip
+	if not self.entered_screen
 	and self.x < 420 and self.x > -420
 	and self.y < 320 and self.y > -320 then
-		self.clip = true
+		self.entered_screen = true
 	end
-	if self.clip and (self.y < -320 or self.y > 320)
+	if self.entered_screen and (self.y < -320 or self.y > 320)
 	or self.x > 420 or self.x < -420
 	or self.y > 500 then
 		return "kill"
@@ -60,33 +60,36 @@ end
 function Enemy:subDraw()
 	G.setColor(255, 255, 255)
 	G.draw(self.img, self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
-		self.x, self.y, -self.ang or 0, 4, 4, self.size / 2, self.size / 2)
+		self.x, self.y, -self.ang, 4, 4, self.size / 2, self.size / 2)
 --	G.polygon("line", self.trans_model)
 end
 
 
 Bullet = Object:new {
 	list = {},
-	model = { 4, 4, 4, -4, -4, -4, -4, 4, },
 	color = { 255, 36, 36 },
+	frame_length = 4,
+	size = 8,
+	ang = 0,
 }
-function Bullet:init(x, y, dx, dy)
+function Bullet:init(x, y, vx, vy)
 	table.insert(self.list, self)
 	self.trans_model = {}
 	self.x = x
 	self.y = y
-	self.dx = dx
-	self.dy = dy
+	self.vx = vx
+	self.vy = vy
 	self.tick = 0
 end
 function Bullet:makeSparks(x, y)
-	for i = 1, 10 do BulletParticle(x, y) end
+	local c = self.color
+	for i = 1, 10 do BulletParticle(x, y, {c[1] * 0.6, c[2] * 0.6, c[3] * 0.6}) end
 end
 function Bullet:update()
 	self.tick = self.tick + 1
 	for i = 1, 2 do
-		self.x = self.x + self.dx / 2
-		self.y = self.y + self.dy / 2
+		self.x = self.x + self.vx / 2
+		self.y = self.y + self.vy / 2
 		transform(self)
 
 		if self.x > 405 or self.x < -405
@@ -123,23 +126,27 @@ function Bullet:update()
 	end
 end
 function Bullet:draw()
-	G.setColor(unpack(self.color))
-	G.polygon("fill", self.trans_model)
+	G.setColor(255, 255, 255)
+	G.draw(self.img, self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
+		self.x, self.y, -self.ang, 4, 4, self.size / 2, self.size / 2)
+--	G.polygon("line", self.trans_model)
 end
+
+
 BulletParticle = SparkParticle:new {
-	color = { 155, 22, 22 },
 	friction = 0.9,
 }
-
+function BulletParticle:init(x, y, color)
+	self:super(x, y)
+	self.color = color
+end
 PlasmaBullet = Bullet:new {
-	img = G.newImage("media/plasma.png")
+	model = { 4, 4, 4, -4, -4, -4, -4, 4, },
+	img = G.newImage("media/plasma.png"),
+	frame_length = 2,
+	size = 7,
 }
 genQuads(PlasmaBullet, 7)
-function PlasmaBullet:draw()
-	G.setColor(255, 255, 255)
-	G.draw(self.img, self.quads[math.floor(self.tick / 2) % #self.quads + 1],
-		self.x, self.y, 0, 4, 4, 3.5, 3.5)
-end
 
 require "ring_enemy"
 require "square_enemy"
@@ -147,3 +154,4 @@ require "rocket_enemy"
 require "cannon_enemy"
 require "blockade_enemy"
 require "twister_enemy"
+require "saucer_enemy"

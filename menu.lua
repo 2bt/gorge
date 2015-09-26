@@ -3,16 +3,16 @@ local G = love.graphics
 
 local stats = {
 	highscore = {
-		{ "TWOBIT", 1000 },
-		{ "TWOBIT",  900 },
-		{ "TWOBIT",  800 },
-		{ "TWOBIT",  700 },
-		{ "TWOBIT",  600 },
-		{ "TWOBIT",  500 },
-		{ "TWOBIT",  400 },
-		{ "TWOBIT",  300 },
-		{ "TWOBIT",  200 },
-		{ "TWOBIT",  100 },
+		{ "TWOBIT", 10000 },
+		{ "TWOBIT",  9000 },
+		{ "TWOBIT",  8000 },
+		{ "TWOBIT",  7000 },
+		{ "TWOBIT",  6000 },
+		{ "TWOBIT",  5000 },
+		{ "TWOBIT",  4000 },
+		{ "TWOBIT",  3000 },
+		{ "TWOBIT",  2000 },
+		{ "TWOBIT",  1000 },
 	}
 }
 

@@ -3,7 +3,7 @@ local G = love.graphics
 flash_shader = G.newShader([[
 vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 	vec4 tc = texture2D(tex, tex_coords) * col;
-	return tc + vec4(vec3(1, 1, 1) - tc.rgb, 0) * 0.75;
+	return tc + vec4(vec3(1, 1, 1) - tc.rgb, 0) * 0.5;
 }]])
 
 Game = Object:new {}
@@ -57,15 +57,17 @@ function Game:reset(seed)
 	RingEnemy.counter = 0
 	RocketEnemy.counter = 0
 
+	self.saucer_delay = 0
 
-	-- TODO
+	-- DEBUG
 --	for i = 1, 720 do self.walls:generate() end
 --	CannonEnemy(self:makeRG(), 0, 0, "left")
 --	CannonEnemy(self:makeRG(), 50, -100, "up")
 --	MoneyItem(0, 0)
 --	SpeedItem(0, -100)
 --	SpeedItem(0, -200)
---	SpeedItem(0, -300)
+--	BallItem(0, 100)
+--	SaucerEnemy(self:makeRG(), 100, -150)
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1
@@ -102,7 +104,8 @@ function Game:next_wall_row()
 	end
 end
 function Game:update()
---	love.timer.sleep(0.1)
+	-- DEBUG
+--	love.timer.sleep(0.05)
 
 	if Input:gotAnyPressed("back")
 	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("shoot")) then
@@ -170,6 +173,7 @@ function Game:update()
 
 
 	-- TODO: spawn enemies
+	if self.saucer_delay > 0 then self.saucer_delay = self.saucer_delay - 1 end
 	if self.rand.float(-5, 1) > 0.99996^(self.tick/10 + 1000 + self.tick % 1000 * 3) then
 
 		local data = self.walls.data
@@ -209,7 +213,7 @@ function Game:update()
 
 
 
-		local r = self.rand.int(1, 7)
+		local r = self.rand.int(1, 8)
 		if #spot > 0 and r <= 4 then
 			local t = spot[self.rand.int(1, #spot)]
 			data[j][t] = -1
@@ -246,6 +250,14 @@ function Game:update()
 			end
 		end
 
+		-- saucer
+		if r == 8 and self.tick % 3 == 0 and self.saucer_delay <= 0 then
+			self.saucer_delay = 3000 - self.tick * 0.02
+			local t = spot[self.rand.int(1, #spot)]
+			data[j][t] = -1
+			local x, y = self.walls:getTilePosition(t, #data - 1)
+			SaucerEnemy(self:makeRG(), x, y)
+		end
 	end
 
 
@@ -286,6 +298,9 @@ end
 	G.clear()
 
 	self.stars:draw()
+	for _, p in ipairs(Particle.list) do
+		if p.layer == "back" then p:draw() end
+	end
 	drawList(Enemy.list)
 	drawList(Bullet.list)
 	drawList(Laser.list)
@@ -312,7 +327,9 @@ if DEBUG then
 	G.rectangle("line", -400, -300, 800, 600)
 end
 
-	drawList(Particle.list)
+	for _, p in ipairs(Particle.list) do
+		if p.layer == "front" then p:draw() end
+	end
 	drawList(Item.list)
 
 

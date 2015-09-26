@@ -171,7 +171,6 @@ function Player:update(input)
 	-- move
 	if self.tick < 60 then
 		self.y = self.y - 3
-		return
 	else
 		self.x = self.x + self.blast_x + input.dx * speed
 		self.y = self.y + self.blast_y + input.dy * speed
@@ -192,6 +191,8 @@ function Player:update(input)
 	-- balls
 	self.balls[1]:update()
 	self.balls[2]:update()
+
+	if self.tick < 60 then return end
 
 	-- shoot
 	if input.dy > 0 then
@@ -241,7 +242,7 @@ function Player:draw()
 
 	if self.flash > 0 then G.setShader() end
 
---	G.polygon("line", self.trans_model)
+--	if self.trans_model[1] then G.polygon("line", self.trans_model) end
 end
 
 
@@ -278,7 +279,7 @@ function Laser:update()
 		end
 
 		for _, e in ipairs(Enemy.list) do
-			local d, n, w = polygonCollision(self.trans_model, e.trans_model)
+			local d, n, w = polygonCollision(e.trans_model, self.trans_model)
 			if d > 0 then
 				e:hit(self.damage)
 				for i = 1, 10 do

@@ -83,7 +83,6 @@ function TwisterEnemy:subUpdate()
 	elseif self.dst_ang < self.ang then
 		self.ang = math.max(self.ang - self.turn_speed, self.dst_ang)
 	else
-
 		self.cnt = self.cnt - 1
 
 		transform(self, self.left_turn_model)

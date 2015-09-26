@@ -21,14 +21,11 @@ function RocketEnemy:init(rand, x, y, wall)
 	self.ang = math.atan2(-self.nx, -self.ny)
 	transform(self)
 	self.active = false
-	self.wall_death = false
 end
 function RocketEnemy:die()
-	if self.active and not self.wall_death then
-		RocketEnemy.counter = RocketEnemy.counter + 1
-		if RocketEnemy.counter % 10 == 0 then
-			SpeedItem(self.x, self.y)
-		end
+	RocketEnemy.counter = RocketEnemy.counter + 1
+	if RocketEnemy.counter % 10 == 0 then
+		SpeedItem(self.x, self.y)
 	end
 end
 function RocketEnemy:subUpdate()
@@ -36,7 +33,7 @@ function RocketEnemy:subUpdate()
 	transform(self)
 
 
-	if self.clip and not self.active and game.player.alive
+	if self.entered_screen and not self.active and game.player.alive
 	and not game.walls:checkSight(self.x, self.y, game.player.x, game.player.y) then
 		local dx = game.player.x - self.x
 		local dy = game.player.y - self.y
@@ -51,8 +48,8 @@ function RocketEnemy:subUpdate()
 	if self.active then
 		if self.tick % 4 == 0 then
 			local sm = SmokeParticle(self.x - self.nx * 16, self.y - self.ny * 16)
-			sm.dx = 0
-			sm.dy = 0
+			sm.vx = 0
+			sm.vy = 0
 			sm.ttl = 8
 		end
 		self.vx = self.vx + self.nx * 0.1
@@ -62,8 +59,7 @@ function RocketEnemy:subUpdate()
 		transform(self)
 		local d, n, w = game.walls:checkCollision(self.trans_model)
 		if d > 0 then
-			self:hit(self.shield)
-			self.wall_death = true
+			self.alive = false
 		end
 	end
 end

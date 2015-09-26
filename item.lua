@@ -2,7 +2,7 @@ local G = love.graphics
 
 
 Item = Object:new {
-	model = { 12, 12, 12, -12, -12, -12, -12, 12, },
+	model = { 16, 16, 16, -16, -16, -16, -16, 16, },
 	bounce_model = { 16, 32, 32, 16, 32, -16, 16, -32, -16, -32, -32, -16, -32, 16, -16, 32, },
 	list = {},
 	size = 8,
@@ -31,8 +31,8 @@ function Item:update()
 	transform(self, self.bounce_model)
 	local d, n, w = game.walls:checkCollision(self.trans_model)
 	if d > 0 then
-		self.x = self.x - n[1] * 0.1
-		self.y = self.y - n[2] * 0.1
+		self.x = self.x - n[1] * 0.2
+		self.y = self.y - n[2] * 0.2
 	end
 	transform(self)
 
@@ -48,6 +48,7 @@ function Item:draw()
 	G.setColor(255, 255, 255)
 	G.draw(self.img, self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
 		self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
+--	if self.trans_model[1] then G.polygon("line", self.trans_model) end
 end
 
 

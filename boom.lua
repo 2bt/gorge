@@ -16,7 +16,7 @@ vec4 effect(vec4 color, sampler2D tex, vec2 tex_pos, vec2 screen_pos) {
 	float h  = texture2D(bump, tex_pos).r;
 	float h2 = texture2D(bump, tex_pos + d * vec2(1, 0)).r;
 	float h3 = texture2D(bump, tex_pos + d * vec2(0, 1)).r;
-	return texture2D(tex, tex_pos + vec2(h - h2, h - h3) * 0.04);
+	return texture2D(tex, tex_pos + vec2(h - h2, h - h3) * 0.03);
 }]])
 
 function Boom:init(x, y)

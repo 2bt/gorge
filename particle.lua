@@ -6,6 +6,7 @@ Particle = Object:new {
 	alive = true,
 	frame_length = 3,
 	size = 8,
+	layer = "front",
 }
 function Particle:init(x, y)
 	table.insert(self.list, self)
@@ -42,15 +43,15 @@ function SparkParticle:init(x, y)
 	self.y = y
 	local ang = math.random() * 2 * math.pi
 	local s = math.random() * 2 + 2
-	self.dx = math.sin(ang) * s
-	self.dy = math.cos(ang) * s
+	self.vx = math.sin(ang) * s
+	self.vy = math.cos(ang) * s
 	self.ttl = math.random(3, 7)
 end
 function SparkParticle:update()
-	self.x = self.x + self.dx
-	self.y = self.y + self.dy + game.walls.speed
-	self.dx = self.dx * self.friction
-	self.dy = self.dy * self.friction
+	self.x = self.x + self.vx
+	self.y = self.y + self.vy + game.walls.speed
+	self.vx = self.vx * self.friction
+	self.vy = self.vy * self.friction
 	self.ttl = self.ttl - 1
 	if self.ttl <= 0 then return "kill" end
 end
@@ -76,8 +77,8 @@ function ExplosionSparkParticle:init(x, y)
 	self.y = y
 	local ang = math.random() * 2 * math.pi
 	local s = math.random() * 2 + 2
-	self.dx = math.sin(ang) * s
-	self.dy = math.cos(ang) * s
+	self.vx = math.sin(ang) * s
+	self.vy = math.cos(ang) * s
 	self.ttl = math.random(10, 15)
 	self.color = {255, math.random(0, 255), 0}
 end
@@ -92,7 +93,9 @@ end
 
 SmokeParticle = Particle:new {
 	img = G.newImage("media/smoke.png"),
-	size = 8
+	size = 8,
+	friction = 0.8,
+	layer = "back"
 }
 genQuads(SmokeParticle)
 function SmokeParticle:init(x, y)
@@ -101,18 +104,11 @@ function SmokeParticle:init(x, y)
 	self.y = y
 	local ang = math.random() * 2 * math.pi
 	local s = math.random() * 2 + 3
-	self.dx = math.sin(ang) * s
-	self.dy = math.cos(ang) * s
+	self.vx = math.sin(ang) * s
+	self.vy = math.cos(ang) * s
 	self.ttl = math.random(20, 25)
 end
-function SmokeParticle:update()
-	self.x = self.x + self.dx
-	self.y = self.y + self.dy + game.walls.speed
-	self.dx = self.dx * 0.8
-	self.dy = self.dy * 0.8
-	self.ttl = self.ttl - 1
-	if self.ttl <= 0 then return "kill" end
-end
+SmokeParticle.update = SparkParticle.update
 function SmokeParticle:draw()
 	G.setColor(30, 30, 30, 150)
 	local f = math.max(1, #self.quads - math.floor(self.ttl / 3))
@@ -129,7 +125,9 @@ genQuads(ExplosionParticle)
 
 
 function makeExplosion(x, y)
+	-- heat wave
 	Boom(x, y)
+
 	for i = 1, 10 do
 		SmokeParticle(x, y)
 	end

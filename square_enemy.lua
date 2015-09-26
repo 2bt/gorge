@@ -75,12 +75,7 @@ function RapidBullet:init(x, y, dx, dy)
 	self:super(x, y, dx, dy)
 	self.ang = math.atan2(dx, dy)
 end
-function RapidBullet:makeSparks(x, y)
-	for i = 1, 10 do
-		RapidParticle(x, y)
-	end
+function RapidBullet:draw()
+	G.setColor(unpack(self.color))
+	G.polygon("fill", self.trans_model)
 end
-RapidParticle = SparkParticle:new {
-	color = { 88, 155, 88 },
-	friction = 0.9,
-}
