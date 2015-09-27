@@ -57,7 +57,7 @@ function Game:reset(seed)
 	RingEnemy.counter = 0
 	RocketEnemy.counter = 0
 
-	self.saucer_delay = 0
+	self.saucer_delay = 4000
 
 	-- DEBUG
 --	for i = 1, 720 do self.walls:generate() end
