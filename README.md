@@ -2,7 +2,6 @@ GORGE
 =====
 
 Endless shoot 'em up game in development.
-It's probably not good.
 You'll need LÖVE 0.9.1 or newer.
 
 ### Controls ###
@@ -11,3 +10,4 @@ You'll need LÖVE 0.9.1 or newer.
 	<tr><td>x</td>					<td>shoot</td></tr>
 </table>
 
+Gamepad works, too.
