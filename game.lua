@@ -67,7 +67,9 @@ function Game:reset(seed)
 --	SpeedItem(0, -100)
 --	SpeedItem(0, -200)
 --	BallItem(0, 100)
---	SaucerEnemy(self:makeRG(), 100, -150)
+--	local s = SaucerEnemy(self:makeRG(), 100, -150)
+--	s.shield = 1
+
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1

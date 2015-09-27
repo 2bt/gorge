@@ -5,7 +5,9 @@ RocketEnemy = Enemy:new {
 	score = 150,
 	img = G.newImage("media/rocket.png"),
 	model = { 16, 16, 4, -20, -4, -20, -16, 16, },
-	counter = 0
+	counter = 0,
+	active = false,
+	suicide = false,
 }
 genQuads(RocketEnemy)
 function RocketEnemy:init(rand, x, y, wall)
@@ -20,12 +22,13 @@ function RocketEnemy:init(rand, x, y, wall)
 	if wall == "right"	then self.nx = -1 end
 	self.ang = math.atan2(-self.nx, -self.ny)
 	transform(self)
-	self.active = false
 end
 function RocketEnemy:die()
-	RocketEnemy.counter = RocketEnemy.counter + 1
-	if RocketEnemy.counter % 10 == 0 then
-		SpeedItem(self.x, self.y)
+	if not self.suicide then
+		RocketEnemy.counter = RocketEnemy.counter + 1
+		if RocketEnemy.counter % 10 == 0 then
+			SpeedItem(self.x, self.y)
+		end
 	end
 end
 function RocketEnemy:subUpdate()
@@ -59,6 +62,7 @@ function RocketEnemy:subUpdate()
 		transform(self)
 		local d, n, w = game.walls:checkCollision(self.trans_model)
 		if d > 0 then
+			self.suicide = true
 			self.alive = false
 		end
 	end

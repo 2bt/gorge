@@ -124,15 +124,16 @@ function SaucerParticle:update()
 			makeExplosion(self.x + math.random(-40, 40), self.y + math.random(-28, 24))
 		end
 
-		for i = 1, 40 do
-			local sm = SmokeParticle(self.x, self.y)
-			local r = math.pi * 2 * i / 40
-			sm.vx = math.cos(r) * 15
-			sm.vy = math.sin(r) * 15
-			sm.ttl = 16
-			sm.layer = "back"
-			sm.friction = 0.89
-		end
+--		for i = 1, 40 do
+--			local sm = SmokeParticle(self.x, self.y)
+--			local r = math.pi * 2 * i / 40
+--			sm.vx = math.cos(r) * 15
+--			sm.vy = math.sin(r) * 15
+--			sm.ttl = 16
+--			sm.layer = "back"
+--			sm.friction = 0.89
+--		end
+		PraxisParticle(self.x, self.y)
 
 		return "kill"
 	end
@@ -151,5 +152,50 @@ SaucerBullet = Bullet:new {
 	color = { 255, 255, 120 },
 }
 genQuads(SaucerBullet)
+
+
+
+-- explosion wave
+PraxisParticle = Particle:new {
+	layer = "back",
+	canvas = G.newCanvas(80, 80),
+	shader = G.newShader([[
+		uniform float f;
+		const float a[] = float[]( 1, 0, 0, 0, 1 );
+		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
+			float d = distance(vec2(40, 40), screen_coords);
+			int i = int(floor(f - d));
+			if (i >= 0 && i < a.length()) return a[i] * col;
+			return vec4(0);
+		}
+	]]),
+}
+function PraxisParticle:init(x, y)
+	table.insert(self.list, self)
+	self.x = x
+	self.y = y
+	self.tick = 0
+end
+function PraxisParticle:update()
+	self.tick = self.tick + 1
+	self.y = self.y + game.walls.speed
+	if self.tick > 30 then return "kill" end
+end
+function PraxisParticle:draw()
+	local f = self.tick / 30
+	local c = (1 - f) ^ 0.3 * 200
+	self.canvas:renderTo(function()
+		G.clear()
+		G.push()
+		G.origin()
+		G.setColor(160, 160, 160, c)
+		self.shader:send("f", (1 - 2 ^ (-3 * f)) * 40)
+		G.setShader(self.shader)
+		G.rectangle("fill", 0, 0, 80, 80)
+		G.setShader()
+		G.pop()
+	end)
+	G.draw(self.canvas, self.x, self.y, 0, 4, 4, 40, 40)
+end
 
 
