@@ -12,6 +12,7 @@ Game.health_quads = makeQuads(16, 8, 8)
 Game.canvas = G.newCanvas()
 
 
+
 function Game:init()
 	self.stars = Stars()
 	self.walls = Walls()
@@ -69,7 +70,7 @@ function Game:reset(seed)
 --	BallItem(0, 100)
 --	local s = SaucerEnemy(self:makeRG(), 100, -150)
 --	s.shield = 1
-
+--	makeEnergyItem(0, -150, self.rand, 3)
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1
@@ -171,6 +172,7 @@ function Game:update()
 	updateList(Laser.list)
 	updateList(Bullet.list)
 	updateList(Item.list)
+
 
 
 
@@ -340,16 +342,21 @@ end
 	G.setColor(255, 255, 255)
 	font:print(("%07d"):format(self.player.score), 800 - 6 * 4 * 7 - 8, 0)
 
+	-- hearts
 	for i = 1, self.player.max_shield do
 		local f = 1
 		if i > self.player.shield
 		or (self.player.shield == 1 and self.tick % 32 < 8) then
 			f = 2
 		end
-		G.draw(self.health_img, self.health_quads[f],
-			8 + (i - 1) * 32,
-			4, 0, 4)
+		G.draw(self.health_img, self.health_quads[f], 8 + (i - 1) * 32, 4, 0, 4)
 	end
+	-- energy
+	G.setColor(127, 127, 127, 100)
+	G.rectangle("fill", 12, 36, 5 * 4, 20 * 4)
+	local h = math.min(20, self.player.energy) * 4
+	G.setColor(0, 255, 255)
+	G.rectangle("fill", 16, 36 + 20 * 4 - h, 3 * 4, h)
 
 
 	-- pause

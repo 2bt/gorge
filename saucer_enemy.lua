@@ -70,8 +70,6 @@ function SaucerEnemy:subUpdate()
 
 	else
 
-
-
 		-- hover for a while
 		if self.tick < 2000 then
 			local oy = -80 + math.sin(self.r + self.tick / 200) * 150
@@ -80,8 +78,7 @@ function SaucerEnemy:subUpdate()
 			self.ty = 0.5
 		end
 
-
-
+		-- don't leave the screen
 		if self.x < -350 then self.tx =  1 end
 		if self.x >  350 then self.tx = -1 end
 	end

@@ -15,12 +15,18 @@ function RingEnemy:init(...)
 end
 function RingEnemy:die()
 	RingEnemy.counter = RingEnemy.counter + 1
-	if RingEnemy.counter % 25 == 0 then
-		local player = game.player
-		if not player.balls[1].alive
-		or not player.balls[2].alive then
-			BallItem(self.x, self.y)
-		elseif player.shield < player.max_shield then
+	local player = game.player
+
+	if RingEnemy.counter >= 15
+	and (not player.balls[1].alive or not player.balls[2].alive) then
+		RingEnemy.counter = RingEnemy.counter - 15
+		BallItem(self.x, self.y)
+		return
+	end
+
+	if RingEnemy.counter >= 25 then
+		RingEnemy.counter = RingEnemy.counter - 25
+		if player.shield < player.max_shield then
 			HealthItem(self.x, self.y)
 		else
 			MoneyItem(self.x, self.y)

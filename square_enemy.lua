@@ -17,6 +17,7 @@ function SquareEnemy:init(...)
 	self:normVel()
 end
 function SquareEnemy:die()
+	makeEnergyItem(self.x, self.y, self.rand, 3)
 end
 function SquareEnemy:normVel()
 	local f = 1.1 / (self.vx*self.vx + self.vy*self.vy) ^ 0.5

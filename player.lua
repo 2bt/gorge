@@ -101,6 +101,7 @@ function Player:reset()
 	self.alive = true
 	self.invincible = 0
 	self.score = 0
+	self.energy = 0
 	self.shoot_delay = 0
 	self.side_shoot = false
 	self.blast = 0

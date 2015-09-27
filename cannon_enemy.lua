@@ -20,6 +20,8 @@ function CannonEnemy:init(rand, x, y, wall)
 	self.cannon_ang = self.ang + self.rand.float(-1.3, 1.3)
 	self.delay = self.rand.int(100, 150)
 end
+function CannonEnemy:die()
+end
 function CannonEnemy:subUpdate()
 	self.y = self.y + game.walls.speed
 	transform(self)

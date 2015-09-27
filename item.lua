@@ -95,3 +95,73 @@ MoneyItem = Item:new {
 	score = 10000,
 }
 genQuads(MoneyItem)
+
+
+
+EnergyItem = Item:new {
+	img = G.newImage("media/energy_item.png"),
+	size = 8,
+	score = 80,
+	model = { 8, 8, 8, -8, -8, -8, -8, 8, },
+	frame_length = 2,
+}
+genQuads(EnergyItem)
+function EnergyItem:init(x, y, vx, vy)
+	self:super(x, y)
+	self.vx = vx
+	self.vy = vy
+	self.tick = math.random(1, #self.quads * self.frame_length)
+end
+function EnergyItem:update()
+	self.tick = self.tick + 1
+	self.y = self.y + game.walls.speed + self.vy
+	self.x = self.x + self.vx
+
+	self.vx = self.vx * 0.98
+	self.vy = self.vy * 0.98
+
+	if self.y > 310 then return "kill" end
+
+	transform(self)
+	local d, n, w = game.walls:checkCollision(self.trans_model)
+	if d > 0 then
+		self.x = self.x - n[1] * d
+		self.y = self.y - n[2] * d
+
+		local dot = (self.vx * n[1] + self.vy * n[2]) * 2
+		self.vx = self.vx - dot * n[1]
+		self.vy = self.vy - dot * n[2]
+	end
+	transform(self)
+
+	if game.player.alive then
+		local player = game.player
+		local dx = player.x - self.x
+		local dy = player.y - self.y
+		local l = dx^2 + dy^2
+		if l < 9000 then
+			l = 1 / (l ^ 0.5)
+			self.x = self.x + dx * l * 5
+			self.y = self.y + dy * l * 5
+		end
+
+
+		local d, n, w = polygonCollision(self.trans_model, player.trans_model)
+		if d > 0 then
+			self:collect(game.player)
+			return "kill"
+		end
+	end
+end
+function EnergyItem:collect(player)
+	SparkleParticle(self.x, self.y)
+	player.score = player.score + self.score
+	player.energy = player.energy + 1
+end
+function makeEnergyItem(x, y, rand, count)
+	for i = 1, count do
+		local r = rand.float(0, math.pi * 2)
+		local s = rand.float(1, 2.5)
+		EnergyItem(x, y, math.sin(r) * s, math.cos(r) * s)
+	end
+end
