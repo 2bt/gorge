@@ -3,7 +3,7 @@ local G = love.graphics
 
 Item = Object:new {
 	model = { 16, 16, 16, -16, -16, -16, -16, 16, },
-	bounce_model = { 16, 32, 32, 16, 32, -16, 16, -32, -16, -32, -32, -16, -32, 16, -16, 32, },
+	bounce_model = { 24, 48, 48, 24, 48, -24, 24, -48, -24, -48, -48, -24, -48, 24, -24, 48, },
 	list = {},
 	size = 8,
 	frame_length = 6,
@@ -31,8 +31,8 @@ function Item:update()
 	transform(self, self.bounce_model)
 	local d, n, w = game.walls:checkCollision(self.trans_model)
 	if d > 0 then
-		self.x = self.x - n[1] * 0.2
-		self.y = self.y - n[2] * 0.2
+		self.x = self.x - n[1] * 0.3
+		self.y = self.y - n[2] * 0.3
 	end
 	transform(self)
 

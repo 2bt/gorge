@@ -236,22 +236,20 @@ function Game:update()
 		end
 
 		-- twister
-		if r == 7 and self.rand.int(0, 3) == 0 then
-			if #side_spot > 0 then
-				local t = side_spot[self.rand.int(1, #side_spot)]
-				for iy = t[2] - 9, t[2] + 9 do
-					if data[iy] and data[iy][t[1]] == 0 then
-						data[iy][t[1]] = -1
-					end
+		if #side_spot > 0 and r == 7 and self.rand.int(0, 3) == 0 then
+			local t = side_spot[self.rand.int(1, #side_spot)]
+			for iy = t[2] - 9, t[2] + 9 do
+				if data[iy] and data[iy][t[1]] == 0 then
+					data[iy][t[1]] = -1
 				end
-				local x, y = self.walls:getTilePosition(t[1], t[2])
-				x = x + (bool[x > 0] - bool[x < 0]) * 16
-				TwisterSpawn(self:makeRG(), x, y, t[3])
 			end
+			local x, y = self.walls:getTilePosition(t[1], t[2])
+			x = x + (bool[x > 0] - bool[x < 0]) * 16
+			TwisterSpawn(self:makeRG(), x, y, t[3])
 		end
 
 		-- saucer
-		if r == 8 and self.tick % 3 == 0 and self.saucer_delay <= 0 then
+		if #spot > 0 and r == 8 and self.tick % 3 == 0 and self.saucer_delay <= 0 then
 			self.saucer_delay = 3000 - self.tick * 0.02
 			local t = spot[self.rand.int(1, #spot)]
 			data[j][t] = -1

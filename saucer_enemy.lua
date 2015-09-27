@@ -25,7 +25,7 @@ SaucerEnemy = Enemy:new {
 		-32, 64,
 	},
 
-	shield = 15,
+	shield = 20,
 }
 genQuads(SaucerEnemy)
 function SaucerEnemy:init(rand, x, y)
