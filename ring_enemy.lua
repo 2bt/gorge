@@ -14,6 +14,8 @@ function RingEnemy:init(...)
 	self.delay = self.rand.int(200)
 end
 function RingEnemy:die()
+	makeEnergyItem(self.x, self.y, self.rand, 1)
+
 	RingEnemy.counter = RingEnemy.counter + 1
 	local player = game.player
 

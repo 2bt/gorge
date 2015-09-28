@@ -21,6 +21,7 @@ function CannonEnemy:init(rand, x, y, wall)
 	self.delay = self.rand.int(100, 150)
 end
 function CannonEnemy:die()
+	makeEnergyItem(self.x, self.y, self.rand, 2)
 end
 function CannonEnemy:subUpdate()
 	self.y = self.y + game.walls.speed

@@ -25,6 +25,7 @@ function RocketEnemy:init(rand, x, y, wall)
 end
 function RocketEnemy:die()
 	if not self.suicide then
+		makeEnergyItem(self.x, self.y, self.rand, 1)
 		RocketEnemy.counter = RocketEnemy.counter + 1
 		if RocketEnemy.counter % 10 == 0 then
 			SpeedItem(self.x, self.y)

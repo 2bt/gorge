@@ -80,13 +80,17 @@ end
 
 
 
-
-
 Player = Object:new {
 	img = G.newImage("media/player.png"),
-	model = { 16, 16, 16, 0, 4, -12, -4, -12, -16, 0, -16, 16, }
+	model = { 16, 16, 16, 0, 4, -12, -4, -12, -16, 0, -16, 16, },
+	field = {
+		img = G.newImage("media/field.png"),
+		model = { 16, 24, 24, 16, 24, 0, 4, -20, -4, -20, -24, 0, -24, 16, -16, 24, },
+		trans_model = {},
+	}
 }
 genQuads(Player, 16)
+genQuads(Player.field, 16)
 function Player:init()
 	self.trans_model = {}
 	self.balls = { Ball(self, -1), Ball(self, 1) }
@@ -97,11 +101,13 @@ function Player:reset()
 	self.y = 350
 	self.shield = 3
 	self.max_shield = self.shield
+	self.score = 0
+	self.energy = 0
+	self.max_energy = 30
+	self.field_active = false
 	self.speed_boost = 0
 	self.alive = true
 	self.invincible = 0
-	self.score = 0
-	self.energy = 0
 	self.shoot_delay = 0
 	self.side_shoot = false
 	self.blast = 0
@@ -164,7 +170,7 @@ function Player:update(input)
 --		speed = 3 + self.speed_boost * 0.2
 		speed = math.sqrt(self.speed_boost + 9)
 
-		if self.shoot_delay > 0 or input.shoot then
+		if self.shoot_delay > 0 or input.a then
 			speed = speed * 0.5
 		end
 	end
@@ -201,7 +207,7 @@ function Player:update(input)
 	elseif input.dy < 0 then
 		self.side_shoot = true
 	end
-	if input.shoot and self.shoot_delay == 0 and self.blast == 0 then
+	if input.a and self.shoot_delay == 0 and self.blast == 0 then
 		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
 		self.balls[1]:shoot(self.side_shoot)
@@ -210,6 +216,22 @@ function Player:update(input)
 	if self.shoot_delay > 0 then
 		self.shoot_delay = self.shoot_delay - 1
 	end
+
+
+	-- field
+	if self.field_active then
+		self.energy = self.energy - 0.1
+		if self.energy < 0 then
+			self.energy = 0
+			self.field_active = false
+		end
+	elseif input.b and self.energy >= self.max_energy then
+		self.field_active = true
+	end
+
+	self.field.x = self.x
+	self.field.y = self.y
+	transform(self.field)
 
 
 	-- collision with enemies
@@ -229,9 +251,23 @@ end
 function Player:draw()
 	if not self.alive then return end
 
+	-- field
+	if self.field_active then
+		local q1 = math.floor( self.tick      / 4) % #self.field.quads + 1
+		local q2 = math.floor((self.tick + 3) / 4) % #self.field.quads + 1
+		G.setBlendMode("add")
+		G.setColor(0, 0, 255, 50)
+		G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
+		G.setColor(0, 255, 0, 50)
+		G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
+		G.setBlendMode("alpha")
+	end
+
+	-- balls
 	G.setColor(255, 255, 255)
 	self.balls[1]:draw()
 	self.balls[2]:draw()
+
 
 	if self.invincible % 8 >= 4 then return end
 

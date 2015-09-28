@@ -8,13 +8,14 @@ BlockadeEnemy = Enemy:new {
 	score = 2000,
 }
 genQuads(BlockadeEnemy)
-function BlockadeEnemy:init(x, y, wall_row, index)
-	self:super(nil, x, y)
+function BlockadeEnemy:init(rand, x, y, wall_row, index)
+	self:super(rand, x, y)
 	self.neighbors = {}
 	self.index = index
 	self.wall_row = wall_row
 end
 function BlockadeEnemy:die()
+	makeEnergyItem(self.x, self.y, self.rand, 1)
 	self.wall_row[self.index] = 0
 
 	for i = 1, 2 do

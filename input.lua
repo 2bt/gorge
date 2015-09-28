@@ -17,7 +17,8 @@ function Input:update()
 			right	= self.joy:isGamepadDown("dpright")	or x >  0.1,
 			up		= self.joy:isGamepadDown("dpup")	or y < -0.1,
 			down	= self.joy:isGamepadDown("dpdown")	or y >  0.1,
-			shoot	= self.joy:isGamepadDown("a"),
+			a		= self.joy:isGamepadDown("a"),
+			b		= self.joy:isGamepadDown("b"),
 			start	= self.joy:isGamepadDown("start"),
 			back	= self.joy:isGamepadDown("back"),
 		}
@@ -27,7 +28,8 @@ function Input:update()
 			right	= isDown("right"),
 			up		= isDown("up"),
 			down	= isDown("down"),
-			shoot	= isDown("x"),
+			a		= isDown("x"),
+			b		= isDown("c"),
 			start	= isDown("space") or isDown("return"),
 			back	= isDown("escape"),
 		}

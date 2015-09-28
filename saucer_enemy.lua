@@ -38,6 +38,7 @@ function SaucerEnemy:init(rand, x, y)
 	self.r = rand.float(0, math.pi * 2)
 end
 function SaucerEnemy:die()
+	makeEnergyItem(self.x, self.y, self.rand, 10)
 	SaucerParticle(self.x, self.y)
 end
 function SaucerEnemy:subUpdate()

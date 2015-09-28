@@ -7,6 +7,7 @@ Item = Object:new {
 	list = {},
 	size = 8,
 	frame_length = 6,
+	layer = "front",
 }
 function Item:init(x, y)
 	table.insert(self.list, self)
@@ -104,6 +105,7 @@ EnergyItem = Item:new {
 	score = 80,
 	model = { 8, 8, 8, -8, -8, -8, -8, 8, },
 	frame_length = 2,
+	layer = "back",
 }
 genQuads(EnergyItem)
 function EnergyItem:init(x, y, vx, vy)
@@ -134,12 +136,12 @@ function EnergyItem:update()
 	end
 	transform(self)
 
-	if game.player.alive then
-		local player = game.player
+	local player = game.player
+	if player.alive then
 		local dx = player.x - self.x
 		local dy = player.y - self.y
 		local l = dx^2 + dy^2
-		if l < 9000 then
+		if l < 6000 then
 			l = 1 / (l ^ 0.5)
 			self.x = self.x + dx * l * 5
 			self.y = self.y + dy * l * 5
@@ -156,7 +158,9 @@ end
 function EnergyItem:collect(player)
 	SparkleParticle(self.x, self.y)
 	player.score = player.score + self.score
-	player.energy = player.energy + 1
+	if player.energy < player.max_energy then
+		player.energy = player.energy + 1
+	end
 end
 function makeEnergyItem(x, y, rand, count)
 	for i = 1, count do

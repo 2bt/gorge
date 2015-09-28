@@ -28,8 +28,14 @@ function updateList(x)
 		end
 	end
 end
-function drawList(x)
-	for _, o in ipairs(x) do o:draw() end
+function drawList(x, layer)
+	if layer then
+		for _, o in ipairs(x) do
+			if o.layer == layer then o:draw() end
+		end
+	else
+		for _, o in ipairs(x) do o:draw() end
+	end
 end
 
 function makeRandomGenerator(seed)

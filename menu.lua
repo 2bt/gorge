@@ -134,7 +134,7 @@ function Menu:update()
 				local start
 				start, self.input = Input:gotAnyPressed("start")
 				if not start then
-					start, self.input = Input:gotAnyPressed("shoot")
+					start, self.input = Input:gotAnyPressed("a")
 				end
 				if start then
 					self.action = self.options[self.state][self.select]
@@ -142,7 +142,7 @@ function Menu:update()
 			end
 
 			-- back
-			if Input:gotAnyPressed("back") then
+			if Input:gotAnyPressed("back") or Input:gotAnyPressed("b") then
 				if self.state == "main" then
 					self.action = "EXIT"
 				else

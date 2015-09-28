@@ -58,7 +58,7 @@ function Game:reset(seed)
 	RingEnemy.counter = 0
 	RocketEnemy.counter = 0
 
-	self.saucer_delay = 4000
+	self.saucer_delay = 6000
 
 	-- DEBUG
 --	for i = 1, 720 do self.walls:generate() end
@@ -70,7 +70,7 @@ function Game:reset(seed)
 --	BallItem(0, 100)
 --	local s = SaucerEnemy(self:makeRG(), 100, -150)
 --	s.shield = 1
---	makeEnergyItem(0, -150, self.rand, 3)
+--	makeEnergyItem(0, -150, self.rand, 40)
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1
@@ -95,7 +95,7 @@ function Game:next_wall_row()
 				if c == 0 then
 					r[ix] = -2
 					local x, y = self.walls:getTilePosition(ix, #data)
-					block = BlockadeEnemy(x, y, r, ix)
+					block = BlockadeEnemy(self:makeRG(), x, y, r, ix)
 					if prev then
 						block.neighbors[1] = prev
 						prev.neighbors[2] = block
@@ -111,7 +111,7 @@ function Game:update()
 --	love.timer.sleep(0.05)
 
 	if Input:gotAnyPressed("back")
-	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("shoot")) then
+	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("a")) then
 		self.action = "BACK"
 	end
 	if not self.action and Input:gotAnyPressed("start") then
@@ -148,13 +148,15 @@ function Game:update()
 		local i = self.record[self.tick] or 5
 		input.dx = i % 4 - 1
 		input.dy = math.floor(i / 4) % 4 - 1
-		input.shoot = math.floor(i / 16) > 0
+		input.a = math.floor(i / 16) > 0
+		input.b = math.floor(i / 32) > 0
 		if not self.record[self.tick] then self.action = "BACK" end
 	else
 		input = self.input.state
 		self.record[self.tick]	= (1 + input.dx)
 								+ (1 + input.dy) * 4
-								+ bool[input.shoot] * 16
+								+ bool[input.a] * 16
+								+ bool[input.b] * 32
 	end
 
 
@@ -300,9 +302,9 @@ end
 	G.clear()
 
 	self.stars:draw()
-	for _, p in ipairs(Particle.list) do
-		if p.layer == "back" then p:draw() end
-	end
+	drawList(Particle.list, "back")
+	drawList(Item.list, "back")
+
 	drawList(Enemy.list)
 	drawList(Bullet.list)
 	drawList(Laser.list)
@@ -329,10 +331,8 @@ if DEBUG then
 	G.rectangle("line", -400, -300, 800, 600)
 end
 
-	for _, p in ipairs(Particle.list) do
-		if p.layer == "front" then p:draw() end
-	end
-	drawList(Item.list)
+	drawList(Particle.list, "front")
+	drawList(Item.list, "front")
 
 
 
@@ -351,16 +351,24 @@ end
 		end
 		G.draw(self.health_img, self.health_quads[f], 8 + (i - 1) * 32, 4, 0, 4)
 	end
+
 	-- energy
-	G.setColor(127, 127, 127, 100)
-	G.rectangle("fill", 12, 36, 5 * 4, 20 * 4)
-	local h = math.min(20, self.player.energy) * 4
+	local m = self.player.max_energy
+	local e = self.player.energy
+	G.setColor(109, 109, 109)
+	G.rectangle("fill", 8, 588 - m * 4, 4, m * 4)
+	G.rectangle("fill", 16, 588 - m * 4, 4, m * 4)
+	G.rectangle("fill", 12, 584 - m * 4, 4, 4)
+	G.rectangle("fill", 12, 588, 4, 4)
+	G.setColor(50, 50, 50, 100)
+	G.rectangle("fill", 12, 588 - m * 4, 4, m * 4)
 	G.setColor(0, 255, 255)
-	G.rectangle("fill", 16, 36 + 20 * 4 - h, 3 * 4, h)
+	G.rectangle("fill", 12, 588 - e * 4, 4, e * 4)
 
 
 	-- pause
 	if self.pause then
+		G.setColor(255, 255, 255)
 		font:printCentered("PAUSE", 398, 300 - 20)
 	end
 

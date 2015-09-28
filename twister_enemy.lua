@@ -106,6 +106,16 @@ function TwisterEnemy:subUpdate()
 	end
 	transform(self)
 
+	-- shoot
+	local player = game.player
+	if player.alive and self.rand.int(1, 1000) == 1 then
+
+		local dx = player.x - self.x
+		local dy = player.y - self.y
+		local ang = math.atan2(dx, dy) + self.rand.float(-0.2, 0.2)
+		PlasmaBullet(self.x, self.y, math.sin(ang) * 4, math.cos(ang) * 4)
+	end
+
 end
 TwisterEnemy.die = RingEnemy.die
 function TwisterEnemy:subDraw_()
