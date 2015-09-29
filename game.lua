@@ -149,8 +149,8 @@ function Game:update()
 		local i = self.record[self.tick] or 5
 		input.dx = i % 4 - 1
 		input.dy = math.floor(i / 4) % 4 - 1
-		input.a = math.floor(i / 16) > 0
-		input.b = math.floor(i / 32) > 0
+		input.a = math.floor(i / 16) % 2 > 0
+		input.b = math.floor(i / 32) % 2 > 0
 		if not self.record[self.tick] then self.action = "BACK" end
 	else
 		input = self.input.state
@@ -270,6 +270,7 @@ function Game:update()
 	if not self.player.alive then
 		self.outro = self.outro + 1
 		if self.outro > 250 then
+			print(self.player.score)
 			state = menu
 			bg_music:stop()
 			if self.is_demo then

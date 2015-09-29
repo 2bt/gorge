@@ -56,7 +56,7 @@ function love.update()
 	updateList(Input.list)
 	state:update()
 	if love.keyboard.isDown("^") then -- fast forward
-		for i = 1, 7 do
+		for i = 1, 20 do
 			state:update()
 		end
 	end
