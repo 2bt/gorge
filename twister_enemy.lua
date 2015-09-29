@@ -108,6 +108,7 @@ function TwisterEnemy:subUpdate()
 
 	-- shoot
 	local player = game.player
+	if self.y < -300 or self.y > 300 then return end
 	if player.alive and self.rand.int(1, 1000) == 1 then
 
 		local dx = player.x - self.x

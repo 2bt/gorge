@@ -84,9 +84,9 @@ function Ball:drawField()
 	if not self.alive then return end
 	local q1 = math.floor( self.player.tick      / 4) % #self.field.quads + 1
 	local q2 = math.floor((self.player.tick + 3) / 4) % #self.field.quads + 1
-	G.setColor(0, 70, 70, 200)
+	G.setColor(0, 60, 60, 200)
 	G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-	G.setColor(35 + math.sin(self.player.tick / 2) * 35, 70, 70, 200)
+	G.setColor(30 + math.sin(self.player.tick / 2) * 30, 60, 60, 200)
 	G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
 end
 function Ball:draw()
@@ -246,9 +246,28 @@ function Player:update(input)
 			self.energy = 0
 			self.field_active = false
 		end
+
+
+		-- bullet wave
+		if input.b and not self.input_b then
+
+			for i = 1, 32 do
+				r = i / 32 * 2 * math.pi
+				local dx = math.sin(r) * 1.5
+				local dy = math.cos(r) * 1.5
+				local l = Laser(self.x + dx, self.y + dy, dx, dy)
+				l.ttl = 25
+			end
+
+			self.energy = 0
+			self.field_active = false
+		end
+
 	elseif input.b and self.energy >= self.max_energy then
 		self.field_active = true
 	end
+
+	self.input_b = input.b
 
 	self.field.x = self.x
 	self.field.y = self.y
@@ -281,9 +300,9 @@ function Player:draw()
 
 		local q1 = math.floor( self.tick      / 4) % #self.field.quads + 1
 		local q2 = math.floor((self.tick + 3) / 4) % #self.field.quads + 1
-		G.setColor(0, 70, 70, 200)
+		G.setColor(0, 60, 60, 200)
 		G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-		G.setColor(35 + math.sin(self.tick / 2) * 35, 70, 70, 200)
+		G.setColor(30 + math.sin(self.tick / 2) * 30, 60, 60, 200)
 		G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
 	end
 
@@ -296,7 +315,7 @@ function Player:draw()
 
 
 	if self.flash > 0 then G.setShader(flash_shader) end
-	G.setColor(255, 255, 250)
+	G.setColor(255, 255, 255)
 	G.draw(self.img,
 		self.quads[1 + math.floor(self.tick / 8 % 2)],
 		self.x, self.y, 0, 4, 4, 8, 8)
@@ -316,18 +335,19 @@ Laser = Object:new {
 	model = { -2, 10, 2, 10, 2, -10, -2, -10, },
 	damage = 1
 }
-function Laser:init(x, y, dx, dy)
+function Laser:init(x, y, vx, vy)
 	table.insert(self.list, self)
 	self.x = x
 	self.y = y
-	self.dx = dx or 0
-	self.dy = dy or -4
+	self.vx = vx or 0
+	self.vy = vy or -4
+	self.ang = math.atan2(self.vx, self.vy)
 	self.trans_model = {}
 end
 function Laser:update()
 	for i = 1, 4 do
-		self.x = self.x + self.dx
-		self.y = self.y + self.dy
+		self.x = self.x + self.vx
+		self.y = self.y + self.vy
 		if self.y < -310 or self.y > 310
 		or self.x < -410 or self.x > 410 then return "kill" end
 		transform(self)
@@ -352,11 +372,14 @@ function Laser:update()
 
 		end
 	end
+	if self.ttl then
+		self.ttl = self.ttl - 1
+		if self.ttl <= 0 then return "kill" end
+	end
 end
 function Laser:draw()
-	local rot = math.atan2(-self.dx, self.dy)
 	G.setColor(255, 255, 255)
-	G.draw(self.img, self.x, self.y, rot, 4, 4, 1.5, 3)
+	G.draw(self.img, self.x, self.y, -self.ang, 4, 4, 1.5, 3)
 --	G.polygon("line", self.trans_model)
 end
 

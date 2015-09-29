@@ -70,8 +70,8 @@ function Game:reset(seed)
 --	BallItem(0, 100)
 --	local s = SaucerEnemy(self:makeRG(), 100, -150)
 --	s.shield = 1
-	makeEnergyItem(0, -150, self.rand, 40)
-	BallItem(0, -150)
+--	makeEnergyItem(0, -150, self.rand, 40)
+--	BallItem(0, -150)
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1
@@ -360,7 +360,7 @@ end
 	local e = self.player.energy
 	G.setColor(60, 60, 60, 100)
 	G.rectangle("fill", 400-m*2,	8, 4*m, 4)
-	G.setColor(0, 255, 255)
+	G.setColor(0, 200, 200)
 	if self.player.field_active then
 		if self.tick % 8 < 4 then
 			G.setColor(0, 127, 127)
