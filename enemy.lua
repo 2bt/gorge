@@ -37,12 +37,12 @@ function Enemy:update()
 	end
 	-- in screen?
 	if not self.entered_screen
-	and self.x < 420 and self.x > -420
-	and self.y < 320 and self.y > -320 then
+	and self.x < 428 and self.x > -428
+	and self.y < 328 and self.y > -328 then
 		self.entered_screen = true
 	end
-	if self.entered_screen and (self.y < -320 or self.y > 320)
-	or self.x > 420 or self.x < -420
+	if self.entered_screen and (self.y < -328 or self.y > 328)
+	or self.x > 428 or self.x < -428
 	or self.y > 500 then
 		return "kill"
 	end
@@ -122,11 +122,19 @@ function Bullet:update()
 			end
 			for _, ball in ipairs(player.balls) do
 				if ball.alive then
-					local d, n, w = polygonCollision(self.trans_model, ball.trans_model)
-					if d > 0 then
-						ball:hit()
-						self:makeSparks(w[1], w[2])
-						return "kill"
+					if player.field_active then
+						local d, n, w = polygonCollision(self.trans_model, ball.field.trans_model)
+						if d > 0 then
+							self:makeSparks(w[1], w[2])
+							return "kill"
+						end
+					else
+						local d, n, w = polygonCollision(self.trans_model, ball.trans_model)
+						if d > 0 then
+							ball:hit()
+							self:makeSparks(w[1], w[2])
+							return "kill"
+						end
 					end
 				end
 			end

@@ -1,5 +1,13 @@
 local G = love.graphics
 
+BallField = Object:new {
+	img = G.newImage("media/ball_field.png"),
+	model = { 8, 16, 16, 8, 16, -8, 8, -16, -8, -16, -16, -8, -16, 8, -8, 16, },
+}
+genQuads(BallField, 16)
+function BallField:init()
+	self.trans_model = {}
+end
 
 Ball = Object:new {
 	model = { 6, 6, 6, -6, -6, -6, -6, 6, },
@@ -13,9 +21,7 @@ function Ball:init(player, dir)
 	self.oy = 8
 	self.alive = false
 	self.trans_model = {}
---	self.x = 0
---	self.y = 0
---	transform(self)
+	self.field = BallField()
 end
 function Ball:activate()
 	self.alive = true
@@ -53,6 +59,11 @@ function Ball:update()
 	self.y = self.y + dy * self.glide
 	transform(self)
 
+	self.field.x = self.x
+	self.field.y = self.y
+	transform(self.field)
+
+
 	-- collision with wall
 	local d, n, w = game.walls:checkCollision(self.trans_model, true)
 	if d > 0 then
@@ -69,12 +80,22 @@ function Ball:update()
 		end
 	end
 end
+function Ball:drawField()
+	if not self.alive then return end
+	local q1 = math.floor( self.player.tick      / 4) % #self.field.quads + 1
+	local q2 = math.floor((self.player.tick + 3) / 4) % #self.field.quads + 1
+	G.setColor(0, 70, 70, 200)
+	G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
+	G.setColor(35 + math.sin(self.player.tick / 2) * 35, 70, 70, 200)
+	G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
+end
 function Ball:draw()
 	if not self.alive then return end
 	G.setColor(255, 255, 255)
 	local f = math.floor(self.player.tick / 4) % #self.quads + 1
 	G.draw(self.img, self.quads[f], self.x, self.y, 0, 4 * self.dir, 4, 4, 4)
 --	G.polygon("line", self.trans_model)
+--	if self.field.trans_model[1] then G.polygon("line", self.field.trans_model) end
 end
 
 
@@ -220,7 +241,7 @@ function Player:update(input)
 
 	-- field
 	if self.field_active then
-		self.energy = self.energy - 0.1
+		self.energy = self.energy - 0.075
 		if self.energy < 0 then
 			self.energy = 0
 			self.field_active = false
@@ -251,28 +272,31 @@ end
 function Player:draw()
 	if not self.alive then return end
 
+
 	-- field
 	if self.field_active then
+
+		self.balls[1]:drawField()
+		self.balls[2]:drawField()
+
 		local q1 = math.floor( self.tick      / 4) % #self.field.quads + 1
 		local q2 = math.floor((self.tick + 3) / 4) % #self.field.quads + 1
-		G.setBlendMode("add")
-		G.setColor(0, 0, 255, 50)
+		G.setColor(0, 70, 70, 200)
 		G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-		G.setColor(0, 255, 0, 50)
+		G.setColor(35 + math.sin(self.tick / 2) * 35, 70, 70, 200)
 		G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
-		G.setBlendMode("alpha")
 	end
 
 	-- balls
-	G.setColor(255, 255, 255)
 	self.balls[1]:draw()
 	self.balls[2]:draw()
 
 
 	if self.invincible % 8 >= 4 then return end
 
-	if self.flash > 0 then G.setShader(flash_shader) end
 
+	if self.flash > 0 then G.setShader(flash_shader) end
+	G.setColor(255, 255, 250)
 	G.draw(self.img,
 		self.quads[1 + math.floor(self.tick / 8 % 2)],
 		self.x, self.y, 0, 4, 4, 8, 8)
@@ -280,6 +304,7 @@ function Player:draw()
 	if self.flash > 0 then G.setShader() end
 
 --	if self.trans_model[1] then G.polygon("line", self.trans_model) end
+--	if self.field.trans_model[1] then G.polygon("line", self.field.trans_model) end
 end
 
 

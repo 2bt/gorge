@@ -51,6 +51,7 @@ function SquareEnemy:subUpdate()
 	end
 
 
+	if self.y < -300 or self.y > 300 then return end
 	if not game.player.alive then return end
 
 	if self.delay <= 10

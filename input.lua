@@ -29,7 +29,7 @@ function Input:update()
 			up		= isDown("up"),
 			down	= isDown("down"),
 			a		= isDown("x"),
-			b		= isDown("c"),
+			b		= isDown("y") or isDown("z"),
 			start	= isDown("space") or isDown("return"),
 			back	= isDown("escape"),
 		}

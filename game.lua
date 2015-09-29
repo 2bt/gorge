@@ -70,7 +70,8 @@ function Game:reset(seed)
 --	BallItem(0, 100)
 --	local s = SaucerEnemy(self:makeRG(), 100, -150)
 --	s.shield = 1
---	makeEnergyItem(0, -150, self.rand, 40)
+	makeEnergyItem(0, -150, self.rand, 40)
+	BallItem(0, -150)
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1
@@ -183,20 +184,20 @@ function Game:update()
 	if self.rand.float(-5, 1) > 0.99996^(self.tick/10 + 1000 + self.tick % 1000 * 3) then
 
 		local data = self.walls.data
-		local j = #data - 1
+		local j = #data - 4
 		local wall_spot = {}
 		local spot = {}
 		for i, c in ipairs(data[j]) do
 			if c == 0 then
-				table.insert(spot, i)
+				table.insert(spot, { i, j })
 				if     data[j][i-1] == 1 then
-					table.insert(wall_spot, { i, "left" })
+					table.insert(wall_spot, { i, j, "left" })
 				elseif data[j][i+1] == 1 then
-					table.insert(wall_spot, { i, "right" })
+					table.insert(wall_spot, { i, j, "right" })
 				elseif data[j+1][i] == 1 then
-					table.insert(wall_spot, { i, "up" })
+					table.insert(wall_spot, { i, j, "up" })
 				elseif data[j-1][i] == 1 then
-					table.insert(wall_spot, { i, "down" })
+					table.insert(wall_spot, { i, j, "down" })
 				end
 			end
 		end
@@ -222,8 +223,8 @@ function Game:update()
 		local r = self.rand.int(1, 8)
 		if #spot > 0 and r <= 4 then
 			local t = spot[self.rand.int(1, #spot)]
-			data[j][t] = -1
-			local x, y = self.walls:getTilePosition(t, #data - 1)
+			data[t[2]][t[1]] = -1
+			local x, y = self.walls:getTilePosition(unpack(t))
 			if r == 1 then
 				SquareEnemy(self:makeRG(), x, y)
 			elseif r < 4 then
@@ -232,12 +233,12 @@ function Game:update()
 		end
 		if #wall_spot > 0 and r >= 5 and r <= 6 then
 			local t = wall_spot[self.rand.int(1, #wall_spot)]
-			data[j][t[1]] = -1
-			local x, y = self.walls:getTilePosition(t[1], #data - 1)
+			data[t[2]][t[1]] = -1
+			local x, y = self.walls:getTilePosition(t[1], t[2])
 			if r == 5 then
-				RocketEnemy(self:makeRG(), x, y, t[2])
+				RocketEnemy(self:makeRG(), x, y, t[3])
 			else
-				CannonEnemy(self:makeRG(), x, y, t[2])
+				CannonEnemy(self:makeRG(), x, y, t[3])
 			end
 		end
 
@@ -258,8 +259,8 @@ function Game:update()
 		if #spot > 0 and r == 8 and self.tick % 3 == 0 and self.saucer_delay <= 0 then
 			self.saucer_delay = 3000 - self.tick * 0.02
 			local t = spot[self.rand.int(1, #spot)]
-			data[j][t] = -1
-			local x, y = self.walls:getTilePosition(t, #data - 1)
+			data[t[2]][t[1]] = -1
+			local x, y = self.walls:getTilePosition(t[1], t[2])
 			SaucerEnemy(self:makeRG(), x, y)
 		end
 	end
@@ -337,6 +338,8 @@ end
 
 
 	-- hud
+
+	-- score
 	G.origin()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.setColor(255, 255, 255)
@@ -355,15 +358,19 @@ end
 	-- energy
 	local m = self.player.max_energy
 	local e = self.player.energy
-	G.setColor(109, 109, 109)
-	G.rectangle("fill", 8, 588 - m * 4, 4, m * 4)
-	G.rectangle("fill", 16, 588 - m * 4, 4, m * 4)
-	G.rectangle("fill", 12, 584 - m * 4, 4, 4)
-	G.rectangle("fill", 12, 588, 4, 4)
-	G.setColor(50, 50, 50, 100)
-	G.rectangle("fill", 12, 588 - m * 4, 4, m * 4)
+	G.setColor(60, 60, 60, 100)
+	G.rectangle("fill", 400-m*2,	8, 4*m, 4)
 	G.setColor(0, 255, 255)
-	G.rectangle("fill", 12, 588 - e * 4, 4, e * 4)
+	if self.player.field_active then
+		if self.tick % 8 < 4 then
+			G.setColor(0, 127, 127)
+		end
+	else
+		if self.player.energy == self.player.max_energy and self.tick % 8 < 4 then
+			G.setColor(255, 255, 255)
+		end
+	end
+	G.rectangle("fill", 400-m*2,	8, 4*e, 4)
 
 
 	-- pause
