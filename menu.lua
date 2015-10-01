@@ -2,7 +2,7 @@ local http = require("socket.http")
 
 function submit_online_highscore(name, score)
 	local url = "http://wwwpub.zih.tu-dresden.de/cgi-bin/cgiwrap/~s8572327/gorge"
-	local ret, err = http.request(url, score .."\n".. name)
+	local ret, err = http.request(url, score .." ".. name)
 	if ret then return tonumber(ret) end
 end
 
