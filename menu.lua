@@ -1,3 +1,13 @@
+local http = require("socket.http")
+
+function submit_online_highscore(name, score)
+	local url = "http://wwwpub.zih.tu-dresden.de/cgi-bin/cgiwrap/~s8572327/gorge"
+	local ret, err = http.request(url, score .."\n".. name)
+	if ret then return tonumber(ret) end
+end
+
+
+
 local G = love.graphics
 
 
@@ -188,6 +198,10 @@ function Menu:keypressed(key)
 			self.tick = 0
 			return
 		elseif key == "return" or key == "escape" then
+
+			if self.entry[1] > "" then
+				local nr = submit_online_highscore(self.entry[1], self.entry[2])
+			end
 			self.entry = false
 			self.stats_changed = true
 			return
@@ -221,7 +235,7 @@ function Menu:draw()
 
 
 
-	-- draw highscore
+
 	if self.state == "main" then
 		for i, m in ipairs(self.options[self.state]) do
 			font:print(m, 280, 320 + 40 * (i - 1))
@@ -230,6 +244,7 @@ function Menu:draw()
 			font:print(">", 248, 320 + 40 * (self.select - 1))
 		end
 	elseif self.state == "highscore" then
+
 		G.setColor(255, 255, 0)
 		font:print("HIGHSCORE", 184, 108)
 
