@@ -12,3 +12,5 @@ You'll need LÖVE 0.9.1 or newer.
 </table>
 
 Gamepad works, too.
+
+There's an online highscore at [http://langnerd.de/gorge.html]
