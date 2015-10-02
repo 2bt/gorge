@@ -159,7 +159,7 @@ PraxisParticle = Particle:new {
 	canvas = G.newCanvas(80, 80),
 	shader = G.newShader([[
 		uniform float f;
-		const float a[] = float[]( 1, 0, 0, 0, 1 );
+		const float a[] = float[]( 1, 1, 0, 0, 1 );
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 			float d = distance(vec2(40, 40), screen_coords);
 			int i = int(floor(f - d));
@@ -181,7 +181,7 @@ function PraxisParticle:update()
 end
 function PraxisParticle:draw()
 	local f = self.tick / 30
-	local c = (1 - f) ^ 0.3 * 200
+	local c = (1 - f) ^ 0.4 * 200
 	self.canvas:renderTo(function()
 		G.clear()
 		G.push()
@@ -193,6 +193,7 @@ function PraxisParticle:draw()
 		G.setShader()
 		G.pop()
 	end)
+	G.setColor(255, 255, 255)
 	G.draw(self.canvas, self.x, self.y, 0, 4, 4, 40, 40)
 end
 
