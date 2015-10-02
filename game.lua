@@ -270,7 +270,6 @@ function Game:update()
 	if not self.player.alive then
 		self.outro = self.outro + 1
 		if self.outro > 250 then
-			print(self.player.score)
 			state = menu
 			bg_music:stop()
 			if self.is_demo then
