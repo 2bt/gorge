@@ -136,7 +136,10 @@ function Menu:update()
 					self.select = self.select + dy
 					self.select = math.max(self.select, 1)
 					self.select = math.min(self.select, #self.options[self.state])
-					if self.select ~= s then self.tick = 0 end
+					if self.select ~= s then
+						playSound("choose")
+						self.tick = 0
+					end
 				end
 
 
@@ -147,6 +150,7 @@ function Menu:update()
 					start, self.input = Input:gotAnyPressed("a")
 				end
 				if start then
+					playSound("select")
 					self.action = self.options[self.state][self.select]
 				end
 			end

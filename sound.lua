@@ -2,6 +2,8 @@
 
 local sounds = {
 	pause			= { "media/pause.wav",			1 },
+	select			= { "media/select.wav",			1 },
+	choose			= { "media/choose.wav",			1 },
 
 	explosion		= { "media/explosion.wav",		2 },
 	big_explosion	= { "media/big_explosion.wav",	2 },
