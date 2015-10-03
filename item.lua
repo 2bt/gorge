@@ -61,6 +61,7 @@ BallItem = Item:new {
 }
 genQuads(BallItem)
 function BallItem:subCollect(player)
+	playSound("collect", self.x, self.y)
 	for _, ball in ipairs(player.balls) do
 		if not ball.alive then ball:activate() end
 	end
@@ -73,6 +74,7 @@ HealthItem = Item:new {
 }
 genQuads(HealthItem)
 function HealthItem:subCollect(player)
+	playSound("collect", self.x, self.y)
 	if player.shield < player.max_shield then
 		player.shield = player.shield + 1
 	end
@@ -86,6 +88,7 @@ SpeedItem = Item:new {
 }
 genQuads(SpeedItem)
 function SpeedItem:subCollect(player)
+	playSound("collect", self.x, self.y)
 	player.speed_boost = player.speed_boost + 1
 end
 
@@ -156,6 +159,7 @@ function EnergyItem:update()
 	end
 end
 function EnergyItem:collect(player)
+	playSound("coin", self.x, self.y)
 	SparkleParticle(self.x, self.y)
 	player.score = player.score + self.score
 	if player.energy < player.max_energy then

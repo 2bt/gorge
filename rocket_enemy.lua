@@ -22,6 +22,10 @@ function RocketEnemy:init(rand, x, y, wall)
 	if wall == "right"	then self.nx = -1 end
 	self.ang = math.atan2(-self.nx, -self.ny)
 	transform(self)
+	self.engine_sound = newLoopSound("engine")
+end
+function RocketEnemy:kill()
+	self.engine_sound:stop()
 end
 function RocketEnemy:die()
 	if not self.suicide then
@@ -30,6 +34,7 @@ function RocketEnemy:die()
 		if RocketEnemy.counter >= 10 then
 			RocketEnemy.counter = RocketEnemy.counter - 10
 			SpeedItem(self.x, self.y)
+			playSound("drop", self.x, self.y)
 		end
 	end
 end
@@ -47,10 +52,12 @@ function RocketEnemy:subUpdate()
 			local cross = self.nx * dy - self.ny * dx
 			if math.abs(cross) < 50 then
 				self.active = true
+				self.engine_sound:play()
 			end
 		end
 	end
 	if self.active then
+		self.engine_sound:setPosition(self.x, self.y)
 		if self.tick % 4 == 0 then
 			local sm = SmokeParticle(self.x - self.nx * 16, self.y - self.ny * 16)
 			sm.vx = 0

@@ -39,6 +39,9 @@ function Ball:shoot(side_shoot)
 end
 function Ball:hit()
 	if not self.alive then return end
+
+	playSound("hit", self.x, self.y)
+
 	self.alive = false
 	for i = 1, 10 do
 		ExplosionSparkParticle(self.x, self.y)
@@ -115,6 +118,7 @@ genQuads(Player.field, 16)
 function Player:init()
 	self.trans_model = {}
 	self.balls = { Ball(self, -1), Ball(self, 1) }
+	self.field_sound = newLoopSound("field")
 end
 function Player:reset()
 	self.tick = 0
@@ -142,6 +146,8 @@ function Player:reset()
 --	transform(self)
 end
 function Player:hit(d, n, w, e)
+	playSound("hit", self.x, self.y)
+
 	if DEBUG then return end
 	-- collision
 	if d then
@@ -229,6 +235,7 @@ function Player:update(input)
 		self.side_shoot = true
 	end
 	if input.a and self.shoot_delay == 0 and self.blast == 0 then
+		playSound("laser", self.x, self.y)
 		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
 		self.balls[1]:shoot(self.side_shoot)
@@ -245,6 +252,7 @@ function Player:update(input)
 		if self.energy < 0 then
 			self.energy = 0
 			self.field_active = false
+			self.field_sound:stop()
 		end
 
 
@@ -261,11 +269,15 @@ function Player:update(input)
 
 			self.energy = 0
 			self.field_active = false
+			self.field_sound:stop()
 		end
 
 	elseif input.b and self.energy >= self.max_energy then
 		self.field_active = true
+		self.field_sound:play()
 	end
+
+	self.field_sound:setPosition(self.x, self.y, 0)
 
 	self.input_b = input.b
 

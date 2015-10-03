@@ -22,12 +22,14 @@ function RingEnemy:die()
 	if RingEnemy.counter >= 15
 	and (not player.balls[1].alive or not player.balls[2].alive) then
 		RingEnemy.counter = RingEnemy.counter - 15
+		playSound("drop", self.x, self.y)
 		BallItem(self.x, self.y)
 		return
 	end
 
 	if RingEnemy.counter >= 25 then
 		RingEnemy.counter = RingEnemy.counter - 25
+		playSound("drop", self.x, self.y)
 		if player.shield < player.max_shield then
 			HealthItem(self.x, self.y)
 		else

@@ -25,6 +25,8 @@ function updateList(x)
 		if b:update() ~= "kill" then
 			x[i] = b
 			i = i + 1
+		else
+			if b.kill then b:kill() end
 		end
 	end
 end

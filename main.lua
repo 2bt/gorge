@@ -35,6 +35,7 @@ require "enemy"
 require "boom"
 require "game"
 require "menu"
+require "sound"
 
 
 

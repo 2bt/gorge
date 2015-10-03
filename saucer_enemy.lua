@@ -113,26 +113,14 @@ function SaucerParticle:update()
 		makeExplosion(self.x + math.random(-40, 40), self.y + math.random(-28, 24))
 	end
 	if self.tick == 40 then
-
 		-- big explosion
+		playSound("big_explosion", self.x, self.y)
 
 		makeExplosion(self.x, self.y)
-
 		for i = 1, 4 do
 			makeExplosion(self.x + math.random(-40, 40), self.y + math.random(-28, 24))
 		end
-
---		for i = 1, 40 do
---			local sm = SmokeParticle(self.x, self.y)
---			local r = math.pi * 2 * i / 40
---			sm.vx = math.cos(r) * 15
---			sm.vy = math.sin(r) * 15
---			sm.ttl = 16
---			sm.layer = "back"
---			sm.friction = 0.89
---		end
 		PraxisParticle(self.x, self.y)
-
 		return "kill"
 	end
 end

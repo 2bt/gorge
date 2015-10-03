@@ -63,6 +63,7 @@ function SquareEnemy:subUpdate()
 		local dy = game.player.y - self.y
 		local ang = math.atan2(dx, dy) + self.rand.float(-0.2, 0.2)
 		local s = self.rand.float(4, 4.2)
+		playSound("bullet", self.x, self.y)
 		RapidBullet(self.x, self.y, math.sin(ang) * s, math.cos(ang) * s)
 		if self.delay == 0 then
 			self.delay = self.rand.int(200, 300)

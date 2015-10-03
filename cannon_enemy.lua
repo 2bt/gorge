@@ -27,6 +27,7 @@ function CannonEnemy:subUpdate()
 	self.y = self.y + game.walls.speed
 	transform(self)
 	if not game.player.alive then return end
+	if self.y > 305 or self.y < -305 then return end
 
 	local dx = game.player.x - self.x
 	local dy = game.player.y - self.y
@@ -49,6 +50,7 @@ function CannonEnemy:subUpdate()
 				dx = dx / l
 				dy = dy / l
 				PlasmaBullet(self.x + dx * 16, self.y + dy * 16, dx * 4, dy * 4)
+				playSound("plasma", self.x, self.y)
 			end
 		end
 	end

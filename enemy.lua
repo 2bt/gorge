@@ -20,12 +20,15 @@ function Enemy:init(rand, x, y)
 	transform(self)
 end
 function Enemy:hit(damage)
+	playSound("hit", self.x, self.y)
 	self.flash = 3
 	self.shield = self.shield - damage
 	if self.shield <= 0 then
 		self.alive = false
 		game.player.score = game.player.score + self.score
 	end
+end
+function Enemy:kill()
 end
 function Enemy:die()
 end
