@@ -92,7 +92,7 @@ function SaucerEnemy:subUpdate()
 			local p = t / 5 % 4 - 1
 			if p == 2 then p = 0 end
 			SaucerBullet(self.x + p * 20, self.y + 24, 0, 10)
-
+			playSound("saucer", self.x, self.y)
 		end
 	end
 

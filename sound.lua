@@ -11,6 +11,7 @@ local sounds = {
 	collect			= { "media/collect.wav",		1 },
 	coin			= { "media/coin.wav",			1 },
 	bullet			= { "media/bullet.wav",			2 },
+	saucer			= { "media/saucer.wav",			1 },
 
 	field			= { "media/field.wav",			0 },
 	engine			= { "media/engine.wav",			0 },

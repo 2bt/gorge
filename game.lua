@@ -68,8 +68,7 @@ function Game:reset(seed)
 --	SpeedItem(0, -100)
 --	SpeedItem(0, -200)
 --	BallItem(0, 100)
---	local s = SaucerEnemy(self:makeRG(), 100, -150)
---	s.shield = 1
+--	SaucerEnemy(self:makeRG(), 100, -150)
 --	makeEnergyItem(0, -150, self.rand, 40)
 --	BallItem(0, -150)
 end
