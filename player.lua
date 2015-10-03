@@ -175,6 +175,7 @@ function Player:hit(d, n, w, e)
 		self.shield = self.shield - 1
 		if self.shield <= 0 then
 			self.alive = false
+			self.field_sound:stop()
 			self.balls[1]:hit()
 			self.balls[2]:hit()
 			makeExplosion(self.x, self.y)

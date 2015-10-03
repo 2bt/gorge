@@ -50,7 +50,7 @@ function playSound(name, x, y)
 	local sources = sounds[name].sources
 	local s = table.remove(sources, 1)
 	table.insert(sources, s)
-	s:rewind()
+	s:stop()
 	s:setPosition(x, y, 0)
 	s:play()
 	return s
