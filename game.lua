@@ -115,6 +115,7 @@ function Game:update()
 		self.action = "BACK"
 	end
 	if not self.action and Input:gotAnyPressed("start") then
+		playSound("pause")
 		self.pause = not self.pause
 	end
 

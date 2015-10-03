@@ -1,6 +1,7 @@
 
 
 local sounds = {
+	pause			= { "media/pause.wav",			1 },
 
 	explosion		= { "media/explosion.wav",		2 },
 	big_explosion	= { "media/big_explosion.wav",	2 },
@@ -51,7 +52,7 @@ function playSound(name, x, y)
 	local s = table.remove(sources, 1)
 	table.insert(sources, s)
 	s:stop()
-	s:setPosition(x, y, 0)
+	s:setPosition(x or 0, y or 0, 0)
 	s:play()
 	return s
 end
