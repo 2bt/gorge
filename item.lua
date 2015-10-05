@@ -15,8 +15,10 @@ function Item:init(x, y)
 	self.y = y
 	self.tick = 0
 	self.trans_model = {}
+	playSound("drop", self.x, self.y)
 end
 function Item:collect(player)
+	playSound("collect", self.x, self.y)
 	makeFastSparkleParticle(self.x, self.y)
 	player.score = player.score + self.score
 	if self.subCollect then
@@ -61,7 +63,6 @@ BallItem = Item:new {
 }
 genQuads(BallItem)
 function BallItem:subCollect(player)
-	playSound("collect", self.x, self.y)
 	for _, ball in ipairs(player.balls) do
 		if not ball.alive then ball:activate() end
 	end
@@ -74,7 +75,6 @@ HealthItem = Item:new {
 }
 genQuads(HealthItem)
 function HealthItem:subCollect(player)
-	playSound("collect", self.x, self.y)
 	if player.shield < player.max_shield then
 		player.shield = player.shield + 1
 	end
@@ -88,7 +88,6 @@ SpeedItem = Item:new {
 }
 genQuads(SpeedItem)
 function SpeedItem:subCollect(player)
-	playSound("collect", self.x, self.y)
 	player.speed_boost = player.speed_boost + 1
 end
 
@@ -112,7 +111,11 @@ EnergyItem = Item:new {
 }
 genQuads(EnergyItem)
 function EnergyItem:init(x, y, vx, vy)
-	self:super(x, y)
+	table.insert(self.list, self)
+	self.x = x
+	self.y = y
+	self.tick = 0
+	self.trans_model = {}
 	self.vx = vx
 	self.vy = vy
 	self.tick = math.random(1, #self.quads * self.frame_length)

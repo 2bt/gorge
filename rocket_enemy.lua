@@ -34,7 +34,6 @@ function RocketEnemy:die()
 		if RocketEnemy.counter >= 10 then
 			RocketEnemy.counter = RocketEnemy.counter - 10
 			SpeedItem(self.x, self.y)
-			playSound("drop", self.x, self.y)
 		end
 	end
 end
