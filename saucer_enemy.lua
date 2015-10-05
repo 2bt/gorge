@@ -140,7 +140,6 @@ SaucerBullet = Bullet:new {
 genQuads(SaucerBullet)
 
 
-
 -- explosion wave
 PraxisParticle = Particle:new {
 	layer = "back",
@@ -151,7 +150,7 @@ PraxisParticle = Particle:new {
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 			float d = distance(vec2(40, 40), screen_coords);
 			int i = int(floor(f - d));
-			if (i >= 0 && i < a.length()) return a[i] * col;
+			if (i >= 0 && i < a.length()) return vec4(col.rgb, col.a * a[i]);
 			return vec4(0);
 		}
 	]]),
@@ -168,6 +167,7 @@ function PraxisParticle:update()
 	if self.tick > 30 then return "kill" end
 end
 function PraxisParticle:draw()
+
 	local f = self.tick / 30
 	local c = (1 - f) ^ 0.4 * 200
 	self.canvas:renderTo(function()
