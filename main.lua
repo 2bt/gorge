@@ -21,6 +21,7 @@ DEBUG = false
 
 love.mouse.setVisible(false)
 G.setDefaultFilter("nearest", "nearest")
+G.setBackgroundColor(0, 0, 0, 0)
 
 
 require "helper"
