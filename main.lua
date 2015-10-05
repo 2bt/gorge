@@ -72,6 +72,9 @@ function love.draw()
 end
 function love.keypressed(key)
 	if state.keypressed then state:keypressed(key) end
+	if key == "f" then
+		love.window.setFullscreen(not love.window.getFullscreen())
+	end
 	if key == "tab" then DEBUG = not DEBUG end
 end
 
