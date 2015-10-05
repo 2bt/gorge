@@ -16,6 +16,10 @@ You'll need LÖVE 0.9.1 or newer.
 		<td><code>y</code> or <code>z</code></td>
 		<td>activate force field/blast</td>
 	</tr>
+	<tr>
+		<td><code>f</code></td>
+		<td>toggle fullscreen</td>
+	</tr>
 </table>
 
 Gamepad works, too.

@@ -290,48 +290,50 @@ if DEBUG then
 end
 
 
-	G.setCanvas(Boom.canvas)
-	G.clear()
-	G.setColor(255, 255, 255)
-	G.setBlendMode("add")
-	drawList(Boom.list)
-	G.setBlendMode("alpha")
+	-- bump texture
+	Boom.canvas:renderTo(function()
+		G.clear()
+		G.setColor(255, 255, 255)
+		G.setBlendMode("add")
+		drawList(Boom.list)
+		G.setBlendMode("alpha")
+	end)
 
 
+	-- background stuff
+	self.canvas:renderTo(function()
+		G.clear()
+		self.stars:draw()
+		drawList(Particle.list, "back")
+		drawList(Item.list, "back")
 
-	G.setCanvas(self.canvas)
-	G.clear()
-
-	self.stars:draw()
-	drawList(Particle.list, "back")
-	drawList(Item.list, "back")
-
-	drawList(Enemy.list)
-	drawList(Bullet.list)
-	drawList(Laser.list)
-	self.player:draw()
-	self.walls:draw()
+		drawList(Enemy.list)
+		drawList(Bullet.list)
+		drawList(Laser.list)
+		self.player:draw()
+		self.walls:draw()
+	end)
 
 
-	G.setCanvas()
+	-- apply bump
 	G.origin()
+	G.setColor(255, 255, 255)
 	Boom.shader:send("bump", Boom.canvas)
 	G.setShader(Boom.shader)
-	G.setColor(255, 255, 255)
 	G.setBlendMode("replace")
 	G.draw(self.canvas)
 	G.setBlendMode("alpha")
 	G.setShader()
 
+
+	-- foreground stuff
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.translate(400, 300)
-
 if DEBUG then
 	G.scale(0.25)
 	G.translate(0, 650)
 	G.rectangle("line", -400, -300, 800, 600)
 end
-
 	drawList(Particle.list, "front")
 	drawList(Item.list, "front")
 
