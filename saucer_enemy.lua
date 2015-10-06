@@ -146,7 +146,7 @@ PraxisParticle = Particle:new {
 	canvas = G.newCanvas(80, 80),
 	shader = G.newShader([[
 		uniform float f;
-		float a[] = float[]( 1, 1, 0, 0, 1 );
+		uniform float a[5] = float[]( 1, 1, 0, 0, 1 );
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 			float d = distance(vec2(40, 40), screen_coords);
 			int i = int(floor(f - d));
