@@ -67,9 +67,9 @@ function Game:reset(seed)
 --	MoneyItem(0, 0)
 --	SpeedItem(0, -100)
 --	SpeedItem(0, -200)
-	BallItem(0, 100)
-	SaucerEnemy(self:makeRG(), 100, -150)
-	makeEnergyItem(0, -150, self.rand, 40)
+--	BallItem(0, 100)
+--	SaucerEnemy(self:makeRG(), 100, -150)
+--	makeEnergyItem(0, -150, self.rand, 40)
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1
