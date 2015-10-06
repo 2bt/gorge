@@ -118,6 +118,7 @@ function Bullet:update()
 
 		local d, n, w = game.walls:checkCollision(self.trans_model)
 		if d > 0 then
+			playSound("miss", w[1], w[2])
 			self:makeSparks(w[1], w[2])
 			return "kill"
 		end
@@ -128,6 +129,7 @@ function Bullet:update()
 		if blast.alive then
 			local x, y = naivePolygonCircleCollision(self.trans_model, blast.x, blast.y, blast.radius)
 			if x then
+				playSound("miss", x, y)
 				self:makeSparks(x, y)
 				return "kill"
 			end
