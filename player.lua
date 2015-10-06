@@ -143,6 +143,7 @@ function Player:reset()
 
 	self.balls[1].alive = false
 	self.balls[2].alive = false
+	self.energy_blast.alive = false
 
 --	transform(self)
 end
