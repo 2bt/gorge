@@ -416,9 +416,7 @@ EnergyBlast = Object:new {
 			if (d > r) return vec4(0);
 			if (d < s) {
 				int i = int(floor(s - d));
-				if (i < a.length) {
-					x = a[i];
-				}
+				if (i < 6) x = a[i];
 				return vec4(0, 1, 1, 0.6) * x;
 			}
 			if (d > r - 1) return vec4(1, 1, 1, 1);
