@@ -87,9 +87,9 @@ function Ball:drawField()
 	if not self.alive then return end
 	local q1 = math.floor( self.player.tick      / 4) % #self.field.quads + 1
 	local q2 = math.floor((self.player.tick + 3) / 4) % #self.field.quads + 1
-	G.setColor(0, 60, 60, 200)
+	G.setColor(0, 80, 80, 200)
 	G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-	G.setColor(30 + math.sin(self.player.tick / 2) * 30, 60, 60, 200)
+	G.setColor(40 + math.sin(self.player.tick / 2) * 40, 80, 80, 200)
 	G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
 end
 function Ball:draw()
@@ -118,6 +118,7 @@ genQuads(Player.field, 16)
 function Player:init()
 	self.trans_model = {}
 	self.balls = { Ball(self, -1), Ball(self, 1) }
+	self.energy_blast = EnergyBlast()
 	self.field_sound = newLoopSound("field")
 end
 function Player:reset()
@@ -256,18 +257,10 @@ function Player:update(input)
 			self.field_sound:stop()
 		end
 
-
-		-- bullet wave
+		-- energy blast
 		if input.b and not self.input_b then
 
-			for i = 1, 32 do
-				r = i / 32 * 2 * math.pi
-				local dx = math.sin(r) * 1.5
-				local dy = math.cos(r) * 1.5
-				local l = Laser(self.x + dx, self.y + dy, dx, dy)
-				l.ttl = 25
-			end
-
+			self.energy_blast:activate(self.x, self.y)
 			self.energy = 0
 			self.field_active = false
 			self.field_sound:stop()
@@ -277,6 +270,9 @@ function Player:update(input)
 		self.field_active = true
 		self.field_sound:play()
 	end
+
+
+	self.energy_blast:update()
 
 	self.field_sound:setPosition(self.x, self.y, 0)
 
@@ -302,6 +298,8 @@ function Player:update(input)
 	end
 end
 function Player:draw()
+	self.energy_blast:draw()
+
 	if not self.alive then return end
 
 
@@ -313,9 +311,9 @@ function Player:draw()
 
 		local q1 = math.floor( self.tick      / 4) % #self.field.quads + 1
 		local q2 = math.floor((self.tick + 3) / 4) % #self.field.quads + 1
-		G.setColor(0, 60, 60, 200)
+		G.setColor(0, 80, 80, 200)
 		G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-		G.setColor(30 + math.sin(self.tick / 2) * 30, 60, 60, 200)
+		G.setColor(40 + math.sin(self.tick / 2) * 40, 80, 80, 200)
 		G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
 	end
 
@@ -401,3 +399,71 @@ SmallLaser = Laser:new {
 	model = { -2, 5, 2, 5, 2, -5, -2, -5, },
 	damage = 0.5
 }
+
+
+
+EnergyBlast = Object:new {
+	canvas = G.newCanvas(100, 100),
+	shader = G.newShader([[
+		uniform float r;
+		uniform float s;
+		float a[] = float[]( 0, 1, 1, 0, 0, 1 );
+		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
+
+			float d = distance(vec2(50, 50), screen_coords);
+			if (d > r) return vec4(0);
+			if (d < s) {
+				int i = int(floor(s - d));
+				float x = i < a.length ? a[i] : 0;
+				return vec4(0, 1, 1, 0.6) * x;
+			}
+			if (d > r - 1) return vec4(1, 1, 1, 1);
+			return vec4(0, 1, 1, 0.6);
+		}
+	]]),
+}
+
+function EnergyBlast:activate(x, y)
+	playSound("blast", self.x, self.y)
+	self.damage = 4
+	self.alive = true
+	self.x = x
+	self.y = y
+	self.level = 0
+	self.radius = 0
+	self.hit_enemies = {}
+end
+function EnergyBlast:update()
+	if not self.alive then return end
+
+	self.y = self.y + game.walls.speed
+
+	self.level = self.level + 0.025
+
+	self.r = (1 - 2 ^ (-4 * self.level)) * 40
+	self.s = (1 - 2 ^ (-1.7 * self.level)) * 60
+	self.radius = self.r * 4
+
+	if self.level >= 1.2 then
+		self.alive = false
+	end
+end
+function EnergyBlast:draw()
+	if not self.alive then return end
+
+	self.canvas:renderTo(function()
+		G.clear()
+		G.push()
+		G.origin()
+		self.shader:send("r", self.r)
+		self.shader:send("s", self.s)
+
+		G.setShader(self.shader)
+		G.rectangle("fill", 0, 0, 128, 128)
+		G.setShader()
+		G.pop()
+	end)
+	G.setColor(255, 255, 255, 200)
+	G.draw(self.canvas, self.x, self.y, 0, 4, 4, 50, 50)
+end
+

@@ -35,7 +35,7 @@ vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 	float f = max(0, pow(perlin(noise, p), 1) - 0.41);
 	f = floor(f * 16.0) / 16.0;
 	if (f > 0) f += 0.1;
-	f = f * f * 1.2;
+	f *= f * 1.2;
 	vec3 c = vec3(0.4, 0.5, 0.5) * f;
 	return vec4(c, 1);
 }]])

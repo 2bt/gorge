@@ -138,6 +138,17 @@ function polygonCollision(a, b)
 	return distance, normal, where
 end
 
+
+function naivePolygonCircleCollision(a, x, y, r)
+	for i = 1, #a, 2 do
+		local dx = x - a[i]
+		local dy = y - a[i+1]
+		if dx*dx + dy*dy <= r*r then return a[i], a[i+1] end
+	end
+	return false
+end
+
+
 function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
 
 	local abx = bx - ax

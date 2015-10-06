@@ -2,12 +2,13 @@ local G = love.graphics
 
 Enemy = Object:new {
 	list = {},
-	alive = true,
 	ang = 0,
 	flash = 0,
 	score = 0,
-	frame_length = 4,
 	size = 16,
+	frame_length = 4,
+	alive = true,
+	hit_by_energy_blast = false,
 }
 function Enemy:init(rand, x, y)
 	table.insert(self.list, self)
@@ -52,6 +53,21 @@ function Enemy:update()
 
 	if self.flash > 0 then self.flash = self.flash - 1 end
 	self.tick = self.tick + 1
+
+
+	local player = game.player
+
+	if not self.hit_by_energy_blast then
+		local blast = player.energy_blast
+		if blast.alive then
+			local x, y = naivePolygonCircleCollision(self.trans_model, blast.x, blast.y, blast.radius)
+			if x then
+				self:hit(blast.damage)
+				self.hit_by_energy_blast = true
+			end
+		end
+	end
+
 
 	self:subUpdate()
 end
@@ -107,6 +123,16 @@ function Bullet:update()
 		end
 
 		local player = game.player
+
+		local blast = player.energy_blast
+		if blast.alive then
+			local x, y = naivePolygonCircleCollision(self.trans_model, blast.x, blast.y, blast.radius)
+			if x then
+				self:makeSparks(x, y)
+				return "kill"
+			end
+		end
+
 
 		if player.alive then
 			if player.field_active then

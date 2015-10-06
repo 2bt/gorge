@@ -2,8 +2,6 @@
 
 local sounds = {
 	pause			= { "media/pause.wav",			1 },
-	select			= { "media/select.wav",			1 },
-	choose			= { "media/choose.wav",			1 },
 
 	explosion		= { "media/explosion.wav",		2 },
 	big_explosion	= { "media/big_explosion.wav",	2 },
@@ -15,6 +13,7 @@ local sounds = {
 	coin			= { "media/coin.wav",			1 },
 	bullet			= { "media/bullet.wav",			2 },
 	saucer			= { "media/saucer.wav",			1 },
+	blast			= { "media/blast.wav",			1 },
 
 	field			= { "media/field.wav",			0 },
 	engine			= { "media/engine.wav",			0 },

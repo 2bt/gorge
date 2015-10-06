@@ -12,13 +12,15 @@ function Input:update()
 	if self.joy then
 
 		local x, y = self.joy:getAxes()
+		x = x or 0
+		y = y or 0
 		s = {
 			left	= self.joy:isGamepadDown("dpleft")	or x < -0.1,
 			right	= self.joy:isGamepadDown("dpright")	or x >  0.1,
 			up		= self.joy:isGamepadDown("dpup")	or y < -0.1,
 			down	= self.joy:isGamepadDown("dpdown")	or y >  0.1,
-			a		= self.joy:isGamepadDown("a"),
-			b		= self.joy:isGamepadDown("b"),
+			a		= self.joy:isGamepadDown("a") or self.joy:isDown(1),
+			b		= self.joy:isGamepadDown("b") or self.joy:isDown(2),
 			start	= self.joy:isGamepadDown("start"),
 			back	= self.joy:isGamepadDown("back"),
 		}
