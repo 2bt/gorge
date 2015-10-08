@@ -276,6 +276,8 @@ function Player:update(input)
 	self.energy_blast:update()
 
 	self.field_sound:setPosition(self.x, self.y, 0)
+	local p = self.energy / self.max_energy
+	self.field_sound:setPitch(1 - (p - 0.95) ^ 8)
 
 	self.input_b = input.b
 
