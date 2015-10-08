@@ -16,14 +16,16 @@ function BlockadeEnemy:init(rand, x, y, wall_row, index)
 end
 function BlockadeEnemy:die()
 	self.wall_row[self.index] = 0
+
+	local ttls = { 10, 10 }
 	if not self.ttl then
 		makeEnergyItem(self.x, self.y, self.rand, 5)
+		ttls[2] = 5
 	end
 
-
-	for i = 1, 2 do
+	for i, ttl in ipairs(ttls) do
 		if self.neighbors[i] then
-			self.neighbors[i].ttl = 10
+			self.neighbors[i].ttl = ttl
 			self.neighbors[i].neighbors[3 - i] = nil
 			self.neighbors[i] = nil
 		end
