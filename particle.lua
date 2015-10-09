@@ -125,7 +125,7 @@ genQuads(ExplosionParticle)
 
 
 function makeExplosion(x, y)
-	playSound("explosion", x, y)
+	sound.play("explosion", x, y)
 	-- heat wave
 	Boom(x, y)
 

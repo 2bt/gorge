@@ -92,7 +92,7 @@ function SaucerEnemy:subUpdate()
 			local p = t / 5 % 4 - 1
 			if p == 2 then p = 0 end
 			SaucerBullet(self.x + p * 20, self.y + 24, 0, 10)
-			playSound("saucer", self.x, self.y)
+			sound.play("saucer", self.x, self.y)
 		end
 	end
 
@@ -114,7 +114,7 @@ function SaucerParticle:update()
 	end
 	if self.tick == 40 then
 		-- big explosion
-		playSound("big_explosion", self.x, self.y)
+		sound.play("big_explosion", self.x, self.y)
 
 		makeExplosion(self.x, self.y)
 		for i = 1, 4 do

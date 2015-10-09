@@ -21,7 +21,7 @@ function Enemy:init(rand, x, y)
 	transform(self)
 end
 function Enemy:hit(damage)
-	playSound("hit", self.x, self.y)
+	sound.play("hit", self.x, self.y)
 	self.flash = 3
 	self.shield = self.shield - damage
 	if self.shield <= 0 then
@@ -47,9 +47,7 @@ function Enemy:update()
 	end
 	if self.entered_screen and (self.y < -328 or self.y > 328)
 	or self.x > 428 or self.x < -428
-	or self.y > 500 then
-		return "kill"
-	end
+	or self.y > 500 then return "kill" end
 
 	if self.flash > 0 then self.flash = self.flash - 1 end
 	self.tick = self.tick + 1
@@ -118,7 +116,7 @@ function Bullet:update()
 
 		local d, n, w = game.walls:checkCollision(self.trans_model)
 		if d > 0 then
-			playSound("miss", w[1], w[2])
+			sound.play("miss", w[1], w[2])
 			self:makeSparks(w[1], w[2])
 			return "kill"
 		end
@@ -129,7 +127,7 @@ function Bullet:update()
 		if blast.alive then
 			local x, y = naivePolygonCircleCollision(self.trans_model, blast.x, blast.y, blast.radius)
 			if x then
-				playSound("miss", x, y)
+				sound.play("miss", x, y)
 				self:makeSparks(x, y)
 				return "kill"
 			end

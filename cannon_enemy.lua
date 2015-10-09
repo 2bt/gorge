@@ -50,7 +50,7 @@ function CannonEnemy:subUpdate()
 				dx = dx / l
 				dy = dy / l
 				PlasmaBullet(self.x + dx * 16, self.y + dy * 16, dx * 4, dy * 4)
-				playSound("plasma", self.x, self.y)
+				sound.play("plasma", self.x, self.y)
 			end
 		end
 	end

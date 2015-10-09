@@ -114,8 +114,9 @@ function Game:update()
 		self.action = "BACK"
 	end
 	if not self.action and Input:gotAnyPressed("start") then
-		playSound("pause")
+		sound.play("pause")
 		self.pause = not self.pause
+		sound.pauseLoopSources(self.pause)
 	end
 
 	-- blend
@@ -130,7 +131,7 @@ function Game:update()
 		if self.blend >= 1 then
 			if self.action == "BACK" then
 				state = menu
-				bg_music:stop()
+				sound.stopLoopSources()
 				menu:swapState("main")
 			end
 		end
@@ -270,7 +271,7 @@ function Game:update()
 		self.outro = self.outro + 1
 		if self.outro > 250 then
 			state = menu
-			bg_music:stop()
+			sound.stopLoopSources()
 			if self.is_demo then
 				menu:swapState("main")
 			else

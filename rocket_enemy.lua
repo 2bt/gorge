@@ -22,7 +22,7 @@ function RocketEnemy:init(rand, x, y, wall)
 	if wall == "right"	then self.nx = -1 end
 	self.ang = math.atan2(-self.nx, -self.ny)
 	transform(self)
-	self.engine_sound = newLoopSound("engine")
+	self.engine_sound = sound.newLoopSource("engine")
 end
 function RocketEnemy:kill()
 	self.engine_sound:stop()

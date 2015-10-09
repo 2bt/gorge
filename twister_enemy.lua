@@ -119,7 +119,7 @@ function TwisterEnemy:subUpdate()
 		local dy = player.y - self.y
 		local ang = math.atan2(dx, dy) + self.rand.float(-0.2, 0.2)
 		PlasmaBullet(self.x, self.y, math.sin(ang) * 4, math.cos(ang) * 4)
-		playSound("plasma", self.x, self.y)
+		sound.play("plasma", self.x, self.y)
 	end
 
 end

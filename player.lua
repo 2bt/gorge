@@ -40,7 +40,7 @@ end
 function Ball:hit()
 	if not self.alive then return end
 
-	playSound("hit", self.x, self.y)
+	sound.play("hit", self.x, self.y)
 
 	self.alive = false
 	for i = 1, 10 do
@@ -119,7 +119,7 @@ function Player:init()
 	self.trans_model = {}
 	self.balls = { Ball(self, -1), Ball(self, 1) }
 	self.energy_blast = EnergyBlast()
-	self.field_sound = newLoopSound("field")
+	self.field_sound = sound.newLoopSource("field")
 end
 function Player:reset()
 	self.tick = 0
@@ -148,7 +148,7 @@ function Player:reset()
 --	transform(self)
 end
 function Player:hit(d, n, w, e)
-	playSound("hit", self.x, self.y)
+	sound.play("hit", self.x, self.y)
 
 	if DEBUG then return end
 	-- collision
@@ -238,7 +238,7 @@ function Player:update(input)
 		self.side_shoot = true
 	end
 	if input.a and self.shoot_delay == 0 and self.blast == 0 then
-		playSound("laser", self.x, self.y)
+		sound.play("laser", self.x, self.y)
 		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
 		self.balls[1]:shoot(self.side_shoot)
@@ -369,7 +369,7 @@ function Laser:update()
 		local d, n, w = game.walls:checkCollision(self.trans_model, true)
 		if d > 0 then
 			for i = 1, 10 do
-				playSound("miss", w[1], w[2])
+				sound.play("miss", w[1], w[2])
 				LaserParticle(w[1], w[2])
 			end
 			return "kill"
@@ -428,7 +428,7 @@ EnergyBlast = Object:new {
 }
 
 function EnergyBlast:activate(x, y)
-	playSound("blast", self.x, self.y)
+	sound.play("blast", self.x, self.y)
 	self.damage = 4
 	self.alive = true
 	self.x = x

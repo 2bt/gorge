@@ -15,10 +15,10 @@ function Item:init(x, y)
 	self.y = y
 	self.tick = 0
 	self.trans_model = {}
-	playSound("drop", self.x, self.y)
+	sound.play("drop", self.x, self.y)
 end
 function Item:collect(player)
-	playSound("collect", self.x, self.y)
+	sound.play("collect", self.x, self.y)
 	makeFastSparkleParticle(self.x, self.y)
 	player.score = player.score + self.score
 	if self.subCollect then
@@ -162,7 +162,7 @@ function EnergyItem:update()
 	end
 end
 function EnergyItem:collect(player)
-	playSound("coin", self.x, self.y)
+	sound.play("coin", self.x, self.y)
 	SparkleParticle(self.x, self.y)
 	player.score = player.score + self.score
 	if player.energy < player.max_energy then

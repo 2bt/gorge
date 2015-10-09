@@ -11,7 +11,7 @@ genQuads(SquareEnemy)
 function SquareEnemy:init(...)
 	self:super(...)
 	self.tick = self.rand.int(1, 100)
-	self.delay = self.rand.int(30, 300)
+	self.delay = self.rand.int(1, 300)
 	self.vx = self.rand.float(-4, 4)
 	self.vy = 1
 	self:normVel()
@@ -63,7 +63,7 @@ function SquareEnemy:subUpdate()
 		local dy = game.player.y - self.y
 		local ang = math.atan2(dx, dy) + self.rand.float(-0.2, 0.2)
 		local s = self.rand.float(4, 4.2)
-		playSound("bullet", self.x, self.y)
+		sound.play("bullet", self.x, self.y)
 		RapidBullet(self.x, self.y, math.sin(ang) * s, math.cos(ang) * s)
 		if self.delay == 0 then
 			self.delay = self.rand.int(200, 300)
