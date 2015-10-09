@@ -85,7 +85,7 @@ function Menu:swapState(state)
 	Particle.list = {}
 end
 function Menu:gameOver(game)
-	local entry = { stats.name, game.player.score }
+	local entry = { stats.name or "", game.player.score }
 
 	for i, e in ipairs(stats.highscore) do
 		if e[2] < entry[2] then

@@ -51,13 +51,10 @@ bg_music = love.audio.newSource("media/music.ogg", "stream")
 bg_music:setLooping(true)
 
 
-local record = false
-local i = 0
-
 function love.update()
 	updateList(Input.list)
 	state:update()
-	if love.keyboard.isDown("^") then -- fast forward
+	if love.keyboard.isDown("f1") then -- fast forward
 		for i = 1, 20 do
 			state:update()
 		end
@@ -65,15 +62,10 @@ function love.update()
 end
 function love.draw()
 	state:draw()
---	if record then
---	if state == game then
---		love.graphics.newScreenshot():encode(("%06d.png"):format(i))
---		i = i + 1
---	end
 end
 function love.keypressed(key)
 	if state.keypressed then state:keypressed(key) end
-	if key == "tab" then DEBUG = not DEBUG end
+--	if key == "tab" then DEBUG = not DEBUG end
 end
 
 function love.resize()
