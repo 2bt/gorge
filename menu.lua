@@ -1,6 +1,6 @@
 local http = require("socket.http")
 
-function submit_online_highscore(name, score)
+function submitOnlineHighscore(name, score)
 	local url = "http://wwwpub.zih.tu-dresden.de/cgi-bin/cgiwrap/~s8572327/gorge"
 	local ret, err = http.request(url, score .." ".. name)
 	if ret then return tonumber(ret) end
@@ -23,7 +23,8 @@ local stats = {
 		{ "TWOBIT",  3000 },
 		{ "TWOBIT",  2000 },
 		{ "TWOBIT",  1000 },
-	}
+	},
+	name = "",
 }
 
 if love.filesystem.isFile(VERSION) then
@@ -63,9 +64,10 @@ end
 Menu = Object()
 Menu.img = G.newImage("media/title.png")
 Menu.options = {
-	main = { "START GAME", "HIGHSCORE", "CREDITS", "EXIT" },
+	main = { "START GAME", "HIGHSCORE", "OPTIONS", "CREDITS", "EXIT" },
 	credits = { "BACK" },
-	highscore = { "BACK" }
+	highscore = { "BACK" },
+	options = { "NORMAL FULLSCREEN", "DESKTOP FULLSCREEN", "WINDOW", "BACK" },
 }
 function Menu:init()
 	self.stars = Stars()
@@ -83,7 +85,7 @@ function Menu:swapState(state)
 	Particle.list = {}
 end
 function Menu:gameOver(game)
-	local entry = {"", game.player.score }
+	local entry = { stats.name, game.player.score }
 
 	for i, e in ipairs(stats.highscore) do
 		if e[2] < entry[2] then
@@ -124,33 +126,26 @@ function Menu:update()
 		elseif self.state == "highscore" and self.entry then
 			-- write name
 			if Input:gotAnyPressed("start") then
-				self.entry = false
-				self.stats_changed = true
+				self:submitHighscore(true)
 			end
 		else
 			-- select option
 			if self.options[self.state] then
-				local dy = bool[Input:gotAnyPressed("down")] - bool[Input:gotAnyPressed("up")]
+				local dy = bool[Input:gotAnyPressed("down") and true or false]
+						 - bool[Input:gotAnyPressed("up") and true or false]
 				if dy ~= 0 then
 					local s = self.select
 					self.select = self.select + dy
 					self.select = math.max(self.select, 1)
 					self.select = math.min(self.select, #self.options[self.state])
 					if self.select ~= s then
---						sound.play("choose")
 						self.tick = 0
 					end
 				end
 
-
 				-- remember who started the game
-				local start
-				start, self.input = Input:gotAnyPressed("start")
-				if not start then
-					start, self.input = Input:gotAnyPressed("a")
-				end
-				if start then
---					sound.play("select")
+				self.input = Input:gotAnyPressed("start") or Input:gotAnyPressed("a")
+				if self.input then
 					self.action = self.options[self.state][self.select]
 				end
 			end
@@ -182,11 +177,24 @@ function Menu:update()
 			elseif self.action == "START GAME" then
 				state = game
 				game:start(love.math.random(0xfffffff), self.input)
---				bg_music:play()
 			elseif self.action == "HIGHSCORE" then
 				self:swapState("highscore")
 			elseif self.action == "CREDITS" then
 				self:swapState("credits")
+
+			elseif self.action == "OPTIONS" then
+				self:swapState("options")
+			elseif self.action == "NORMAL FULLSCREEN" then
+				self:swapState("options")
+				love.window.setFullscreen(true, "normal")
+			elseif self.action == "DESKTOP FULLSCREEN" then
+				self:swapState("options")
+				love.window.setFullscreen(true, "desktop")
+			elseif self.action == "WINDOW" then
+				self:swapState("options")
+				love.window.setFullscreen(false)
+
+
 
 			elseif self.action == "DEMO" then
 				state = game
@@ -195,19 +203,23 @@ function Menu:update()
 		end
 	end
 end
+function Menu:submitHighscore(online)
+	if online and self.entry[1] > "" then
+		local nr = submitOnlineHighscore(self.entry[1], self.entry[2])
+	end
+	stats.name = self.entry[1]
+	self.entry = false
+	self.stats_changed = true
+end
 function Menu:keypressed(key)
 	if self.state == "highscore" and self.entry then
 		if key == "backspace" then
 			self.entry[1] = self.entry[1]:sub(1, -2)
 			self.tick = 0
 			return
-		elseif key == "return" or key == "escape" then
 
-			if self.entry[1] > "" then
-				local nr = submit_online_highscore(self.entry[1], self.entry[2])
-			end
-			self.entry = false
-			self.stats_changed = true
+		elseif key == "return" or key == "escape" then
+			self:submitHighscore(key == "return")
 			return
 		end
 
@@ -235,33 +247,45 @@ function Menu:draw()
 		G.setColor(255, 255, 255)
 		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
 		drawList(Particle.list)
-	end
 
-
-
-
-	if self.state == "main" then
-		for i, m in ipairs(self.options[self.state]) do
+		G.setColor(255, 255, 255)
+		for i, m in ipairs(self.options.main) do
 			font:print(m, 280, 320 + 40 * (i - 1))
 		end
 		if self.tick % 32 < 24 then
 			font:print(">", 248, 320 + 40 * (self.select - 1))
 		end
+
+		G.setColor(40, 40, 40)
+		font:printCentered("\0 2015 DANIEL LANGNER", 400, 360 + 40 * 5)
+
+	elseif self.state == "options" then
+
+		G.setColor(255, 255, 0)
+		font:print("OPTIONS", 184, 72)
+
+		G.setColor(255, 255, 255)
+		for i, m in ipairs(self.options.options) do
+			font:print(m, 280, 320 + 40 * (i - 1))
+		end
+		if self.tick % 32 < 24 then
+			font:print(">", 248, 320 + 40 * (self.select - 1))
+		end
+
 	elseif self.state == "highscore" then
 
 		G.setColor(255, 255, 0)
-		font:print("HIGHSCORE", 184, 108)
+		font:print("HIGHSCORE", 184, 72)
 
 		G.setColor(255, 255, 255)
 		for i, e in ipairs(stats.highscore) do
-			font:print(
-				("%2d. %-13s  %07d"):format(i, e[1], e[2]),
-				400 - 24 * 13,
-				140 + 32 * i)
+			font:print(("%2d. %-13s  %07d"):format(i, e[1], e[2]),
+						400 - 24 * 13,
+						96 + 40 * i)
 			if e == self.entry and self.tick % 32 < 24 then
 				font:print("\x7f",
-					400 + 24 * (#self.entry[1] - 9),
-					140 + 32 * i)
+							400 + 24 * (#self.entry[1] - 9),
+							140 + 40 * i)
 			end
 		end
 	elseif self.state == "credits" then
@@ -273,9 +297,6 @@ function Menu:draw()
 
 
 
-
-	G.setColor(40, 40, 40)
-	font:printCentered("\0 2015 DANIEL LANGNER", 400, 360 + 40 * 5)
 
 	if self.blend > 0 then
 		G.setColor(0, 0, 0, 255 * self.blend)

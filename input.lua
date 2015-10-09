@@ -47,7 +47,7 @@ end
 function Input:gotAnyPressed(key)
 	for _, input in ipairs(self.list) do
 		if input:gotPressed(key) then
-			return true, input
+			return input
 		end
 	end
 	return false
