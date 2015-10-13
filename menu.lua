@@ -285,7 +285,7 @@ function Menu:draw()
 			if e == self.entry and self.tick % 32 < 24 then
 				font:print("\x7f",
 							400 + 24 * (#self.entry[1] - 9),
-							140 + 40 * i)
+							96 + 40 * i)
 			end
 		end
 	elseif self.state == "credits" then
