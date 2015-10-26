@@ -94,7 +94,7 @@ function Walls:generate()
 	-- create islands
 	if self.row_counter > 30 and self.rand.int(0, 40) == 0 then
 		local cx = self.rand.float(2, self.W - 1)
-		local cy = 9
+		local cy = self.rand.float(9, 10)
 		local r = self.rand.float(1.1, 3.3)
 
 		local occupied = 0
