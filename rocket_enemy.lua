@@ -30,11 +30,7 @@ end
 function RocketEnemy:die()
 	if not self.suicide then
 		makeEnergyItem(self.x, self.y, self.rand, 1)
-		RocketEnemy.counter = RocketEnemy.counter + 1
-		if RocketEnemy.counter >= 10 then
-			RocketEnemy.counter = RocketEnemy.counter - 10
-			SpeedItem(self.x, self.y)
-		end
+		game:trySpawnFlame(self.x, self.y)
 	end
 end
 function RocketEnemy:subUpdate()

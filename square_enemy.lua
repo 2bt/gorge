@@ -18,6 +18,7 @@ function SquareEnemy:init(...)
 end
 function SquareEnemy:die()
 	makeEnergyItem(self.x, self.y, self.rand, 3)
+	game:trySpawnHeart(self.x, self.y, 2)
 end
 function SquareEnemy:normVel()
 	local f = 1.1 / (self.vx*self.vx + self.vy*self.vy) ^ 0.5

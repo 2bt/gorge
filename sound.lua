@@ -18,6 +18,7 @@ local sounds = {
 	saucer			= { "media/saucer.wav",			1 },
 	blast			= { "media/blast.wav",			1 },
 	miss			= { "media/miss.wav",			2 },
+	spider			= { "media/spider.wav",			2 },
 
 	field			= { "media/field.wav",			0 },
 	engine			= { "media/engine.wav",			0 },

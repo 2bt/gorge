@@ -114,6 +114,7 @@ function SaucerParticle:update()
 	end
 	if self.tick == 40 then
 		-- big explosion
+		quake = 10 -- shake screen
 		sound.play("big_explosion", self.x, self.y)
 
 		makeExplosion(self.x, self.y)
@@ -121,6 +122,10 @@ function SaucerParticle:update()
 			makeExplosion(self.x + math.random(-40, 40), self.y + math.random(-28, 24))
 		end
 		PraxisParticle(self.x, self.y)
+
+
+		game:trySpawnHeart(self.x, self.y, 5)
+
 		return "kill"
 	end
 end

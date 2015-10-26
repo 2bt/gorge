@@ -15,25 +15,7 @@ function RingEnemy:init(...)
 end
 function RingEnemy:die()
 	makeEnergyItem(self.x, self.y, self.rand, 1)
-
-	RingEnemy.counter = RingEnemy.counter + 1
-	local player = game.player
-
-	if RingEnemy.counter >= 15
-	and (not player.balls[1].alive or not player.balls[2].alive) then
-		RingEnemy.counter = RingEnemy.counter - 15
-		BallItem(self.x, self.y)
-		return
-	end
-
-	if RingEnemy.counter >= 25 then
-		RingEnemy.counter = RingEnemy.counter - 25
-		if player.shield < player.max_shield then
-			HealthItem(self.x, self.y)
-		else
-			MoneyItem(self.x, self.y)
-		end
-	end
+	game:trySpawnHeart(self.x, self.y)
 end
 function RingEnemy:turnTo(ang1, ang2)
 	local ang = self.rand.float(ang1, ang2)

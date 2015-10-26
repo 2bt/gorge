@@ -2,7 +2,7 @@ local G = love.graphics
 
 SpiderEnemy = Enemy:new {
 	img = G.newImage("media/spider.png"),
-	shield = 1.5,
+	shield = 1,
 	score = 550,
 	model = { 5, 16, 16, 5, 16, -5, 5, -16, -5, -16, -16, -5, -16, 5, -5, 16, },
 	frame_length = 7,
@@ -34,6 +34,7 @@ function SpiderEnemy:init(rand, x, y, wall)
 end
 function SpiderEnemy:die()
 	makeEnergyItem(self.x, self.y, self.rand, 3)
+	game:trySpawnHeart(self.x, self.y, 2)
 end
 function SpiderEnemy:subUpdate()
 	self.x = self.x
@@ -126,6 +127,7 @@ function SpiderEnemy:subUpdate()
 			if self.dir == -1 then l = 1 - l end
 			local ang = l * math.pi - self.sprite_ang
 			SpiderBullet(self.x, self.y, -math.cos(ang) * 3, -math.sin(ang) * 3)
+			sound.play("spider", self.x, self.y)
 		end
 
 	end

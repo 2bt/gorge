@@ -55,8 +55,8 @@ function Game:reset(seed)
 	Bullet.list = {}
 	Item.list = {}
 
-	RingEnemy.counter = 0
-	RocketEnemy.counter = 0
+	self.flame_account = 0
+	self.heart_account = 0
 
 	self.saucer_delay = 6000
 
@@ -70,24 +70,50 @@ function Game:reset(seed)
 --	BallItem(0, 100)
 --	SaucerEnemy(self:makeRG(), 100, -150)
 --	makeEnergyItem(0, -150, self.rand, 40)
+
+end
+function Game:trySpawnFlame(x, y, s)
+	self.flame_account = self.flame_account + (1 or s)
+	if self.flame_account >= 10 then
+		self.flame_account = self.flame_account - 10
+		SpeedItem(x, y)
+	end
+end
+function Game:trySpawnHeart(x, y, s)
+	self.heart_account = self.heart_account + (s or 1)
+	if self.heart_account >= 15
+	and (not self.player.balls[1].alive or not self.player.balls[2].alive) then
+		self.heart_account = self.heart_account - 15
+		BallItem(x, y)
+		return
+	end
+	if self.heart_account >= 25 then
+		self.heart_account = self.heart_account - 25
+		if self.player.shield < self.player.max_shield then
+			HealthItem(x, y)
+		else
+			MoneyItem(x, y)
+		end
+	end
 end
 function Game:next_wall_row()
 	self.wall_rows = self.wall_rows + 1
-	if self.wall_rows % 50 == 0 then
+	if self.wall_rows >= 100 then
+		self.wall_rows = self.wall_rows - 100
 		self.blockades = self.blockades + 1
 	end
 	if self.blockades > 0 then
 		local data = self.walls.data
 		local r = data[#data]
 
-		local i = 1
-		while r[i] > 0 do i = i + 1 end
-		local j = i
-		while r[j] == 0 do j = j + 1 end
-		local k = j
-		while (r[k] or 0) > 0 do k = k + 1 end
-		if k == #r + 1
-		and (r[i - 1] or 1) == 1 and (r[j] or 1) == 1 then
+		local suitable = true
+		for _, c in ipairs(r) do
+			if c ~= 0 and c ~= 1 then
+				suitable = false
+				break
+			end
+		end
+		if suitable then
 			self.blockades = self.blockades - 1
 			local prev
 			for ix, c in ipairs(r) do
@@ -284,9 +310,21 @@ function Game:update()
 		end
 	end
 end
+
+quake = 0
+
 function Game:draw()
+	quake = quake * 0.95
+	if quake < 1 then quake = 0 end
+	local quake_x = self.rand.float(-1, 1)
+	local quake_y = self.rand.float(-1, 1)
+
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.translate(400, 300)
+	G.translate(math.floor(quake_x * quake), math.floor(quake_y * quake))
+
+
+
 
 if DEBUG then
 	G.scale(0.25)
@@ -333,6 +371,7 @@ end
 	-- foreground stuff
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.translate(400, 300)
+	G.translate(quake_x * quake, quake_y * quake)
 if DEBUG then
 	G.scale(0.25)
 	G.translate(0, 650)

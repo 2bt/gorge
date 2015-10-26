@@ -185,6 +185,7 @@ function Player:hit(d, n, w, e)
 	end
 end
 function Player:update(input)
+	self.energy_blast:update()
 	if not self.alive then return end
 
 	self.tick = self.tick + 1
@@ -273,7 +274,6 @@ function Player:update(input)
 	end
 
 
-	self.energy_blast:update()
 
 	self.field_sound:setPosition(self.x, self.y, 0)
 	local p = self.energy / self.max_energy
@@ -436,6 +436,7 @@ function EnergyBlast:activate(x, y)
 	self.level = 0
 	self.radius = 0
 	self.hit_enemies = {}
+	self:update()
 end
 function EnergyBlast:update()
 	if not self.alive then return end

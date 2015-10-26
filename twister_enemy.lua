@@ -123,7 +123,10 @@ function TwisterEnemy:subUpdate()
 	end
 
 end
-TwisterEnemy.die = RingEnemy.die
+function TwisterEnemy:die()
+	makeEnergyItem(self.x, self.y, self.rand, 1)
+	game:trySpawnHeart(self.x, self.y)
+end
 function TwisterEnemy:subDraw_()
 	G.setColor(255, 0, 0)
 	G.rectangle("fill", self.x - 10, self.y - 10, 20, 20)

@@ -22,6 +22,7 @@ function CannonEnemy:init(rand, x, y, wall)
 end
 function CannonEnemy:die()
 	makeEnergyItem(self.x, self.y, self.rand, 2)
+	game:trySpawnHeart(self.x, self.y)
 end
 function CannonEnemy:subUpdate()
 	self.y = self.y + game.walls.speed
