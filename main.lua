@@ -54,7 +54,7 @@ bg_music:setLooping(true)
 function love.update()
 	updateList(Input.list)
 	state:update()
-	if love.keyboard.isDown("f1") then -- fast forward
+	if love.keyboard.isDown("^") then -- fast forward
 		for i = 1, 20 do
 			state:update()
 		end
@@ -65,7 +65,7 @@ function love.draw()
 end
 function love.keypressed(key)
 	if state.keypressed then state:keypressed(key) end
---	if key == "tab" then DEBUG = not DEBUG end
+	if key == "tab" then DEBUG = not DEBUG end
 end
 
 function love.resize()

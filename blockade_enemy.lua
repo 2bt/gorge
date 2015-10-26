@@ -9,7 +9,7 @@ BlockadeEnemy = Enemy:new {
 }
 genQuads(BlockadeEnemy)
 function BlockadeEnemy:init(rand, x, y, wall_row, index)
-	self:super(rand, x, y)
+	self:super(rand, x, y - game.walls.speed) -- fix offset issue
 	self.neighbors = {}
 	self.index = index
 	self.wall_row = wall_row

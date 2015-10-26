@@ -191,12 +191,13 @@ PlasmaBullet = Bullet:new {
 	frame_length = 2,
 	size = 7,
 }
-genQuads(PlasmaBullet, 7)
+genQuads(PlasmaBullet)
 
-require "ring_enemy"
-require "square_enemy"
-require "rocket_enemy"
-require "cannon_enemy"
 require "blockade_enemy"
-require "twister_enemy"
+require "cannon_enemy"
+require "ring_enemy"
+require "rocket_enemy"
 require "saucer_enemy"
+require "spider_enemy"
+require "square_enemy"
+require "twister_enemy"
