@@ -316,13 +316,12 @@ quake = 0
 function Game:draw()
 	quake = quake * 0.95
 	if quake < 1 then quake = 0 end
-	local quake_x = self.rand.float(-1, 1)
-	local quake_y = self.rand.float(-1, 1)
+	local quake_x = math.random(-quake, quake)
+	local quake_y = math.random(-quake, quake)
 
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.translate(400, 300)
-	G.translate(math.floor(quake_x * quake), math.floor(quake_y * quake))
-
+	G.translate(math.floor(quake_x), math.floor(quake_y))
 
 
 
