@@ -5,7 +5,7 @@ Walls = Object:new {
 	img = G.newImage("media/walls.png"),
 	speed = 1,
 	W = 26,
-	H = 35,
+	H = 38,
 	polys = {
 		[-2] = { 0, 4, 0, 28, 32, 28, 32, 4 },
 		{ 0, 0, 0, 32, 32, 32, 32, 0 },
@@ -19,13 +19,14 @@ genQuads(Walls, 8)
 function Walls:reset(rand)
 	self.rand = rand
 	self.tick = 0
+	self.row_counter = 0
 	self.data = {}
 	self.gen_data = {}
 
 	for y = 1, self.H do
 		self.gen_data[y] = {}
 		for x = 1, self.W do
-			self.gen_data[y][x] = y < 13 and 0 or 1
+			self.gen_data[y][x] = y < 15 and 0 or 1
 		end
 	end
 
@@ -38,8 +39,8 @@ function Walls:reset(rand)
 	self.offset = 0
 	self.radius = self.W / 2 + 1
 	self.cx = self.W / 2 + 0.5
-	self.cy = 17
-	for i = 1, 27 do self:generate() end
+	self.cy = 19
+	for i = 1, 29 do self:generate() end
 
 
 	-- DEBUG
@@ -58,6 +59,7 @@ function Walls:update()
 
 end
 function Walls:generate()
+	self.row_counter = self.row_counter + 1
 
 	local row = table.remove(self.gen_data, 1)
 	table.insert(self.gen_data, row)
@@ -66,7 +68,8 @@ function Walls:generate()
 	end
 
 	self.cy = self.cy - 1
-	while self.cy < 23 do
+
+	while self.cy < 25 do
 		for y, row in ipairs(self.gen_data) do
 			for x in ipairs(row) do
 				local dx = x - self.cx
@@ -82,11 +85,45 @@ function Walls:generate()
 
 		self.cy = self.cy + math.cos(ang) * self.radius
 		self.cx = self.cx + math.sin(ang) * self.radius
-		self.cx = math.max(1 + 6, self.cx)
-		self.cx = math.min(self.W - 6, self.cx)
-		self.radius = self.rand.float(3, 10)
+		self.cx = math.max(1 + 6, math.min(self.W - 6, self.cx))
+		self.radius = self.rand.float(3.6, 11.8)
 
 	end
+
+
+	-- create islands
+	if self.row_counter > 30 and self.rand.int(0, 40) == 0 then
+		local cx = self.rand.float(2, self.W - 1)
+		local cy = 9
+		local r = self.rand.float(1.1, 3.3)
+
+		local occupied = 0
+		for y, row in ipairs(self.gen_data) do
+			for x, c in ipairs(row) do
+				local dx = x - cx
+				local dy = y - cy
+				if dx * dx + dy * dy < (r + 3.6) ^ 2 then
+					if c == 1 then
+						occupied = occupied + 1
+					end
+				end
+			end
+		end
+
+		if occupied == 0 then
+			for y, row in ipairs(self.gen_data) do
+				for x in ipairs(row) do
+					local dx = x - cx
+					local dy = y - cy
+					if dx * dx + dy * dy < r^2 then
+						row[x] = 1
+					end
+				end
+			end
+		end
+
+	end
+
 
 
 	local row = {}
