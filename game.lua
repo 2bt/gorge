@@ -377,7 +377,7 @@ end
 	-- foreground stuff
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 	G.translate(400, 300)
-	G.translate(quake_x * quake, quake_y * quake)
+	G.translate(math.floor(quake_x), math.floor(quake_y))
 if DEBUG then
 	G.scale(0.25)
 	G.translate(0, 650)
