@@ -2,7 +2,7 @@ local G = love.graphics
 
 
 Item = Object:new {
-	model = { 16, 16, 16, -16, -16, -16, -16, 16, },
+	model = { 12, 12, 12, -12, -12, -12, -12, 12, },
 	bounce_model = { 24, 48, 48, 24, 48, -24, 24, -48, -24, -48, -48, -24, -48, 24, -24, 48, },
 	list = {},
 	size = 8,
@@ -29,7 +29,7 @@ function Item:update()
 	self.tick = self.tick + 1
 	self.y = self.y + game.walls.speed + math.sin(self.tick * 0.1)
 	self.x = self.x + math.cos(self.tick * 0.1)
-	if self.y > 310 then return "kill" end
+	if self.y > 330 then return "kill" end
 
 	transform(self, self.bounce_model)
 	local d, n, w = game.walls:checkCollision(self.trans_model)
@@ -39,13 +39,25 @@ function Item:update()
 	end
 	transform(self)
 
-	if game.player.alive then
-		local d, n, w = polygonCollision(self.trans_model, game.player.trans_model)
+
+	local player = game.player
+	if player.alive then
+		local dx = player.x - self.x
+		local dy = player.y - self.y
+		local l = dx*dx + dy*dy
+		if l < 3500 then
+			l = 3 / (l ^ 0.5)
+			self.x = self.x + dx * l
+			self.y = self.y + dy * l
+		end
+
+		local d, n, w = polygonCollision(self.trans_model, player.trans_model)
 		if d > 0 then
 			self:collect(game.player)
 			return "kill"
 		end
 	end
+
 end
 function Item:draw()
 	G.setColor(255, 255, 255)
@@ -128,7 +140,7 @@ function EnergyItem:update()
 	self.vx = self.vx * 0.98
 	self.vy = self.vy * 0.98
 
-	if self.y > 310 then return "kill" end
+	if self.y > 330 then return "kill" end
 
 	transform(self)
 	local d, n, w = game.walls:checkCollision(self.trans_model)
@@ -146,11 +158,11 @@ function EnergyItem:update()
 	if player.alive then
 		local dx = player.x - self.x
 		local dy = player.y - self.y
-		local l = dx^2 + dy^2
+		local l = dx*dx + dy*dy
 		if l < 6000 then
-			l = 1 / (l ^ 0.5)
-			self.x = self.x + dx * l * 5
-			self.y = self.y + dy * l * 5
+			l = 5 / (l ^ 0.5)
+			self.x = self.x + dx * l
+			self.y = self.y + dy * l
 		end
 
 
