@@ -12,6 +12,7 @@ local G = love.graphics
 
 
 local stats = {
+	version = 0,
 	highscore = {
 		{ "TWOBIT", 10000 },
 		{ "TWOBIT",  9000 },
@@ -28,7 +29,8 @@ local stats = {
 }
 
 if love.filesystem.isFile(VERSION) then
-	stats = loadstring("return " .. love.filesystem.read(VERSION))()
+	local s = loadstring("return " .. love.filesystem.read(VERSION))()
+	if s.version == stats.version then stats = s end
 end
 
 local function saveStats()
