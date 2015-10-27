@@ -107,10 +107,15 @@ function Game:next_wall_row()
 		local r = data[#data]
 
 		local suitable = true
-		for _, c in ipairs(r) do
-			if c ~= 0 and c ~= 1 then
-				suitable = false
-				break
+		for x, c in ipairs(r) do
+			if c == 0 then
+				local cl = r[x - 1] or 1
+				local cr = r[x + 1] or 1
+				if 2 <= cl and cl <= 5
+				or 2 <= cr and cr <= 5 then
+					suitable = false
+					break
+				end
 			end
 		end
 		if suitable then
@@ -126,6 +131,8 @@ function Game:next_wall_row()
 						prev.neighbors[2] = block
 					end
 					prev = block
+				else
+					prev = nil
 				end
 			end
 		end
