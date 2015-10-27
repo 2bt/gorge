@@ -17,7 +17,7 @@ end
 function BlockadeEnemy:die()
 	self.wall_row[self.index] = 0
 
-	local ttls = { 10, 10 }
+	local ttls = { 9, 10 }
 	if not self.ttl then
 		makeEnergyItem(self.x, self.y, self.rand, 5)
 		ttls[2] = 5
