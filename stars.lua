@@ -39,7 +39,6 @@ vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 	vec3 c = vec3(0.4, 0.5, 0.5) * f;
 	return vec4(c, 1);
 }]])
-Stars.shader:send("noise", Stars.noise)
 Stars.canvas = G.newCanvas(200, 151)
 
 
@@ -80,6 +79,7 @@ function Stars:draw()
 	self.canvas:renderTo(function()
 		G.clear()
 		self.shader:send("xx", math.floor(self.xx))
+		self.shader:send("noise", self.noise)
 		G.setShader(self.shader)
 		G.push()
 		G.origin()

@@ -26,11 +26,20 @@ local stats = {
 		{ "TWOBIT",  1000 },
 	},
 	name = "",
+	music_vol = 7,
+	sound_vol = 7,
+	fullscreen = false,
 }
 
 if love.filesystem.isFile(VERSION) then
 	local s = loadstring("return " .. love.filesystem.read(VERSION))()
-	if s.version == stats.version then stats = s end
+	if s.version == stats.version then
+		s.music_vol = s.music_vol or stats.music_vol
+		s.sound_vol = s.sound_vol or stats.sound_vol
+		stats = s
+	end
+	sound.setVolume(stats.sound_vol / 10)
+	love.window.setFullscreen(stats.fullscreen, "desktop")
 end
 
 local function saveStats()
@@ -66,10 +75,9 @@ end
 Menu = Object()
 Menu.img = G.newImage("media/title.png")
 Menu.options = {
-	main = { "START GAME", "HIGHSCORE", "OPTIONS", "CREDITS", "EXIT" },
-	credits = { "BACK" },
+	main = { "START GAME", "HIGHSCORE", "OPTIONS", "EXIT" },
 	highscore = { "BACK" },
-	options = { "NORMAL FULLSCREEN", "DESKTOP FULLSCREEN", "WINDOW", "BACK" },
+	options = { "SOUND VOLUME", "MUSIC VOLUME", "TOGGLE FULLSCREEN", "BACK" },
 }
 function Menu:init()
 	self.stars = Stars()
@@ -84,7 +92,6 @@ function Menu:swapState(state)
 	self.blend = 1
 	self.entry = false
 	self.stats_changed = false
-	Particle.list = {}
 end
 function Menu:gameOver(game)
 	local entry = { stats.name or "", game.player.score }
@@ -112,10 +119,8 @@ function Menu:update()
 	self.stars:update(1)
 	updateList(Particle.list)
 
-	if self.state == "main" then
-		if math.random() < 0.3 then
-			SparkleParticle(math.random(200, 600), math.random(136, 230))
-		end
+	if math.random() < 0.3 then
+		SparkleParticle(math.random(200, 600), math.random(136, 230))
 	end
 
 
@@ -132,23 +137,48 @@ function Menu:update()
 			end
 		else
 			-- select option
-			if self.options[self.state] then
+			local option = self.options[self.state]
+			if option then
+				local o = option[self.select]
+
 				local dy = bool[Input:gotAnyPressed("down") and true or false]
 						 - bool[Input:gotAnyPressed("up") and true or false]
+
 				if dy ~= 0 then
 					local s = self.select
 					self.select = self.select + dy
 					self.select = math.max(self.select, 1)
-					self.select = math.min(self.select, #self.options[self.state])
+					self.select = math.min(self.select, #option)
 					if self.select ~= s then
 						self.tick = 0
 					end
 				end
 
-				-- remember who started the game
-				self.input = Input:gotAnyPressed("start") or Input:gotAnyPressed("a")
-				if self.input then
-					self.action = self.options[self.state][self.select]
+				local dx = bool[Input:gotAnyPressed("right") and true or false]
+						 - bool[Input:gotAnyPressed("left") and true or false]
+
+				if dx ~= 0 then
+					if o == "SOUND VOLUME" then
+						self.tick = 0
+						self.stats_changed = true
+						stats.sound_vol = math.max(0, math.min(stats.sound_vol + dx, 10))
+						sound.setVolume(stats.sound_vol / 10)
+						sound.play("laser")
+					end
+					if o == "MUSIC VOLUME" then
+						self.tick = 0
+						self.stats_changed = true
+						stats.music_vol = math.max(0, math.min(stats.music_vol + dx, 10))
+					end
+				end
+
+				if o ~= "MUSIC VOLUME"
+				and o ~= "SOUND VOLUME" then
+					-- remember who started the game
+					self.input = Input:gotAnyPressed("start") or Input:gotAnyPressed("a")
+					if self.input then
+						self.action = option[self.select]
+					end
 				end
 			end
 
@@ -181,22 +211,14 @@ function Menu:update()
 				game:start(love.math.random(0xfffffff), self.input)
 			elseif self.action == "HIGHSCORE" then
 				self:swapState("highscore")
-			elseif self.action == "CREDITS" then
-				self:swapState("credits")
-
 			elseif self.action == "OPTIONS" then
 				self:swapState("options")
-			elseif self.action == "NORMAL FULLSCREEN" then
-				self:swapState("options")
-				love.window.setFullscreen(true, "normal")
-			elseif self.action == "DESKTOP FULLSCREEN" then
-				self:swapState("options")
-				love.window.setFullscreen(true, "desktop")
-			elseif self.action == "WINDOW" then
-				self:swapState("options")
-				love.window.setFullscreen(false)
 
-
+			elseif self.action == "TOGGLE FULLSCREEN" then
+				self:swapState("options")
+				stats.fullscreen = not stats.fullscreen
+				self.stats_changed = true
+				love.window.setFullscreen(stats.fullscreen, "desktop")
 
 			elseif self.action == "DEMO" then
 				state = game
@@ -237,6 +259,26 @@ function Menu:keypressed(key)
 	end
 
 end
+
+
+function drawFrame(x, y, w, h)
+	r, g, b, a = love.graphics.getColor()
+	love.graphics.setColor(r/4, g/4, b/4, a)
+	y = y + 4
+
+	G.rectangle("fill", x, y, w, 4)
+	G.rectangle("fill", x, y + h - 4, w, 4)
+
+	love.graphics.setColor(r, g, b, a)
+	y = y - 4
+
+	G.rectangle("fill", x, y, w, 4)
+	G.rectangle("fill", x, y + h - 4, w, 4)
+	G.rectangle("fill", x, y, 4, h)
+	G.rectangle("fill", x + w - 4, y, 4, h)
+end
+
+
 function Menu:draw()
 
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
@@ -263,16 +305,35 @@ function Menu:draw()
 
 	elseif self.state == "options" then
 
-		G.setColor(255, 255, 0)
-		font:print("OPTIONS", 184, 72)
+		G.setColor(255, 255, 255)
+		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
+		drawList(Particle.list)
+
+		local x = 184
+		local y = 320
+
+--		G.setColor(255, 255, 0)
+--		font:print("OPTIONS", x, 72)
 
 		G.setColor(255, 255, 255)
 		for i, m in ipairs(self.options.options) do
-			font:print(m, 280, 320 + 40 * (i - 1))
+			font:print(m, x, y + 40 * (i - 1))
 		end
 		if self.tick % 32 < 24 then
-			font:print(">", 248, 320 + 40 * (self.select - 1))
+			font:print(">", x - 32, y + 40 * (self.select - 1))
 		end
+
+		drawFrame(x + 4 + 6 * 4 * 13, y+8 + 40 * 0, 8 + 12*10, 20)
+		drawFrame(x + 4 + 6 * 4 * 13, y+8 + 40 * 1, 8 + 12*10, 20)
+
+		G.setColor(191, 191, 0)
+		G.rectangle("fill", x + 8 + 6 * 4 * 13, y+12 + 40 * 0, 12 * stats.sound_vol, 12)
+		G.rectangle("fill", x + 8 + 6 * 4 * 13, y+12 + 40 * 1, 12 * stats.music_vol, 12)
+
+
+		G.setColor(40, 40, 40)
+		font:printCentered("\0 2015 DANIEL LANGNER", 400, 360 + 40 * 5)
+
 
 	elseif self.state == "highscore" then
 
@@ -290,11 +351,6 @@ function Menu:draw()
 							96 + 40 * i)
 			end
 		end
-	elseif self.state == "credits" then
-		G.setColor(255, 255, 0)
-		font:print("CREDITS", 184, 108)
-		G.setColor(255, 255, 255)
-		font:print("TODO", 184, 172)
 	end
 
 

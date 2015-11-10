@@ -79,3 +79,17 @@ function sound.stopLoopSources()
 		s:stop()
 	end
 end
+
+function sound.setVolume(vol)
+	collectgarbage()
+	collectgarbage()
+	for s, n in pairs(loop_sources) do
+		s:setVolume(vol)
+	end
+	for _, v in pairs(sounds) do
+		for _, s in ipairs(v.sources) do
+			s:setVolume(vol)
+		end
+	end
+end
+

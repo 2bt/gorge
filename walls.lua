@@ -63,9 +63,7 @@ function Walls:generate()
 
 	local row = table.remove(self.gen_data, 1)
 	table.insert(self.gen_data, row)
-	for x in ipairs(row) do
-		row[x] = 1
-	end
+	for x in ipairs(row) do row[x] = 1 end
 
 	self.cy = self.cy - 1
 
