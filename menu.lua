@@ -1,9 +1,15 @@
 local http = require("socket.http")
 
-function submitOnlineHighscore(name, score)
-	local url = "http://wwwpub.zih.tu-dresden.de/cgi-bin/cgiwrap/~s8572327/gorge"
-	local ret, err = http.request(url, score .." ".. name)
-	if ret then return tonumber(ret) end
+function submitOnlineHighscore(highscore)
+	local url = "http://www.langnerd.de/cgi-bin/gorge"
+	local msg = ""
+	for _, entry in ipairs(highscore) do
+		msg = msg .. entry[2] .. " " .. entry[1] .. "\n"
+	end
+	local ret, err = http.request(url, msg)
+	if err == 200 then return tonumber(ret) end
+	print("submitting online highscore failed: " .. err)
+	print(ret, err)
 end
 
 
@@ -229,7 +235,11 @@ function Menu:update()
 end
 function Menu:submitHighscore(online)
 	if online and self.entry[1] > "" then
-		local nr = submitOnlineHighscore(self.entry[1], self.entry[2])
+		local nr = tonumber(submitOnlineHighscore(stats.highscore))
+		if nr > 0 then
+			print("Your online rank: " .. nr)
+			if nr <= 10 then print("Not bad!") end
+		end
 	end
 	stats.name = self.entry[1]
 	self.entry = false

@@ -65,7 +65,7 @@ function love.draw()
 end
 function love.keypressed(key)
 	if state.keypressed then state:keypressed(key) end
-	if key == "tab" then DEBUG = not DEBUG end
+--	if key == "tab" then DEBUG = not DEBUG end
 end
 
 function love.resize()
