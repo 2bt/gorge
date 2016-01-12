@@ -2,7 +2,7 @@ GORGE
 =====
 
 Endless shoot 'em up game.
-It's still in development but already playable.
+It's still kinda in development but already playable.
 You'll need LÖVE 0.9.1 or newer.
 
 ### Controls ###
@@ -18,5 +18,5 @@ You'll need LÖVE 0.9.1 or newer.
 	</tr>
 </table>
 
-Gamepad works, too.
-There's a rudimentary online highscore at [http://langnerd.de/gorge.html]
+Gamepad should work as well.
+There's a rudimentary online highscore at [http://www.langnerd.de/gorge.html]
