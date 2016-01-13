@@ -431,6 +431,15 @@ end
 	end
 
 
+--	generate border image
+--	if self.walls.row_counter % 18 == 0 and self.walls.offset == 0 then
+--		local background = love.image.newImageData(800, 576)
+--		background:paste(G.newScreenshot(), 0, 0, 0, 0, 800, 576)
+--		background:encode("png", ("%03d.png"):format(self.walls.row_counter))
+--	end
+
+
+
 	local blend = self.blend
 	if not self.player.alive and self.outro > 200 then
 		blend = math.max(blend, math.min(1, (self.outro - 200) / 50))

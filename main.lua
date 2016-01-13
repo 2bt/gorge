@@ -60,8 +60,21 @@ function love.update()
 		end
 	end
 end
+--counter = -16
 function love.draw()
+--	if counter == 0 then Particle.list = {} end
+
 	state:draw()
+
+--	if counter >= 0 then
+--		local banner = love.image.newImageData(500, 128)
+--		banner:paste(G.newScreenshot(false), 0, 0, 150, 112, 500, 128)
+--		banner:encode("png", ("%04d.png"):format(counter))
+--	end
+--	if counter > 100 and #Particle.list == 0 then
+--		os.exit()
+--	end
+--	counter = counter + 1
 end
 function love.keypressed(key)
 	if state.keypressed then state:keypressed(key) end
