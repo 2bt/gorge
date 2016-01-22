@@ -411,7 +411,7 @@ EnergyBlast = Object:new {
 	shader = G.newShader([[
 		uniform float r;
 		uniform float s;
-		const float a[] = float[]( 0, 1, 1, 0, 0, 1 );
+		float a[] = float[]( 0, 1, 1, 0, 0, 1 );
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 			float d = distance(vec2(50, 50), screen_coords);
 			float x = 0;
