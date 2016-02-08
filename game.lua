@@ -144,6 +144,7 @@ function Game:update()
 
 	if Input:gotAnyPressed("back")
 	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("a")) then
+		sound.play("back")
 		self.action = "BACK"
 	end
 	if not self.action and Input:gotAnyPressed("start") then

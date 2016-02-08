@@ -5,6 +5,8 @@ love.audio.setPosition(0, 0, -700)
 
 local sounds = {
 	pause			= { "media/pause.wav",			1 },
+	select			= { "media/select.wav",			1 },
+	back			= { "media/back.wav",			1 },
 
 	explosion		= { "media/explosion.wav",		2 },
 	big_explosion	= { "media/big_explosion.wav",	2 },

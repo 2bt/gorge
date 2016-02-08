@@ -175,6 +175,7 @@ function Menu:update()
 						self.tick = 0
 						self.stats_changed = true
 						stats.music_vol = math.max(0, math.min(stats.music_vol + dx, 10))
+						-- TODO
 					end
 				end
 
@@ -183,7 +184,14 @@ function Menu:update()
 					-- remember who started the game
 					self.input = Input:gotAnyPressed("start") or Input:gotAnyPressed("a")
 					if self.input then
+
 						self.action = option[self.select]
+
+						if self.action == "BACK" then
+							sound.play("back")
+						else
+							sound.play("select")
+						end
 					end
 				end
 			end
@@ -193,6 +201,7 @@ function Menu:update()
 				if self.state == "main" then
 					self.action = "EXIT"
 				else
+					sound.play("back")
 					self.action = "BACK"
 				end
 			end
