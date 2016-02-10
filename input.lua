@@ -22,6 +22,7 @@ function Input:update()
 			a		= self.joy:isGamepadDown("a") or self.joy:isDown(1),
 			b		= self.joy:isGamepadDown("b") or self.joy:isDown(2),
 			start	= self.joy:isGamepadDown("start"),
+			enter	= self.joy:isGamepadDown("start"),
 			back	= self.joy:isGamepadDown("back"),
 		}
 	else
@@ -32,7 +33,8 @@ function Input:update()
 			down	= isDown("down"),
 			a		= isDown("x"),
 			b		= isDown("y") or isDown("z"),
-			start	= isDown("space") or isDown("return"),
+			start	= isDown("space") or isDown(" ") or isDown("return"),
+			enter	= isDown("return"),
 			back	= isDown("escape"),
 		}
 	end

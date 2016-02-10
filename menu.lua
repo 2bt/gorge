@@ -20,16 +20,16 @@ local G = love.graphics
 local stats = {
 	version = 0,
 	highscore = {
-		{ "2BT", 10000 },
-		{ "2BT",  9000 },
-		{ "2BT",  8000 },
-		{ "2BT",  7000 },
-		{ "2BT",  6000 },
-		{ "2BT",  5000 },
-		{ "2BT",  4000 },
-		{ "2BT",  3000 },
-		{ "2BT",  2000 },
-		{ "2BT",  1000 },
+		{ "", 10000 },
+		{ "",  9000 },
+		{ "",  8000 },
+		{ "",  7000 },
+		{ "",  6000 },
+		{ "",  5000 },
+		{ "",  4000 },
+		{ "",  3000 },
+		{ "",  2000 },
+		{ "",  1000 },
 	},
 	name = "",
 	music_vol = 7,
@@ -138,9 +138,12 @@ function Menu:update()
 			self.action = "DEMO"
 		elseif self.state == "highscore" and self.entry then
 			-- write name
-			if Input:gotAnyPressed("start") then
+			if Input:gotAnyPressed("enter") then
 				self:submitHighscore(true)
+			elseif Input:gotAnyPressed("back") then
+				self:submitHighscore(false)
 			end
+
 		else
 			-- select option
 			local option = self.options[self.state]
@@ -260,10 +263,6 @@ function Menu:keypressed(key)
 			self.entry[1] = self.entry[1]:sub(1, -2)
 			self.tick = 0
 			return
-
-		elseif key == "return" or key == "escape" then
-			self:submitHighscore(key == "return")
-			return
 		end
 
 		if #self.entry[1] >= 13 then return end
@@ -271,9 +270,11 @@ function Menu:keypressed(key)
 		if #key == 1 and key:match("[%a%d.-]") then
 			self.entry[1] = self.entry[1] .. key:upper()
 			self.tick = 0
-		elseif key == "space" then
-			self.entry[1] = self.entry[1] .. " "
-			self.tick = 0
+		elseif key == "space" or key == " " then
+			if #self.entry[1] > 0 then
+				self.entry[1] = self.entry[1] .. " "
+				self.tick = 0
+			end
 		end
 	end
 
