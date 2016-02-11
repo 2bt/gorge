@@ -59,6 +59,7 @@ function Game:reset(seed)
 	self.heart_account = 0
 
 	self.saucer_delay = 6000
+	self.spawn_break_counter = 0
 
 	-- DEBUG
 --	for i = 1, 720 do self.walls:generate() end
@@ -212,10 +213,14 @@ function Game:update()
 
 
 
-
-	-- TODO: spawn enemies
+	-- TODO: spawn enemies better
 	if self.saucer_delay > 0 then self.saucer_delay = self.saucer_delay - 1 end
-	if self.rand.float(-5, 1) > 0.99996^(self.tick/10 + 1000 + self.tick % 1000 * 3) then
+	if self.rand.float(-5, 1) > 0.99996^(self.tick/10 + 1000 + self.tick % 1000 * 3)
+	or self.spawn_break_counter > 70 then
+		if self.spawn_break_counter > 70 then
+			print("idle spawn", self.walls.row_counter)
+		end
+		self.spawn_break_counter = 0
 
 		local data = self.walls.data
 		local j = #data - 4
@@ -300,7 +305,8 @@ function Game:update()
 			SaucerEnemy(self:makeRG(), x, y)
 		end
 
-
+	else
+		self.spawn_break_counter = self.spawn_break_counter + 1
 	end
 
 
