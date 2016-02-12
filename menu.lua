@@ -18,7 +18,7 @@ local G = love.graphics
 
 
 local stats = {
-	version = 0,
+	version = 1,
 	highscore = {
 		{ "", 10000 },
 		{ "",  9000 },
@@ -35,15 +35,23 @@ local stats = {
 	music_vol = 7,
 	sound_vol = 7,
 	fullscreen = false,
+	demo = nil,
 }
 
 if love.filesystem.isFile(VERSION) then
 	local s = loadstring("return " .. love.filesystem.read(VERSION))()
-	if s.version == stats.version then
-		s.music_vol = s.music_vol or stats.music_vol
-		s.sound_vol = s.sound_vol or stats.sound_vol
-		stats = s
+
+	-- patch
+	if s.version ~= stats.version then
+		s.version = stats.version
+
+		-- delete demo as it won't play correctly any more
+		s.demo = nil
+
+
 	end
+
+	stats = s
 	sound.setVolume(stats.sound_vol / 10)
 	love.window.setFullscreen(stats.fullscreen, "desktop")
 end
@@ -100,20 +108,26 @@ function Menu:swapState(state)
 	self.stats_changed = false
 end
 function Menu:gameOver(game)
-	local entry = { stats.name or "", game.player.score }
 
+	-- save demo
+	if not stats.demo or stats.demo.score < game.player.score then
+		stats.demo = {
+			record = game.record,
+			seed = game.seed,
+			score = game.player.score,
+		}
+		self.stats_changed = true
+	end
+
+	-- check top ten
+	local entry = { stats.name or "", game.player.score }
 	for i, e in ipairs(stats.highscore) do
 		if e[2] < entry[2] then
 			table.insert(stats.highscore, i, entry)
 			table.remove(stats.highscore)
-			if not stats.demo or i == 1 then
-				stats.demo = {
-					record = game.record,
-					seed = game.seed
-				}
-			end
 			self:swapState("highscore")
 			self.entry = entry
+			self.stats_changed = true
 			return
 		end
 	end
@@ -137,10 +151,13 @@ function Menu:update()
 		if self.state == "main" and self.tick > 60 * 10 and stats.demo then
 			self.action = "DEMO"
 		elseif self.state == "highscore" and self.entry then
-			-- write name
+
+			-- done writing name?
 			if Input:gotAnyPressed("enter") then
+				sound.play("select")
 				self:submitHighscore(true)
 			elseif Input:gotAnyPressed("back") then
+				sound.play("select")
 				self:submitHighscore(false)
 			end
 
@@ -255,7 +272,6 @@ function Menu:submitHighscore(online)
 	end
 	stats.name = self.entry[1]
 	self.entry = false
-	self.stats_changed = true
 end
 function Menu:keypressed(key)
 	if self.state == "highscore" and self.entry then
