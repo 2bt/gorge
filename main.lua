@@ -1,6 +1,5 @@
 local G = love.graphics
 
-
 -- compatibility
 do
 	local a, b, c = love.getVersion()
@@ -16,6 +15,7 @@ do
 end
 
 
+MOBILE = true
 DEBUG = false
 
 
@@ -39,16 +39,16 @@ require "game"
 require "menu"
 
 
-
-
 font = Font()
 
 game = Game()
 menu = Menu()
 state = menu
 
-bg_music = love.audio.newSource("media/music.ogg", "stream")
-bg_music:setLooping(true)
+keyboard = Input()
+
+--bg_music = love.audio.newSource("media/music.ogg", "stream")
+--bg_music:setLooping(true)
 
 
 function love.update()
@@ -77,6 +77,7 @@ function love.draw()
 --	counter = counter + 1
 end
 function love.keypressed(key)
+	keyboard:keypressed(key)
 	if state.keypressed then state:keypressed(key) end
 --	if key == "tab" then DEBUG = not DEBUG end
 end
@@ -86,7 +87,3 @@ function love.resize()
 	Game.canvas = G.newCanvas()
 end
 
-local joys = {}
-function love.joystickadded(j)
-	if not joys[j] then Input(j) end
-end

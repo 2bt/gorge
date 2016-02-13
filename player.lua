@@ -405,27 +405,46 @@ SmallLaser = Laser:new {
 }
 
 
+print("GORGE player 0")
 
 EnergyBlast = Object:new {
 	canvas = G.newCanvas(100, 100),
+	-- TODO: fix this for android
+--[=[
 	shader = G.newShader([[
 		uniform float r;
 		uniform float s;
-		float a[] = float[]( 0, 1, 1, 0, 0, 1 );
+		float a[6] = float[6]( 0.0, 1.0, 1.0, 0.0, 0.0, 1.0 );
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
-			float d = distance(vec2(50, 50), screen_coords);
-			float x = 0;
-			if (d > r) return vec4(0);
+			float d = distance(vec2(50.0, 50.0), screen_coords);
+			float x = 0.0;
+			if (d > r) return vec4(0.0);
 			if (d < s) {
-				int i = int(floor(s - d));
+				int i = int(s - d);
 				if (i < a.length()) x = a[i];
-				return vec4(0, 1, 1, 0.6) * x;
+				return vec4(0.0, 1.0, 1.0, 0.6) * x;
 			}
-			if (d > r - 1) return vec4(1, 1, 1, 1);
-			return vec4(0, 1, 1, 0.6);
+			if (d > r - 1.0) return vec4(1.0, 1.0, 1.0, 1.0);
+			return vec4(0.0, 1.0, 1.0, 0.6);
+		}
+	]]),
+--]=]
+	shader = G.newShader([[
+		uniform float r;
+		uniform float s;
+		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
+			float d = distance(vec2(50.0, 50.0), screen_coords);
+			float x = 0.0;
+			if (d > r) return vec4(0.0);
+			if (d < s) {
+				return vec4(0.0, 1.0, 1.0, 0.6);
+			}
+			if (d > r - 1.0) return vec4(1.0, 1.0, 1.0, 1.0);
+			return vec4(0.0, 1.0, 1.0, 0.6);
 		}
 	]]),
 }
+print("GORGE player 1")
 
 function EnergyBlast:activate(x, y)
 	sound.play("blast", self.x, self.y)
@@ -457,7 +476,7 @@ function EnergyBlast:draw()
 	if not self.alive then return end
 
 	self.canvas:renderTo(function()
-		G.clear()
+		G.clear(0, 0, 0, 0)
 		G.push()
 		G.origin()
 		self.shader:send("r", self.r)

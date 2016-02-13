@@ -12,10 +12,10 @@ Boom.img:setFilter("linear", "linear")
 Boom.shader = G.newShader([[
 uniform sampler2D bump;
 vec4 effect(vec4 color, sampler2D tex, vec2 tex_pos, vec2 screen_pos) {
-	vec2 d = vec2(6, 6) / love_ScreenSize.xy;
+	vec2 d = vec2(6.0, 6.0) / love_ScreenSize.xy;
 	float h  = texture2D(bump, tex_pos).r;
-	float h2 = texture2D(bump, tex_pos + d * vec2(1, 0)).r;
-	float h3 = texture2D(bump, tex_pos + d * vec2(0, 1)).r;
+	float h2 = texture2D(bump, tex_pos + d * vec2(1.0, 0.0)).r;
+	float h3 = texture2D(bump, tex_pos + d * vec2(0.0, 1.0)).r;
 	return texture2D(tex, tex_pos + vec2(h - h2, h - h3) * 0.03);
 }]])
 

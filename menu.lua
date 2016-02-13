@@ -95,7 +95,7 @@ Menu.options = {
 }
 function Menu:init()
 	self.stars = Stars()
-	self.stars:reset(makeRandomGenerator(32))
+	self.stars:reset(makeRandomGenerator(4))
 	self:swapState("main")
 end
 function Menu:swapState(state)
@@ -204,12 +204,10 @@ function Menu:update()
 					-- remember who started the game
 					self.input = Input:gotAnyPressed("start") or Input:gotAnyPressed("a")
 					if self.input then
-
 						self.action = option[self.select]
-
 						if self.action == "BACK" then
 							sound.play("back")
-						else
+						elseif self.action ~= "EXIT" then
 							sound.play("select")
 						end
 					end

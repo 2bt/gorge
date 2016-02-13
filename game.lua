@@ -344,7 +344,7 @@ end
 
 	-- bump texture
 	Boom.canvas:renderTo(function()
-		G.clear()
+		G.clear(0, 0, 0, 255)
 		G.setColor(255, 255, 255)
 		G.setBlendMode("add")
 		drawList(Boom.list)
@@ -354,7 +354,7 @@ end
 
 	-- background stuff
 	self.canvas:renderTo(function()
-		G.clear()
+		G.clear(0, 0, 0, 255)
 		self.stars:draw()
 		drawList(Particle.list, "back")
 		drawList(Item.list, "back")

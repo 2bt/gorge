@@ -145,21 +145,35 @@ SaucerBullet = Bullet:new {
 genQuads(SaucerBullet)
 
 
+print("GORGE saucer 0")
 -- explosion wave
 PraxisParticle = Particle:new {
 	layer = "back",
 	canvas = G.newCanvas(80, 80),
+	-- TODO: fix this for android
+--[=[
 	shader = G.newShader([[
 		uniform float f;
-		float a[] = float[]( 1, 1, 0, 0, 1 );
+		float a[5] = float[5]( 1.0, 1.0, 0.0, 0.0, 1.0 );
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
-			float d = distance(vec2(40, 40), screen_coords);
-			int i = int(floor(f - d));
+			float d = distance(vec2(40.0, 40.0), screen_coords);
+			int i = int(f - d);
 			if (i >= 0 && i < a.length()) return vec4(col.rgb, col.a * a[i]);
-			return vec4(0);
+			return vec4(0.0);
+		}
+	]]),
+--]=]
+	shader = G.newShader([[
+		uniform float f;
+		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
+			float d = distance(vec2(40.0, 40.0), screen_coords);
+			int i = int(f - d);
+			if (i >= 0 && i < 5) return vec4(col.rgb, col.a);
+			return vec4(0.0);
 		}
 	]]),
 }
+print("GORGE saucer 1")
 function PraxisParticle:init(x, y)
 	table.insert(self.list, self)
 	self.x = x
@@ -176,7 +190,7 @@ function PraxisParticle:draw()
 	local f = self.tick / 30
 	local c = (1 - f) ^ 0.4 * 200
 	self.canvas:renderTo(function()
-		G.clear()
+		G.clear(0, 0, 0, 0)
 		G.push()
 		G.origin()
 		G.setColor(160, 160, 160, c)
