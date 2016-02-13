@@ -15,6 +15,7 @@ Walls = Object:new {
 		{ 0, 0, 0, 32, 32, 0 },
 	}
 }
+Walls.batch = G.newSpriteBatch(Walls.img, 800, "stream")
 genQuads(Walls, 8)
 function Walls:reset(rand)
 	self.rand = rand
@@ -166,6 +167,10 @@ function Walls:generate()
 end
 function Walls:draw()
 
+	G.setColor(84, 38, 90)
+	local batch = self.batch
+	batch:clear()
+
 
 	-- debug
 if DEBUG then
@@ -173,15 +178,12 @@ if DEBUG then
 		local row = self.gen_data[y]
 		for x, cell in ipairs(row) do
 			if cell > 0 then
-				G.draw(self.img, self.quads[cell],
-					x * 32 - 448,
-					76 - y * 32 + self.offset - 32 * 20, 0, 4, 4)
+				batch.add(x * 32 - 448, 76 - y * 32 + self.offset - 32 * 20, 0, 4, 4)
 			end
 		end
 	end
 end
 
-	G.setColor(84, 38, 90)
 
 	for iy, row in ipairs(self.data) do
 		local next_row = self.data[iy + 1] or {}
@@ -203,37 +205,37 @@ end
 					if (row[ix + 1] or 1) <= 0 and (prev_row[ix] or 1) <= 0 then n = n + 8 end
 
 
-					G.draw(self.img, self.quads[n], x, y, 0, 4, 4)
+					batch:add(self.quads[n], x, y, 0, 4, 4)
 				else
-					G.draw(self.img, self.quads[cell], x, y, 0, 4, 4)
+					batch:add(self.quads[cell], x, y, 0, 4, 4)
 				end
 
 				-- smooth corners
 				if cell >= 6 then
 					if row[ix - 1] == 1 and next_row[ix] == 1 and (next_row[ix - 1] or 0) < 6 then
-						G.draw(self.img, self.quads[7], x, y, 0, 4, 4)
+						batch:add(self.quads[7], x, y, 0, 4, 4)
 					end
 					if row[ix + 1] == 1 and next_row[ix] == 1 and (next_row[ix + 1] or 0) < 6 then
-						G.draw(self.img, self.quads[7], x, y, 0, -4, 4, 8)
+						batch:add(self.quads[7], x, y, 0, -4, 4, 8)
 					end
 					if row[ix - 1] == 1 and prev_row[ix] == 1 and (prev_row[ix - 1] or 0) < 6 then
-						G.draw(self.img, self.quads[7], x, y, 0, 4, -4, 0, 8)
+						batch:add(self.quads[7], x, y, 0, 4, -4, 0, 8)
 					end
 					if row[ix + 1] == 1 and prev_row[ix] == 1 and (prev_row[ix + 1] or 0) < 6 then
-						G.draw(self.img, self.quads[7], x, y, 0, -4, -4, 8, 8)
+						batch:add(self.quads[7], x, y, 0, -4, -4, 8, 8)
 					end
 				elseif cell == 1 then
 					if (next_row[ix] or 6) >= 6 and (row[ix - 1] or 6) >= 6 then
-						G.draw(self.img, self.quads[8], x, y, 0, 4, 4)
+						batch:add(self.quads[8], x, y, 0, 4, 4)
 					end
 					if (next_row[ix] or 6) >= 6 and (row[ix + 1] or 6) >= 6 then
-						G.draw(self.img, self.quads[8], x, y, 0, -4, 4, 8)
+						batch:add(self.quads[8], x, y, 0, -4, 4, 8)
 					end
 					if (prev_row[ix] or 6) >= 6 and (row[ix - 1] or 6) >= 6 then
-						G.draw(self.img, self.quads[8], x, y, 0, 4, -4, 0, 8)
+						batch:add(self.quads[8], x, y, 0, 4, -4, 0, 8)
 					end
 					if (prev_row[ix] or 6) >= 6 and (row[ix + 1] or 6) >= 6 then
-						G.draw(self.img, self.quads[8], x, y, 0, -4, -4, 8, 8)
+						batch:add(self.quads[8], x, y, 0, -4, -4, 8, 8)
 					end
 				end
 
@@ -243,6 +245,7 @@ end
 		end
 	end
 
+	G.draw(batch)
 
 end
 

@@ -75,6 +75,9 @@ function love.draw()
 --		os.exit()
 --	end
 --	counter = counter + 1
+
+	G.setColor(255, 255, 255)
+	G.print(love.timer.getFPS(), 10, 50)
 end
 function love.keypressed(key)
 	keyboard:keypressed(key)
