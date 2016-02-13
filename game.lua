@@ -2,11 +2,11 @@ local G = love.graphics
 
 flash_shader = G.newShader([[
 vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
-	vec4 tc = texture2D(tex, tex_coords) * col;
-	return tc + vec4(vec3(1, 1, 1) - tc.rgb, 0) * 0.5;
+	vec4 tc = texture2D(tex, tex_coords);
+	return tc + vec4(vec3(1.0, 1.0, 1.0) - tc.rgb, 0.0) * col.x;
 }]])
 
-Game = Object:new {}
+Game = Object:New {}
 Game.health_img = G.newImage("media/health.png")
 Game.health_quads = makeQuads(16, 8, 8)
 Game.canvas = G.newCanvas()
@@ -143,8 +143,8 @@ function Game:update()
 	-- DEBUG
 --	love.timer.sleep(0.05)
 
-	if Input:gotAnyPressed("back")
-	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("a")) then
+	if self.action ~= "BACK" and (Input:gotAnyPressed("back")
+	or self.is_demo and	(Input:gotAnyPressed("start") or Input:gotAnyPressed("a"))) then
 		sound.play("back")
 		self.action = "BACK"
 	end
@@ -180,19 +180,34 @@ function Game:update()
 
 	-- input
 	local input = {}
+--	if self.is_demo then
+--		local i = self.record[self.tick] or 5
+--		input.dx = i % 4 - 1
+--		input.dy = math.floor(i / 4) % 4 - 1
+--		input.a = math.floor(i / 16) % 2 > 0
+--		input.b = math.floor(i / 32) % 2 > 0
+--		if not self.record[self.tick] then self.action = "BACK" end
+--	else
+--		input = self.input.state
+--		self.record[self.tick]	= (1 + input.dx)
+--								+ (1 + input.dy) * 4
+--								+ bool[input.a] * 16
+--								+ bool[input.b] * 32
+--	end
 	if self.is_demo then
-		local i = self.record[self.tick] or 5
-		input.dx = i % 4 - 1
-		input.dy = math.floor(i / 4) % 4 - 1
-		input.a = math.floor(i / 16) % 2 > 0
-		input.b = math.floor(i / 32) % 2 > 0
+		local i = self.record[self.tick] or {}
+		input.dx = i[1] or 0
+		input.dy = i[2] or 0
+		local b = i[3] or ""
+		input.a = b:match("a")
+		input.b = b:match("b")
 		if not self.record[self.tick] then self.action = "BACK" end
 	else
 		input = self.input.state
-		self.record[self.tick]	= (1 + input.dx)
-								+ (1 + input.dy) * 4
-								+ bool[input.a] * 16
-								+ bool[input.b] * 32
+		local b = (input.a and "a" or "") .. (input.b and "b" or "")
+		local i = { input.dx, input.dy }
+		if b ~= "" then i[3] = b end
+		self.record[self.tick] = i
 	end
 
 
@@ -356,12 +371,18 @@ end
 	self.canvas:renderTo(function()
 		G.clear(0, 0, 0, 255)
 		self.stars:draw()
-		drawList(Particle.list, "back")
-		drawList(Item.list, "back")
 
-		drawList(Enemy.list)
-		drawList(Bullet.list)
-		drawList(Laser.list)
+		Particle:DrawAll("back")
+		G.setColor(255, 255, 255)
+		Item:DrawAll("back")
+
+		G.setShader(flash_shader)
+		Enemy:DrawAll()
+		G.setShader()
+
+		G.setColor(255, 255, 255)
+		Bullet:DrawAll()
+		Laser:DrawAll()
 		self.player:draw()
 		self.walls:draw()
 	end)
@@ -387,8 +408,8 @@ if DEBUG then
 	G.translate(0, 650)
 	G.rectangle("line", -400, -300, 800, 600)
 end
-	drawList(Particle.list, "front")
-	drawList(Item.list, "front")
+	Particle:DrawAll("front")
+	Item:DrawAll("front")
 
 
 

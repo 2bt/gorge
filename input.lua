@@ -1,7 +1,7 @@
 local isDown = love.keyboard.isDown
 local G = love.graphics
 
-Input = Object:new {
+Input = Object:New {
 	list = {},
 }
 function Input:init(joy)
@@ -90,7 +90,7 @@ else
 
 
 -- touch
-TouchInput = Input:new {
+TouchInput = Input:New {
 	state		= {},
 	prev_state	= {},
 
@@ -118,6 +118,8 @@ function TouchInput:update()
 		s.dx = math.max(-1, math.min(1, dx / dist))
 		s.dy = math.max(-1, math.min(1, dy / dist))
 
+		s.dx = math.floor(s.dx * 10 + 0.5) / 10
+		s.dy = math.floor(s.dy * 10 + 0.5) / 10
 	end
 	s.left	= s.dx < -0.9
 	s.right	= s.dx >  0.9

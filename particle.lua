@@ -1,13 +1,12 @@
 local G = love.graphics
 
 
-Particle = Object:new {
-	list = {},
+Particle = BatchDrawer(300, {
+	color = { 255, 255, 255 },
 	alive = true,
 	frame_length = 3,
-	size = 8,
 	layer = "front",
-}
+})
 function Particle:init(x, y)
 	table.insert(self.list, self)
 	self.x = x
@@ -16,10 +15,10 @@ function Particle:init(x, y)
 end
 function Particle:draw()
 	if self.tick < 0 then return end
-	G.setColor(255, 255, 255)
 	local f = math.floor(self.tick / self.frame_length) + 1
 	if self.quads[f] then
-		G.draw(self.img, self.quads[f], self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
+		self.quads.batch:setColor(unpack(self.color))
+		self.quads.batch:add(self.quads[f], self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
 	else
 		self.alive = false
 	end
@@ -32,11 +31,10 @@ end
 
 
 
-SparkParticle = Particle:new {
-	img = G.newImage("media/spark.png"),
-	color = {255, 255, 255},
+SparkParticle = Particle:New {
 	friction = 1
 }
+SparkParticle:InitQuads("media/spark.png")
 function SparkParticle:init(x, y)
 	table.insert(self.list, self)
 	self.x = x
@@ -56,19 +54,19 @@ function SparkParticle:update()
 	if self.ttl <= 0 then return "kill" end
 end
 function SparkParticle:draw()
-	G.setColor(unpack(self.color))
-	G.draw(self.img, self.x, self.y, 0, 4, 4, 1.5, 1.5)
+	self.quads.batch:setColor(unpack(self.color))
+	self.quads.batch:add(self.quads[1], self.x, self.y, 0, 4, 4, 1.5, 1.5)
 end
 
 
-LaserParticle = SparkParticle:new {
+LaserParticle = SparkParticle:New {
 	color = {0, 155, 155},
 	friction = 0.7,
 }
 
 
 
-ExplosionSparkParticle = SparkParticle:new {
+ExplosionSparkParticle = SparkParticle:New {
 	friction = 0.95,
 }
 function ExplosionSparkParticle:init(x, y)
@@ -84,20 +82,19 @@ function ExplosionSparkParticle:init(x, y)
 end
 function ExplosionSparkParticle:draw()
 	local c = self.color
-	G.setColor(c[1], c[2], 0, math.min(255, self.ttl * 50))
-	G.draw(self.img, self.x, self.y, 0, 4, 4, 1.5, 1.5)
+	self.quads.batch:setColor(c[1], c[2], 0, math.min(255, self.ttl * 50))
+	self.quads.batch:add(self.quads[1], self.x, self.y, 0, 4, 4, 1.5, 1.5)
 end
 
 
 
 
-SmokeParticle = Particle:new {
-	img = G.newImage("media/smoke.png"),
+SmokeParticle = Particle:New {
 	size = 8,
 	friction = 0.8,
 	layer = "back"
 }
-genQuads(SmokeParticle)
+SmokeParticle:InitQuads("media/smoke.png")
 function SmokeParticle:init(x, y)
 	table.insert(self.list, self)
 	self.x = x
@@ -110,19 +107,15 @@ function SmokeParticle:init(x, y)
 end
 SmokeParticle.update = SparkParticle.update
 function SmokeParticle:draw()
-	G.setColor(30, 30, 30, 150)
 	local f = math.max(1, #self.quads - math.floor(self.ttl / 3))
-	G.draw(self.img, self.quads[f], self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
+	self.quads.batch:setColor(30, 30, 30, 150)
+	self.quads.batch:add(self.quads[f], self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
 end
 
 
 
-ExplosionParticle = Particle:new {
-	img = G.newImage("media/explosion.png"),
-	size = 16
-}
-genQuads(ExplosionParticle)
-
+ExplosionParticle = Particle:New { size = 16 }
+ExplosionParticle:InitQuads("media/explosion.png")
 
 function makeExplosion(x, y)
 	sound.play("explosion", x, y)
@@ -141,18 +134,15 @@ function makeExplosion(x, y)
 end
 
 
-SparkleParticle = Particle:new {
-	img = G.newImage("media/sparkle.png")
-}
-genQuads(SparkleParticle)
+SparkleParticle = Particle:New { size = 8 }
+SparkleParticle:InitQuads("media/sparkle.png")
 function SparkleParticle:update()
 	self.tick = self.tick + 1
 	if not self.alive then return "kill" end
 end
 
-
-FastSparkleParticle = Particle:new {
-	img = SparkleParticle.img,
+FastSparkleParticle = Particle:New {
+	size = 8,
 	quads = SparkleParticle.quads,
 }
 function makeFastSparkleParticle(x, y)

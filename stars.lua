@@ -1,7 +1,7 @@
 local G = love.graphics
 
-Stars = Object:new()
-Stars.img = G.newImage("media/stars.png")
+Stars = Object:New{ img = G.newImage("media/stars.png") }
+Stars.batch = G.newSpriteBatch(Stars.img, 200, "stream")
 genQuads(Stars, 8)
 
 local r = love.math.newRandomGenerator(42)
@@ -93,11 +93,14 @@ function Stars:draw()
 	G.setColor(255, 255, 255)
 	G.draw(self.canvas, -400, -304 + (self.xx % 1 * 4), 0, 4)
 --]]
-	G.setBlendMode("add")
+	local batch = self.batch
+	batch:clear()
 	for i, s in ipairs(self.list) do
-		G.setColor(unpack(s.color))
-		G.draw(self.img, self.quads[s.frame], s.x, s.y, 0, 4, 4, 4, 4)
+		batch:setColor(unpack(s.color))
+		batch:add(self.quads[s.frame], s.x, s.y, 0, 4, 4, 4, 4)
 	end
+	G.setBlendMode("add")
+	G.draw(batch)
 	G.setBlendMode("alpha")
 end
 

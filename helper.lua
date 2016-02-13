@@ -1,5 +1,7 @@
+local G = love.graphics
+
 Object = {}
-function Object:new(o)
+function Object:New(o)
 	o = o or {}
 	setmetatable(o, self)
 	local m = getmetatable(self)
@@ -9,7 +11,7 @@ function Object:new(o)
 	return o
 end
 setmetatable(Object, { __call = function(self, ...)
-	local o = self:new()
+	local o = self:New()
 	if o.init then o:init(...) end
 	return o
 end })
@@ -65,7 +67,7 @@ function makeQuads(w, h, s)
 	local quads = {}
 	for y = 0, h - s, s do
 		for x = 0, w - s, s do
-			table.insert(quads, love.graphics.newQuad(x, y, s, s, w, h))
+			table.insert(quads, G.newQuad(x, y, s, s, w, h))
 		end
 	end
 	return quads
@@ -76,18 +78,30 @@ function transform(obj, model)
 	model = model or obj.model
 	local nx = math.sin(obj.ang or 0)
 	local ny = math.cos(obj.ang or 0)
+	local trans_model = obj.trans_model
 	for i = 1, #model, 2 do
 		local x = model[i]
 		local y = model[i + 1]
-		obj.trans_model[i] 		= obj.x + y * nx + x * ny
-		obj.trans_model[i + 1]	= obj.y - x * nx + y * ny
+		trans_model[i] 		= obj.x + y * nx + x * ny
+		trans_model[i + 1]	= obj.y - x * nx + y * ny
 	end
 	for i = #model + 1, #obj.trans_model do
-		obj.trans_model[i] = nil
+		trans_model[i] = nil
 	end
+	trans_model.x = obj.x
+	trans_model.y = obj.y
+	trans_model.r = model.r
 end
 
 function polygonCollision(a, b)
+	if a.r and b.r then
+		local dx = a.x - b.x
+		local dy = a.y - b.y
+		if (dx*dx + dy*dy) ^ 0.5 > a.r + b.r then
+			return 0
+		end
+	end
+
 	local normal = {}
 	local where = {}
 	local distance = 9e99
@@ -138,7 +152,6 @@ function polygonCollision(a, b)
 	return distance, normal, where
 end
 
-
 function naivePolygonCircleCollision(a, x, y, r)
 	for i = 1, #a, 2 do
 		local dx = x - a[i]
@@ -148,6 +161,14 @@ function naivePolygonCircleCollision(a, x, y, r)
 	return false
 end
 
+function initPolygonRadius(p)
+	local r = 0
+	for i = 1, #p, 2 do
+		local rr = p[i] ^ 2 + p[i+1] ^ 2
+		if r < rr then r = rr end
+	end
+	p.r = r ^ 0.5
+end
 
 function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
 
@@ -172,4 +193,85 @@ function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
 	end
 	return abi, qwi
 
+end
+
+
+
+QuadGenerator = Object:New { list = {} }
+function QuadGenerator:GenerateQuads()
+	for _, p in ipairs(self.list) do
+		p:generateQuads()
+	end
+end
+function QuadGenerator:init(maxsprites)
+	table.insert(self.list, self)
+	self.maxsprites = maxsprites
+	self.image_table = {}
+
+end
+function QuadGenerator:requestQuads(imagename, size)
+	local quads = { name = imagename }
+	local data = love.image.newImageData(imagename)
+	table.insert(self.image_table, {
+		quads = quads,
+		data = data,
+		width = data:getWidth(),
+		height = size or data:getHeight(),
+	})
+	return quads
+end
+function QuadGenerator:generateQuads()
+
+	local width = 0
+	local height = 0
+	for _, img in ipairs(self.image_table) do
+		width = math.max(width, img.width)
+		height = height + img.height
+	end
+
+	local data = love.image.newImageData(width, height)
+
+	local y = 0
+	for _, img in ipairs(self.image_table) do
+		data:paste(img.data, 0, y, 0, 0, img.width, img.height)
+		y = y + img.height
+	end
+
+	self.img = G.newImage(data)
+	self.batch = G.newSpriteBatch(self.img, self.maxsprites, "stream")
+
+	local y = 0
+	for _, img in ipairs(self.image_table) do
+		img.quads.batch = self.batch
+--		print(img.width, img.height)
+		for x = 0, img.width - img.height, img.height do
+			table.insert(img.quads, G.newQuad(x, y, img.height, img.height, width, height))
+		end
+		y = y + img.height
+		print(img.quads.name, #img.quads)
+	end
+
+	self.image_table = nil
+end
+
+
+BatchDrawer = Object:New()
+function BatchDrawer:init(maxsprites, o)
+	for k, v in pairs(o) do self[k] = v end
+	self.quad_generator = QuadGenerator(maxsprites)
+	self.list = {}
+end
+function BatchDrawer:InitQuads(imagename)
+	self.quads = self.quad_generator:requestQuads(imagename, self.size)
+end
+function BatchDrawer:DrawAll(layer)
+	self.quad_generator.batch:clear()
+	if layer then
+		for _, o in ipairs(self.list) do
+			if o.layer == layer then o:draw() end
+		end
+	else
+		for _, o in ipairs(self.list) do o:draw() end
+	end
+	G.draw(self.quad_generator.batch)
 end

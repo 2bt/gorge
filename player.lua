@@ -1,18 +1,20 @@
 local G = love.graphics
 
-BallField = Object:new {
+BallField = Object:New {
 	img = G.newImage("media/ball_field.png"),
 	model = { 8, 16, 16, 8, 16, -8, 8, -16, -8, -16, -16, -8, -16, 8, -8, 16, },
 }
 genQuads(BallField, 16)
+initPolygonRadius(BallField.model)
 function BallField:init()
 	self.trans_model = {}
 end
 
-Ball = Object:new {
+Ball = Object:New {
 	model = { 6, 6, 6, -6, -6, -6, -6, 6, },
 	img = G.newImage("media/ball.png")
 }
+initPolygonRadius(Ball.model)
 genQuads(Ball, 8)
 function Ball:init(player, dir)
 	self.player = player
@@ -104,7 +106,7 @@ end
 
 
 
-Player = Object:new {
+Player = Object:New {
 	img = G.newImage("media/player.png"),
 	model = { 16, 16, 16, 0, 4, -12, -4, -12, -16, 0, -16, 16, },
 	field = {
@@ -115,6 +117,8 @@ Player = Object:new {
 }
 genQuads(Player, 16)
 genQuads(Player.field, 16)
+initPolygonRadius(Player.model)
+initPolygonRadius(Player.field.model)
 function Player:init()
 	self.trans_model = {}
 	self.balls = { Ball(self, -1), Ball(self, 1) }
@@ -244,6 +248,11 @@ function Player:update(input)
 		Laser(self.x, self.y - 4)
 		self.balls[1]:shoot(self.side_shoot)
 		self.balls[2]:shoot(self.side_shoot)
+
+
+		-- DEBUG
+--		PraxisParticle(self.x, self.y)
+
 	end
 	if self.shoot_delay > 0 then
 		self.shoot_delay = self.shoot_delay - 1
@@ -328,8 +337,12 @@ function Player:draw()
 	if self.invincible % 8 >= 4 then return end
 
 
-	if self.flash > 0 then G.setShader(flash_shader) end
-	G.setColor(255, 255, 255)
+	if self.flash > 0 then
+		G.setShader(flash_shader)
+		G.setColor(127, 0, 0)
+	else
+		G.setColor(255, 255, 255)
+	end
 	G.draw(self.img,
 		self.quads[1 + math.floor(self.tick / 8 % 2)],
 		self.x, self.y, 0, 4, 4, 8, 8)
@@ -343,12 +356,12 @@ end
 
 
 
-Laser = Object:new {
-	list = {},
-	img = G.newImage("media/laser.png"),
+Laser = BatchDrawer(50, {
 	model = { -2, 10, 2, 10, 2, -10, -2, -10, },
 	damage = 1
-}
+})
+Laser:InitQuads("media/laser.png")
+initPolygonRadius(Laser.model)
 function Laser:init(x, y, vx, vy)
 	table.insert(self.list, self)
 	self.x = x
@@ -393,58 +406,48 @@ function Laser:update()
 	end
 end
 function Laser:draw()
-	G.setColor(255, 255, 255)
-	G.draw(self.img, self.x, self.y, -self.ang, 4, 4, 1.5, 3)
---	G.polygon("line", self.trans_model)
+	self.quads.batch:add(self.quads[1], self.x, self.y, -self.ang, 2, 2, 6, 6)
 end
-
-SmallLaser = Laser:new {
-	img = G.newImage("media/small_laser.png"),
+SmallLaser = Laser:New {
 	model = { -2, 5, 2, 5, 2, -5, -2, -5, },
 	damage = 0.5
 }
+SmallLaser:InitQuads("media/small_laser.png")
+initPolygonRadius(SmallLaser.model)
+function Laser:draw()
+	self.quads.batch:add(self.quads[1], self.x, self.y, -self.ang, 2, 2, 6, 6)
+end
 
 
-print("GORGE player 0")
-
-EnergyBlast = Object:new {
+EnergyBlast = Object:New {
 	canvas = G.newCanvas(100, 100),
-	-- TODO: fix this for android
---[=[
 	shader = G.newShader([[
+		uniform sampler2D table;
 		uniform float r;
 		uniform float s;
-		float a[6] = float[6]( 0.0, 1.0, 1.0, 0.0, 0.0, 1.0 );
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 			float d = distance(vec2(50.0, 50.0), screen_coords);
 			float x = 0.0;
 			if (d > r) return vec4(0.0);
 			if (d < s) {
-				int i = int(s - d);
-				if (i < a.length()) x = a[i];
+				x = texture2D(table, vec2((s - d) * 0.1 , 0.0)).x;
 				return vec4(0.0, 1.0, 1.0, 0.6) * x;
 			}
 			if (d > r - 1.0) return vec4(1.0, 1.0, 1.0, 1.0);
 			return vec4(0.0, 1.0, 1.0, 0.6);
 		}
 	]]),
---]=]
-	shader = G.newShader([[
-		uniform float r;
-		uniform float s;
-		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
-			float d = distance(vec2(50.0, 50.0), screen_coords);
-			float x = 0.0;
-			if (d > r) return vec4(0.0);
-			if (d < s) {
-				return vec4(0.0, 1.0, 1.0, 0.6);
-			}
-			if (d > r - 1.0) return vec4(1.0, 1.0, 1.0, 1.0);
-			return vec4(0.0, 1.0, 1.0, 0.6);
-		}
-	]]),
 }
-print("GORGE player 1")
+local data = love.image.newImageData(8, 1)
+data:setPixel(0, 0, 0, 0, 0, 0)
+data:setPixel(1, 0, 255, 255, 255, 255)
+data:setPixel(2, 0, 255, 255, 255, 255)
+data:setPixel(3, 0, 0, 0, 0, 0)
+data:setPixel(4, 0, 0, 0, 0, 0)
+data:setPixel(5, 0, 255, 255, 255, 255)
+data:setPixel(6, 0, 0, 0, 0, 0)
+EnergyBlast.img = G.newImage(data)
+EnergyBlast.shader:send("table", EnergyBlast.img)
 
 function EnergyBlast:activate(x, y)
 	sound.play("blast", self.x, self.y)
@@ -465,7 +468,7 @@ function EnergyBlast:update()
 	self.level = self.level + 0.025
 
 	self.r = (1 - 2 ^ (-4 * self.level)) * 40
-	self.s = (1 - 2 ^ (-1.7 * self.level)) * 60
+	self.s = (1 - 2 ^ (-1.8 * self.level)) * 60
 	self.radius = self.r * 4
 
 	if self.level >= 1.2 then

@@ -1,9 +1,8 @@
 local G = love.graphics
 
-SaucerEnemy = Enemy:new {
+SaucerEnemy = Enemy:New {
 	size = 24,
 	score = 5000,
-	img = G.newImage("media/saucer.png"),
 	model = {
 		-16, 24,
 		16, 24,
@@ -27,7 +26,8 @@ SaucerEnemy = Enemy:new {
 
 	shield = 20,
 }
-genQuads(SaucerEnemy)
+SaucerEnemy:InitQuads("media/saucer.png")
+initPolygonRadius(SaucerEnemy.model)
 function SaucerEnemy:init(rand, x, y)
 	self:super(rand, x, y)
 	transform(self)
@@ -100,7 +100,7 @@ function SaucerEnemy:subUpdate()
 	transform(self, self.model)
 end
 
-SaucerParticle = Particle:new {
+SaucerParticle = Particle:New {
 	size = 24,
 	img = SaucerEnemy.img,
 	quads = SaucerEnemy.quads,
@@ -136,18 +136,17 @@ function SaucerParticle:draw()
 end
 
 
-SaucerBullet = Bullet:new {
-	img = G.newImage("media/saucer_bullet.png"),
+SaucerBullet = Bullet:New {
 	model = { 2,  10, 2, -10, -2, -10, -2,  10, },
 	size = 9,
 	color = { 255, 255, 120 },
 }
-genQuads(SaucerBullet)
+SaucerBullet:InitQuads("media/saucer_bullet.png")
+initPolygonRadius(SaucerBullet.model)
 
 
-print("GORGE saucer 0")
 -- explosion wave
-PraxisParticle = Particle:new {
+PraxisParticle = Particle:New {
 	layer = "back",
 	canvas = G.newCanvas(80, 80),
 	-- TODO: fix this for android
@@ -167,13 +166,14 @@ PraxisParticle = Particle:new {
 		uniform float f;
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 			float d = distance(vec2(40.0, 40.0), screen_coords);
-			int i = int(f - d);
-			if (i >= 0 && i < 5) return vec4(col.rgb, col.a);
+//			int i = int(f - d);
+//			if (i >= 0 && i < 5 && i != 2) return vec4(col.rgb, col.a);
+			d = f - d;
+			if (d >= 0.0 && d < 5.0 && !(d > 2.0 && d < 4.0)) return vec4(col.rgb, col.a);
 			return vec4(0.0);
 		}
 	]]),
 }
-print("GORGE saucer 1")
 function PraxisParticle:init(x, y)
 	table.insert(self.list, self)
 	self.x = x

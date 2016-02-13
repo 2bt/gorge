@@ -1,13 +1,14 @@
 local G = love.graphics
 
-SquareEnemy = Enemy:new {
-	img = G.newImage("media/square.png"),
+SquareEnemy = Enemy:New {
+	size = 16,
 	shield = 2,
 	score = 350,
 	model = { 8, 16, 16, 8, 16, -8, 8, -16, -8, -16, -16, -8, -16, 8, -8, 16, },
 	bounce_model = { 16, 32, 32, 16, 32, -16, 16, -32, -16, -32, -32, -16, -32, 16, -16, 32, },
 }
-genQuads(SquareEnemy)
+SquareEnemy:InitQuads("media/square.png")
+initPolygonRadius(SquareEnemy.model)
 function SquareEnemy:init(...)
 	self:super(...)
 	self.tick = self.rand.int(1, 100)
@@ -71,15 +72,14 @@ function SquareEnemy:subUpdate()
 		end
 	end
 end
-RapidBullet = Bullet:new {
+RapidBullet = Bullet:New {
 	color = { 146, 255, 146 },
-	model = { 2, 6, 2, -6, -2, -6, -2, 6, }
+	model = { 2, 6, 2, -6, -2, -6, -2, 6, },
+	size = 7,
 }
+RapidBullet:InitQuads("media/rapid_bullet.png")
+initPolygonRadius(RapidBullet.model)
 function RapidBullet:init(x, y, dx, dy)
 	self:super(x, y, dx, dy)
 	self.ang = math.atan2(dx, dy)
-end
-function RapidBullet:draw()
-	G.setColor(unpack(self.color))
-	G.polygon("fill", self.trans_model)
 end

@@ -1,12 +1,13 @@
 local G = love.graphics
 
-CannonEnemy = Enemy:new {
+CannonEnemy = Enemy:New {
+	size = 16,
 	shield = 1,
 	score = 300,
-	img = G.newImage("media/cannon.png"),
 	model = { 16, 16, 16, 0, 8, -16, -8, -16, -16, 0, -16, 16, }
 }
-genQuads(CannonEnemy)
+CannonEnemy:InitQuads("media/cannon.png")
+initPolygonRadius(CannonEnemy.model)
 function CannonEnemy:init(rand, x, y, wall)
 	self:super(rand, x, y)
 	self.nx = 0
@@ -60,8 +61,7 @@ function CannonEnemy:subUpdate()
 	end
 end
 function CannonEnemy:subDraw()
-	G.setColor(255, 255, 255)
-	G.draw(self.img, self.quads[2], self.x, self.y, -self.cannon_ang or 0, 4, 4, 8, 8)
-	G.draw(self.img, self.quads[1], self.x, self.y, -self.ang or 0, 4, 4, 8, 8)
+	self.quads.batch:add(self.quads[2], self.x, self.y, -self.cannon_ang or 0, 4, 4, 8, 8)
+	self.quads.batch:add(self.quads[1], self.x, self.y, -self.ang or 0, 4, 4, 8, 8)
 --	G.polygon("line", self.trans_model)
 end

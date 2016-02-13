@@ -1,15 +1,16 @@
 local G = love.graphics
 
-RocketEnemy = Enemy:new {
+RocketEnemy = Enemy:New {
+	size = 16,
 	shield = 1,
 	score = 150,
-	img = G.newImage("media/rocket.png"),
 	model = { 16, 16, 4, -20, -4, -20, -16, 16, },
 	counter = 0,
 	active = false,
 	suicide = false,
 }
-genQuads(RocketEnemy)
+RocketEnemy:InitQuads("media/rocket.png")
+initPolygonRadius(RocketEnemy.model)
 function RocketEnemy:init(rand, x, y, wall)
 	self:super(rand, x, y)
 	self.vx = 0

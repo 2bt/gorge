@@ -1,13 +1,13 @@
 local G = love.graphics
 
-BlockadeEnemy = Enemy:new {
+BlockadeEnemy = Enemy:New {
 	size = 8,
-	img = G.newImage("media/blockade.png"),
 	model = { 16, 12, 16, -12, -16, -12, -16, 12, },
 	shield = 10,
 	score = 2000,
 }
-genQuads(BlockadeEnemy)
+BlockadeEnemy:InitQuads("media/blockade.png")
+initPolygonRadius(BlockadeEnemy.model)
 function BlockadeEnemy:init(rand, x, y, wall_row, index)
 	self:super(rand, x, y - game.walls.speed) -- fix offset issue
 	self.neighbors = {}

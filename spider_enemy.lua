@@ -1,15 +1,15 @@
 local G = love.graphics
 
-SpiderEnemy = Enemy:new {
-	img = G.newImage("media/spider.png"),
+SpiderEnemy = Enemy:New {
+	size = 16,
 	shield = 1,
 	score = 550,
 	model = { 5, 16, 16, 5, 16, -5, 5, -16, -5, -16, -16, -5, -16, 5, -5, 16, },
 	frame_length = 7,
-
 	speed = 0.8
 }
-genQuads(SpiderEnemy)
+SpiderEnemy:InitQuads("media/spider.png")
+initPolygonRadius(SpiderEnemy.model)
 function SpiderEnemy:init(rand, x, y, wall)
 	self:super(rand, x, y)
 	self.nx = 0
@@ -133,21 +133,19 @@ function SpiderEnemy:subUpdate()
 	end
 end
 function SpiderEnemy:subDraw()
-	G.setColor(255, 255, 255)
 	local o = self.shoot and 5 or 1
-	G.draw(self.img, self.quads[math.floor(self.tick / self.frame_length) % 4 + o],
+	self.quads.batch:add(self.quads[math.floor(self.tick / self.frame_length) % 4 + o],
 		self.x, self.y, -self.sprite_ang, 4 * self.dir, 4, self.size / 2, self.size / 2)
 --	G.polygon("line", self.trans_model)
 end
-
-SpiderBullet = Bullet:new {
+SpiderBullet = Bullet:New {
 	color = { 255, 241, 0 },
 	model = { 4, 4, 4, -4, -4, -4, -4, 4, },
-	img = G.newImage("media/spider_bullet.png"),
-	frame_length = 4,
 	size = 8,
+	frame_length = 4,
 }
-genQuads(SpiderBullet)
+SpiderBullet:InitQuads("media/spider_bullet.png")
+initPolygonRadius(SpiderBullet.model)
 function SpiderBullet:init(x, y, dx, dy)
 	self:super(x, y, dx, dy)
 --	self.ang = math.atan2(dx, dy)

@@ -1,7 +1,7 @@
 local G = love.graphics
 
 
-TwisterSpawn = Particle:new {}
+TwisterSpawn = Particle:New {}
 function TwisterSpawn:init(rand, x, y, ang)
 	table.insert(self.list, self)
 	self.rand = rand
@@ -34,7 +34,8 @@ function TwisterSpawn:draw()
 end
 
 
-TwisterEnemy = Enemy:new {
+TwisterEnemy = Enemy:New {
+	size= 16,
 	model = { 16, 4, 16, -4, -8, -18, -16, -8, -16, 8, -8, 18, },
 	left_turn_model = {
 		40, 14,
@@ -52,16 +53,14 @@ TwisterEnemy = Enemy:new {
 		-16, -14,
 		-16, 68,
 	},
-	img = G.newImage("media/twister.png"),
 	frame_length = 4,
 	shield = 1,
 	score = 120,
 	speed = 2,
 	turn_speed = 1 / 32.0 * 4
 }
-
-
-genQuads(TwisterEnemy)
+TwisterEnemy:InitQuads("media/twister.png")
+initPolygonRadius(TwisterEnemy.model)
 function TwisterEnemy:init(rand, x, y, ang, path_rand)
 	self:super(rand, x, y)
 	self.path_rand = path_rand
@@ -127,6 +126,7 @@ function TwisterEnemy:die()
 	makeEnergyItem(self.x, self.y, self.rand, 1)
 	game:trySpawnHeart(self.x, self.y)
 end
+-- for debuging
 function TwisterEnemy:subDraw_()
 	G.setColor(255, 0, 0)
 	G.rectangle("fill", self.x - 10, self.y - 10, 20, 20)

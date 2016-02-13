@@ -1,15 +1,13 @@
 local G = love.graphics
 
-Enemy = Object:new {
-	list = {},
+Enemy = BatchDrawer(100, {
 	ang = 0,
 	flash = 0,
 	score = 0,
-	size = 16,
 	frame_length = 4,
 	alive = true,
 	hit_by_energy_blast = false,
-}
+})
 function Enemy:init(rand, x, y)
 	table.insert(self.list, self)
 	self.rand = rand
@@ -66,29 +64,38 @@ function Enemy:update()
 		end
 	end
 
-
 	self:subUpdate()
 end
 function Enemy:draw()
-	if self.flash > 0 then G.setShader(flash_shader) end
+	local s = self.__index
+	for k, v in pairs(_G) do
+		if s == v then print(k) end
+	end
+--	print(self.quads.name)
+	if self.flash > 0 then
+		self.quads.batch:setColor(127, 0, 0)
+	else
+		self.quads.batch:setColor(0, 0, 0, 0)
+	end
 	self:subDraw()
-	if self.flash > 0 then G.setShader() end
 end
 function Enemy:subDraw()
-	G.setColor(255, 255, 255)
-	G.draw(self.img, self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
+	self.quads.batch:add(self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
 		self.x, self.y, -self.ang, 4, 4, self.size / 2, self.size / 2)
 --	G.polygon("line", self.trans_model)
 end
 
 
-Bullet = Object:new {
-	list = {},
-	color = { 255, 36, 36 },
+
+
+
+
+-- bullet ----------------------------------------------------------------------
+Bullet = BatchDrawer(200, {
 	frame_length = 4,
 	size = 8,
 	ang = 0,
-}
+})
 function Bullet:init(x, y, vx, vy)
 	table.insert(self.list, self)
 	self.trans_model = {}
@@ -171,27 +178,32 @@ function Bullet:update()
 	end
 end
 function Bullet:draw()
-	G.setColor(255, 255, 255)
-	G.draw(self.img, self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
+	self.quads.batch:add(self.quads[math.floor(self.tick / self.frame_length) % #self.quads + 1],
 		self.x, self.y, -self.ang, 4, 4, self.size / 2, self.size / 2)
 --	G.polygon("line", self.trans_model)
 end
 
 
-BulletParticle = SparkParticle:new {
+BulletParticle = SparkParticle:New {
 	friction = 0.9,
 }
 function BulletParticle:init(x, y, color)
 	self:super(x, y)
 	self.color = color
 end
-PlasmaBullet = Bullet:new {
+PlasmaBullet = Bullet:New {
+	color = { 255, 36, 36 },
 	model = { 4, 4, 4, -4, -4, -4, -4, 4, },
-	img = G.newImage("media/plasma.png"),
 	frame_length = 2,
 	size = 7,
 }
-genQuads(PlasmaBullet)
+PlasmaBullet:InitQuads("media/plasma_bullet.png")
+initPolygonRadius(PlasmaBullet.model)
+
+
+
+
+-- more enemies
 
 require "blockade_enemy"
 require "cannon_enemy"

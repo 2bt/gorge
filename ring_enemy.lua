@@ -1,13 +1,14 @@
 local G = love.graphics
 
-RingEnemy = Enemy:new {
-	img = G.newImage("media/ring.png"),
+RingEnemy = Enemy:New {
+	size = 16,
 	shield = 1,
 	score = 100,
 	model = { 8, 16, 12, 8, 12, -8, 8, -16, -8, -16, -12, -8, -12, 8, -8, 16, },
 	counter = 0
 }
-genQuads(RingEnemy)
+RingEnemy:InitQuads("media/ring.png")
+initPolygonRadius(RingEnemy.model)
 function RingEnemy:init(...)
 	self:super(...)
 	self:turnTo(0.2, math.pi - 0.2)

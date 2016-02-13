@@ -1,7 +1,7 @@
 local G = love.graphics
 
 
-Boom = Object:new {
+Boom = Object:New {
 	list = {}
 }
 

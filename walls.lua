@@ -1,7 +1,7 @@
 local G = love.graphics
 
 
-Walls = Object:new {
+Walls = Object:New {
 	img = G.newImage("media/walls.png"),
 	speed = 1,
 	W = 26,

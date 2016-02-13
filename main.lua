@@ -15,7 +15,8 @@ do
 end
 
 
-MOBILE = true
+
+--MOBILE = true
 DEBUG = false
 
 
@@ -38,6 +39,9 @@ require "sound"
 require "game"
 require "menu"
 
+QuadGenerator:GenerateQuads()
+
+
 
 font = Font()
 
@@ -47,37 +51,39 @@ state = menu
 
 keyboard = Input()
 
+
+
+time_draw = 0
+time_update = 0
+
 --bg_music = love.audio.newSource("media/music.ogg", "stream")
 --bg_music:setLooping(true)
 
 
 function love.update()
+	local t = love.timer.getTime()
+
 	updateList(Input.list)
 	state:update()
-	if love.keyboard.isDown("^") then -- fast forward
-		for i = 1, 20 do
-			state:update()
-		end
+
+	-- fast forward
+	if love.keyboard.isDown("^") then
+		for i = 1, 20 do state:update() end
 	end
+
+	time_update = love.timer.getTime() - t
 end
---counter = -16
 function love.draw()
---	if counter == 0 then Particle.list = {} end
+	local t = love.timer.getTime()
 
 	state:draw()
 
---	if counter >= 0 then
---		local banner = love.image.newImageData(500, 128)
---		banner:paste(G.newScreenshot(false), 0, 0, 150, 112, 500, 128)
---		banner:encode("png", ("%04d.png"):format(counter))
---	end
---	if counter > 100 and #Particle.list == 0 then
---		os.exit()
---	end
---	counter = counter + 1
+	time_draw = love.timer.getTime() - t
 
 	G.setColor(255, 255, 255)
-	G.print(love.timer.getFPS(), 10, 50)
+	G.print(love.timer.getFPS(), 10, 40)
+	G.print(("%.2f"):format(time_update * 1000), 10, 60)
+	G.print(("%.2f"):format(time_draw   * 1000), 10, 80)
 end
 function love.keypressed(key)
 	keyboard:keypressed(key)
@@ -89,4 +95,3 @@ function love.resize()
 	Boom.canvas = G.newCanvas()
 	Game.canvas = G.newCanvas()
 end
-

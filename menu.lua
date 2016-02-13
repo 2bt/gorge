@@ -324,7 +324,7 @@ function Menu:draw()
 	if self.state == "main" then
 		G.setColor(255, 255, 255)
 		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
-		drawList(Particle.list)
+		Particle:DrawAll()
 
 		G.setColor(255, 255, 255)
 		for i, m in ipairs(self.options.main) do
@@ -341,13 +341,10 @@ function Menu:draw()
 
 		G.setColor(255, 255, 255)
 		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
-		drawList(Particle.list)
+		Particle:DrawAll()
 
 		local x = 184
 		local y = 320
-
---		G.setColor(255, 255, 0)
---		font:print("OPTIONS", x, 72)
 
 		G.setColor(255, 255, 255)
 		for i, m in ipairs(self.options.options) do
@@ -386,8 +383,6 @@ function Menu:draw()
 			end
 		end
 	end
-
-
 
 
 	if self.blend > 0 then
