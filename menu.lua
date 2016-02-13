@@ -8,7 +8,7 @@ function submitOnlineHighscore(highscore)
 	end
 	local ret, err = http.request(url, msg)
 	if err == 200 then return tonumber(ret) end
-	print("submitting online highscore failed: " .. err)
+	print("Submitting online highscore failed: " .. err)
 	print(ret, err)
 end
 
@@ -18,7 +18,7 @@ local G = love.graphics
 
 
 local stats = {
-	version = 1,
+	version = 0,
 	highscore = {
 		{ "", 10000 },
 		{ "",  9000 },

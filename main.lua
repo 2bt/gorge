@@ -16,7 +16,7 @@ end
 
 
 
---MOBILE = true
+MOBILE = true
 DEBUG = false
 
 
@@ -52,17 +52,11 @@ state = menu
 keyboard = Input()
 
 
-
-time_draw = 0
-time_update = 0
-
 --bg_music = love.audio.newSource("media/music.ogg", "stream")
 --bg_music:setLooping(true)
 
 
 function love.update()
-	local t = love.timer.getTime()
-
 	updateList(Input.list)
 	state:update()
 
@@ -70,20 +64,11 @@ function love.update()
 	if love.keyboard.isDown("^") then
 		for i = 1, 20 do state:update() end
 	end
-
-	time_update = love.timer.getTime() - t
 end
 function love.draw()
-	local t = love.timer.getTime()
-
 	state:draw()
-
-	time_draw = love.timer.getTime() - t
-
 	G.setColor(255, 255, 255)
 	G.print(love.timer.getFPS(), 10, 40)
-	G.print(("%.2f"):format(time_update * 1000), 10, 60)
-	G.print(("%.2f"):format(time_draw   * 1000), 10, 80)
 end
 function love.keypressed(key)
 	keyboard:keypressed(key)
@@ -95,3 +80,10 @@ function love.resize()
 	Boom.canvas = G.newCanvas()
 	Game.canvas = G.newCanvas()
 end
+
+function love.focus(f)
+	if f == false and state == game then
+		game:setPause(true)
+	end
+end
+

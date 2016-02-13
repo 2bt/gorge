@@ -67,11 +67,6 @@ function Enemy:update()
 	self:subUpdate()
 end
 function Enemy:draw()
-	local s = self.__index
-	for k, v in pairs(_G) do
-		if s == v then print(k) end
-	end
---	print(self.quads.name)
 	if self.flash > 0 then
 		self.quads.batch:setColor(127, 0, 0)
 	else

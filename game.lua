@@ -139,6 +139,10 @@ function Game:next_wall_row()
 		end
 	end
 end
+function Game:setPause(p)
+	self.pause = p
+	sound.pauseLoopSources(self.pause)
+end
 function Game:update()
 	-- DEBUG
 --	love.timer.sleep(0.05)
@@ -148,17 +152,26 @@ function Game:update()
 		sound.play("back")
 		self.action = "BACK"
 	end
-	if not self.action and Input:gotAnyPressed("start") then
-		sound.play("pause")
-		self.pause = not self.pause
-		sound.pauseLoopSources(self.pause)
-	end
 
-	-- blend
 	if not self.action then
+		-- blend
 		if self.blend > 0 then
 			self.blend = self.blend - 0.1
 		end
+
+		-- pause
+		if Input:gotAnyPressed("start") then
+			sound.play("pause")
+			self:setPause(not self.pause)
+		else
+			if self.pause and self.input:gotPressed("a") then
+				sound.play("pause")
+				self:setPause(false)
+			end
+		end
+
+
+		if self.pause then return end
 	else
 		if self.blend < 1 then
 			self.blend = self.blend + 0.1
@@ -172,28 +185,12 @@ function Game:update()
 		end
 	end
 
-	-- pause
-	if self.pause then return end
 
 
 	self.tick = self.tick + 1
 
 	-- input
 	local input = {}
---	if self.is_demo then
---		local i = self.record[self.tick] or 5
---		input.dx = i % 4 - 1
---		input.dy = math.floor(i / 4) % 4 - 1
---		input.a = math.floor(i / 16) % 2 > 0
---		input.b = math.floor(i / 32) % 2 > 0
---		if not self.record[self.tick] then self.action = "BACK" end
---	else
---		input = self.input.state
---		self.record[self.tick]	= (1 + input.dx)
---								+ (1 + input.dy) * 4
---								+ bool[input.a] * 16
---								+ bool[input.b] * 32
---	end
 	if self.is_demo then
 		local i = self.record[self.tick] or {}
 		input.dx = i[1] or 0

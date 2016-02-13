@@ -102,7 +102,6 @@ end
 
 SaucerParticle = Particle:New {
 	size = 24,
-	img = SaucerEnemy.img,
 	quads = SaucerEnemy.quads,
 	layer = "back",
 }
@@ -130,8 +129,8 @@ function SaucerParticle:update()
 	end
 end
 function SaucerParticle:draw()
-	G.setColor(127, 127, 127)
-	G.draw(self.img, self.quads[1],
+	self.quads.batch:setColor(127, 127, 127)
+	self.quads.batch:add(self.quads[1],
 		self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
 end
 

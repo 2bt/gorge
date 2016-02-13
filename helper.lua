@@ -210,7 +210,8 @@ function QuadGenerator:init(maxsprites)
 
 end
 function QuadGenerator:requestQuads(imagename, size)
-	local quads = { name = imagename }
+--	local quads = { name = imagename }
+	local quads = {}
 	local data = love.image.newImageData(imagename)
 	table.insert(self.image_table, {
 		quads = quads,
@@ -243,12 +244,11 @@ function QuadGenerator:generateQuads()
 	local y = 0
 	for _, img in ipairs(self.image_table) do
 		img.quads.batch = self.batch
---		print(img.width, img.height)
 		for x = 0, img.width - img.height, img.height do
 			table.insert(img.quads, G.newQuad(x, y, img.height, img.height, width, height))
 		end
 		y = y + img.height
-		print(img.quads.name, #img.quads)
+--		print(img.quads.name, #img.quads)
 	end
 
 	self.image_table = nil
