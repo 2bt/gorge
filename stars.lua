@@ -32,7 +32,6 @@ float perlin(vec2 p) {
 	return c / 2.0;
 }
 vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
-]]..(COMPATIBILITY and "screen_coords.y = 150 - screen_coords.y;" or "")..[[
 	vec2 p = (screen_coords - vec2(0.0, xx)) * 0.0016;
 	float f = max(0.0, pow(perlin(p), 1.0) - 0.41);
 	f = floor(f * 16.0) / 16.0;

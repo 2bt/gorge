@@ -8,16 +8,7 @@ local G = love.graphics
 do
 	local a, b, c = love.getVersion()
 	VERSION = a ..".".. b ..".".. c
-	local v = a * 10000 + b * 100 + c
-	if v < 1000 then
-		COMPATIBILITY = true
-		local b = G.setBlendMode
-		G.setBlendMode = function(m)
-			b(({ ["add"] = "additive" })[m] or m)
-		end
-	end
 end
-
 
 
 love.mouse.setVisible(false)
