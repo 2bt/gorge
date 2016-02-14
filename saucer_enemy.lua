@@ -14,14 +14,14 @@ SaucerEnemy = Enemy:New {
 		-40, 8,
 	},
 	bounce_model = {
-		32, 64,
-		64, 32,
-		64, -32,
-		32, -64,
-		-32, -64,
-		-64, -32,
-		-64, 32,
-		-32, 64,
+		24, 48,
+		48, 24,
+		48, -24,
+		24, -48,
+		-24, -48,
+		-48, -24,
+		-48, 24,
+		-24, 48,
 	},
 
 	shield = 20,
@@ -99,7 +99,13 @@ function SaucerEnemy:subUpdate()
 
 	transform(self, self.model)
 end
-
+--function SaucerEnemy:draw()
+--	G.setColor(255, 255, 255)
+--	G.polygon("line", self.trans_model)
+--	transform(self, self.bounce_model)
+--	G.polygon("line", self.trans_model)
+--	transform(self, self.model)
+--end
 SaucerParticle = Particle:New {
 	size = 24,
 	quads = SaucerEnemy.quads,

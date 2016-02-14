@@ -3,7 +3,8 @@ local G = love.graphics
 flash_shader = G.newShader([[
 vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 	vec4 tc = texture2D(tex, tex_coords);
-	return tc + vec4(vec3(1.0, 1.0, 1.0) - tc.rgb, 0.0) * col.x;
+	tc = vec4(tc.xyz * col.xyz, tc.w);
+	return tc + vec4(vec3(1.0, 1.0, 1.0) - tc.rgb, 0.0) * (1.0 - col.w);
 }]])
 
 Game = Object:New {}
@@ -195,16 +196,22 @@ function Game:update()
 		local i = self.record[self.tick] or {}
 		input.dx = i[1] or 0
 		input.dy = i[2] or 0
-		local b = i[3] or ""
-		input.a = b:match("a")
-		input.b = b:match("b")
+		input.a = i[3] == 1
+		input.b = i[4] == 1
 		if not self.record[self.tick] then self.action = "BACK" end
 	else
 		input = self.input.state
-		local b = (input.a and "a" or "") .. (input.b and "b" or "")
-		local i = { input.dx, input.dy }
-		if b ~= "" then i[3] = b end
-		self.record[self.tick] = i
+		local ri = {
+			input.dx,
+			input.dy,
+			input.a and 1 or 0,
+			input.b and 1 or 0,
+		}
+		for i = #ri, 1, -1 do
+			if ri[i+1] then break end
+			if ri[i] == 0 then ri[i] = nil end
+		end
+		self.record[self.tick] = ri
 	end
 
 
@@ -359,7 +366,7 @@ end
 		G.clear(0, 0, 0, 255)
 		G.setColor(255, 255, 255)
 		G.setBlendMode("add")
-		drawList(Boom.list)
+		Boom:DrawAll()
 		G.setBlendMode("alpha")
 	end)
 
@@ -367,20 +374,27 @@ end
 	-- background stuff
 	self.canvas:renderTo(function()
 		G.clear(0, 0, 0, 255)
+
 		self.stars:draw()
 
-		Particle:DrawAll("back")
+		Particle:DrawBatch("back")
 		G.setColor(255, 255, 255)
-		Item:DrawAll("back")
+		Item:DrawBatch("back")
 
-		G.setShader(flash_shader)
+		Player.quad_generator.batch:clear()
 		Enemy:DrawAll()
+		self.player:draw()
+		G.setShader(flash_shader)
+		G.draw(Player.quad_generator.batch)
 		G.setShader()
 
+		-- draw lasers and bullets
 		G.setColor(255, 255, 255)
+		Laser.quad_generator.batch:clear()
 		Bullet:DrawAll()
 		Laser:DrawAll()
-		self.player:draw()
+		G.draw(Laser.quad_generator.batch)
+
 		self.walls:draw()
 	end)
 
@@ -405,8 +419,8 @@ if DEBUG then
 	G.translate(0, 650)
 	G.rectangle("line", -400, -300, 800, 600)
 end
-	Particle:DrawAll("front")
-	Item:DrawAll("front")
+	Particle:DrawBatch("front")
+	Item:DrawBatch("front")
 
 
 

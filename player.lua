@@ -1,21 +1,24 @@
 local G = love.graphics
+local quad_generator = QuadGenerator(200)
 
 BallField = Object:New {
-	img = G.newImage("media/ball_field.png"),
+	quad_generator = quad_generator,
+	size = 16,
 	model = { 8, 16, 16, 8, 16, -8, 8, -16, -8, -16, -16, -8, -16, 8, -8, 16, },
 }
-genQuads(BallField, 16)
+BallField:InitQuads("media/ball_field.png")
 initPolygonRadius(BallField.model)
 function BallField:init()
 	self.trans_model = {}
 end
 
 Ball = Object:New {
+	quad_generator = quad_generator,
+	size = 8,
 	model = { 6, 6, 6, -6, -6, -6, -6, 6, },
-	img = G.newImage("media/ball.png")
 }
+Ball:InitQuads("media/ball.png")
 initPolygonRadius(Ball.model)
-genQuads(Ball, 8)
 function Ball:init(player, dir)
 	self.player = player
 	self.dir = dir
@@ -89,34 +92,35 @@ function Ball:drawField()
 	if not self.alive then return end
 	local q1 = math.floor( self.player.tick      / 4) % #self.field.quads + 1
 	local q2 = math.floor((self.player.tick + 3) / 4) % #self.field.quads + 1
-	G.setColor(0, 80, 80, 200)
-	G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-	G.setColor(40 + math.sin(self.player.tick / 2) * 40, 80, 80, 200)
-	G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
+	self.quads.batch:setColor(0, 80, 80)
+	self.quads.batch:add(self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
+	self.quads.batch:setColor(40 + math.sin(self.player.tick / 2) * 40, 80, 80)
+	self.quads.batch:add(self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
 end
 function Ball:draw()
 	if not self.alive then return end
-	G.setColor(255, 255, 255)
 	local f = math.floor(self.player.tick / 4) % #self.quads + 1
-	G.draw(self.img, self.quads[f], self.x, self.y, 0, 4 * self.dir, 4, 4, 4)
---	G.polygon("line", self.trans_model)
---	if self.field.trans_model[1] then G.polygon("line", self.field.trans_model) end
+	self.quads.batch:setColor(255, 255, 255)
+	self.quads.batch:add(self.quads[f], self.x, self.y, 0, 4 * self.dir, 4, 4, 4)
 end
-
 
 
 
 Player = Object:New {
+	quad_generator = quad_generator,
+	size = 16,
 	img = G.newImage("media/player.png"),
 	model = { 16, 16, 16, 0, 4, -12, -4, -12, -16, 0, -16, 16, },
-	field = {
+	field = Object:New {
+		size = 16,
 		img = G.newImage("media/field.png"),
 		model = { 16, 24, 24, 16, 24, 0, 4, -20, -4, -20, -24, 0, -24, 16, -16, 24, },
 		trans_model = {},
 	}
 }
-genQuads(Player, 16)
-genQuads(Player.field, 16)
+Player.field.quad_generator = Player.quad_generator
+Player:InitQuads("media/player.png")
+Player.field:InitQuads("media/field.png")
 initPolygonRadius(Player.model)
 initPolygonRadius(Player.field.model)
 function Player:init()
@@ -314,40 +318,33 @@ function Player:draw()
 
 	if not self.alive then return end
 
+	local batch = self.quads.batch
 
 	-- field
 	if self.field_active then
-
 		self.balls[1]:drawField()
 		self.balls[2]:drawField()
-
 		local q1 = math.floor( self.tick      / 4) % #self.field.quads + 1
 		local q2 = math.floor((self.tick + 3) / 4) % #self.field.quads + 1
-		G.setColor(0, 80, 80, 200)
-		G.draw(self.field.img, self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-		G.setColor(40 + math.sin(self.tick / 2) * 40, 80, 80, 200)
-		G.draw(self.field.img, self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
+		batch:setColor(0, 80, 80)
+		batch:add(self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
+		batch:setColor(40 + math.sin(self.tick / 2) * 40, 80, 80)
+		batch:add(self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
 	end
 
 	-- balls
 	self.balls[1]:draw()
 	self.balls[2]:draw()
 
-
 	if self.invincible % 8 >= 4 then return end
 
-
 	if self.flash > 0 then
-		G.setShader(flash_shader)
-		G.setColor(127, 0, 0)
+		batch:setColor(255, 255, 255, 127)
 	else
-		G.setColor(255, 255, 255)
+		batch:setColor(255, 255, 255)
 	end
-	G.draw(self.img,
-		self.quads[1 + math.floor(self.tick / 8 % 2)],
+	batch:add(self.quads[1 + math.floor(self.tick / 8 % 2)],
 		self.x, self.y, 0, 4, 4, 8, 8)
-
-	if self.flash > 0 then G.setShader() end
 
 --	if self.trans_model[1] then G.polygon("line", self.trans_model) end
 --	if self.field.trans_model[1] then G.polygon("line", self.field.trans_model) end
@@ -356,10 +353,12 @@ end
 
 
 
-Laser = BatchDrawer(50, {
+Laser = Object:New {
+	quad_generator = QuadGenerator(200),
+	list = {},
 	model = { -2, 10, 2, 10, 2, -10, -2, -10, },
 	damage = 1
-})
+}
 Laser:InitQuads("media/laser.png")
 initPolygonRadius(Laser.model)
 function Laser:init(x, y, vx, vy)
@@ -485,9 +484,10 @@ function EnergyBlast:draw()
 		self.shader:send("r", self.r)
 		self.shader:send("s", self.s)
 
+		local s = G.getShader()
 		G.setShader(self.shader)
 		G.rectangle("fill", 0, 0, 128, 128)
-		G.setShader()
+		G.setShader(s)
 		G.pop()
 	end)
 	G.setColor(255, 255, 255, 200)

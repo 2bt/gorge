@@ -2,7 +2,7 @@ GORGE
 =====
 
 Endless shoot 'em up game.
-It's still kinda in development but already playable.
+It's still kinda in development but already playable, even on Android.
 You'll need LÖVE 0.9.1 or newer.
 
 ### Controls ###

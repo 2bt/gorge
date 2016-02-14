@@ -18,7 +18,7 @@ local G = love.graphics
 
 
 local stats = {
-	version = 0,
+	version = 3,
 	highscore = {
 		{ "", 10000 },
 		{ "",  9000 },
@@ -38,8 +38,13 @@ local stats = {
 	demo = nil,
 }
 
-if love.filesystem.isFile(VERSION) then
-	local s = loadstring("return " .. love.filesystem.read(VERSION))()
+function loadStats()
+	if not love.filesystem.isFile(VERSION) then return end
+	local zipped = love.filesystem.read(VERSION)
+	local unzipped
+	pcall(function() unzipped = love.math.decompress(zipped, "zlib") end)
+	if not unzipped then return end
+	local s = loadstring("return " .. unzipped)()
 
 	-- patch
 	if s.version ~= stats.version then
@@ -47,44 +52,45 @@ if love.filesystem.isFile(VERSION) then
 
 		-- delete demo as it won't play correctly any more
 		s.demo = nil
-
-
 	end
 
 	stats = s
 	sound.setVolume(stats.sound_vol / 10)
 	love.window.setFullscreen(stats.fullscreen, "desktop")
 end
+loadStats()
 
 local function saveStats()
-	local f = love.filesystem.newFile(VERSION, "w")
+	local buf = {}
 	local function w(o)
 		local t = type(o)
 		if t == "table" then
-			f:write("{")
+			buf[#buf+1] = "{"
 			if o[1] then
-				for _, a in ipairs(o) do
+				for i, a in ipairs(o) do
+					if i > 1 then buf[#buf+1] = "," end
 					w(a)
-					f:write(",")
 				end
 			else
 				for k, a in pairs(o) do
-					f:write(k .. "=")
+					buf[#buf+1] = k .. "="
 					w(a)
-					f:write(",")
+					buf[#buf+1] = ","
 				end
 			end
-			f:write("}")
+			buf[#buf+1] = "}"
 		elseif t == "string" then
-			f:write(("%q"):format(o))
+			buf[#buf+1] = ("%q"):format(o)
 		else
-			f:write(tostring(o))
+			buf[#buf+1] = tostring(o)
 		end
 	end
 	w(stats)
+	local zipped = love.math.compress(table.concat(buf), "zlib")
+	local f = love.filesystem.newFile(VERSION, "w")
+	f:write(zipped)
 	f:close()
 end
-
 
 Menu = Object()
 Menu.img = G.newImage("media/title.png")
@@ -243,6 +249,7 @@ function Menu:update()
 				state = game
 				game:start(love.math.random(0xfffffff), self.input)
 			elseif self.action == "HIGHSCORE" then
+				love.keyboard.setTextInput(true)
 				self:swapState("highscore")
 			elseif self.action == "OPTIONS" then
 				self:swapState("options")

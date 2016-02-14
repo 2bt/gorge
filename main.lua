@@ -1,3 +1,7 @@
+MOBILE = (love.system.getOS() == "Android")
+DEBUG = false
+
+
 local G = love.graphics
 
 -- compatibility
@@ -14,10 +18,6 @@ do
 	end
 end
 
-
-
-MOBILE = true
-DEBUG = false
 
 
 love.mouse.setVisible(false)
@@ -40,8 +40,6 @@ require "game"
 require "menu"
 
 QuadGenerator:GenerateQuads()
-
-
 
 font = Font()
 
@@ -67,8 +65,8 @@ function love.update()
 end
 function love.draw()
 	state:draw()
-	G.setColor(255, 255, 255)
-	G.print(love.timer.getFPS(), 10, 40)
+--	G.setColor(255, 255, 255)
+--	G.print(love.timer.getFPS(), 10, 40)
 end
 function love.keypressed(key)
 	keyboard:keypressed(key)
@@ -86,4 +84,3 @@ function love.focus(f)
 		game:setPause(true)
 	end
 end
-

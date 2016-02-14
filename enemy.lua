@@ -1,13 +1,15 @@
 local G = love.graphics
 
-Enemy = BatchDrawer(100, {
+Enemy = Object:New {
+	quad_generator = Player.quad_generator,
+	list = {},
 	ang = 0,
 	flash = 0,
 	score = 0,
 	frame_length = 4,
 	alive = true,
 	hit_by_energy_blast = false,
-})
+}
 function Enemy:init(rand, x, y)
 	table.insert(self.list, self)
 	self.rand = rand
@@ -68,9 +70,9 @@ function Enemy:update()
 end
 function Enemy:draw()
 	if self.flash > 0 then
-		self.quads.batch:setColor(127, 0, 0)
+		self.quads.batch:setColor(255, 255, 255, 127)
 	else
-		self.quads.batch:setColor(0, 0, 0, 0)
+		self.quads.batch:setColor(255, 255, 255)
 	end
 	self:subDraw()
 end
@@ -86,11 +88,13 @@ end
 
 
 -- bullet ----------------------------------------------------------------------
-Bullet = BatchDrawer(200, {
+Bullet = Object:New {
+	quad_generator = Laser.quad_generator,
+	list = {},
 	frame_length = 4,
 	size = 8,
 	ang = 0,
-})
+}
 function Bullet:init(x, y, vx, vy)
 	table.insert(self.list, self)
 	self.trans_model = {}

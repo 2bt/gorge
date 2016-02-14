@@ -210,7 +210,6 @@ function QuadGenerator:init(maxsprites)
 
 end
 function QuadGenerator:requestQuads(imagename, size)
---	local quads = { name = imagename }
 	local quads = {}
 	local data = love.image.newImageData(imagename)
 	table.insert(self.image_table, {
@@ -222,16 +221,14 @@ function QuadGenerator:requestQuads(imagename, size)
 	return quads
 end
 function QuadGenerator:generateQuads()
-
+	-- merge image
 	local width = 0
 	local height = 0
 	for _, img in ipairs(self.image_table) do
 		width = math.max(width, img.width)
 		height = height + img.height
 	end
-
 	local data = love.image.newImageData(width, height)
-
 	local y = 0
 	for _, img in ipairs(self.image_table) do
 		data:paste(img.data, 0, y, 0, 0, img.width, img.height)
@@ -241,6 +238,7 @@ function QuadGenerator:generateQuads()
 	self.img = G.newImage(data)
 	self.batch = G.newSpriteBatch(self.img, self.maxsprites, "stream")
 
+	-- generate quads
 	local y = 0
 	for _, img in ipairs(self.image_table) do
 		img.quads.batch = self.batch
@@ -248,7 +246,6 @@ function QuadGenerator:generateQuads()
 			table.insert(img.quads, G.newQuad(x, y, img.height, img.height, width, height))
 		end
 		y = y + img.height
---		print(img.quads.name, #img.quads)
 	end
 
 	self.image_table = nil
@@ -264,7 +261,7 @@ end
 function BatchDrawer:InitQuads(imagename)
 	self.quads = self.quad_generator:requestQuads(imagename, self.size)
 end
-function BatchDrawer:DrawAll(layer)
+function BatchDrawer:DrawBatch(layer)
 	self.quad_generator.batch:clear()
 	if layer then
 		for _, o in ipairs(self.list) do
@@ -274,4 +271,12 @@ function BatchDrawer:DrawAll(layer)
 		for _, o in ipairs(self.list) do o:draw() end
 	end
 	G.draw(self.quad_generator.batch)
+end
+
+
+function Object:InitQuads(imagename)
+	self.quads = self.quad_generator:requestQuads(imagename, self.size)
+end
+function Object:DrawAll()
+	for _, o in ipairs(self.list) do o:draw() end
 end
