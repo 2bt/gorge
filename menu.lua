@@ -341,8 +341,8 @@ function Menu:draw()
 			font:print(">", 248, 320 + 40 * (self.select - 1))
 		end
 
-		G.setColor(40, 40, 40)
-		font:printCentered("\0 2015 DANIEL LANGNER", 400, 360 + 40 * 5)
+		G.setColor(80, 80, 80)
+		font:printCentered("\0 2016 DANIEL LANGNER", 400, 360 + 40 * 5)
 
 	elseif self.state == "options" then
 
@@ -369,8 +369,8 @@ function Menu:draw()
 		G.rectangle("fill", x + 8 + 6 * 4 * 13, y+12 + 40 * 1, 12 * stats.music_vol, 12)
 
 
-		G.setColor(40, 40, 40)
-		font:printCentered("\0 2015 DANIEL LANGNER", 400, 360 + 40 * 5)
+		G.setColor(80, 80, 80)
+		font:printCentered("\0 2016 DANIEL LANGNER", 400, 360 + 40 * 5)
 
 
 	elseif self.state == "highscore" then
