@@ -207,7 +207,7 @@ function Player:update(input)
 		self.blast = self.blast - 1
 	else
 --		speed = 3 + self.speed_boost * 0.2
-		speed = math.sqrt(self.speed_boost + 9)
+		speed = (self.speed_boost + 9) ^ 0.5
 
 		if self.shoot_delay > 0 or input.a then
 			speed = speed * 0.5

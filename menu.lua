@@ -18,7 +18,7 @@ local G = love.graphics
 
 
 local stats = {
-	version = 3,
+	version = 4,
 	highscore = {
 		{ "", 10000 },
 		{ "",  9000 },

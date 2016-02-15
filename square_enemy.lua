@@ -56,9 +56,9 @@ function SquareEnemy:subUpdate()
 	if self.y < -300 or self.y > 300 then return end
 	if not game.player.alive then return end
 
-	if self.delay <= 10
-	or not game.walls:checkSight(self.x, self.y, game.player.x, game.player.y) then
-		self.delay = self.delay - 1
+
+	if self.delay == 10 and game.walls:checkSight(self.x, self.y, game.player.x, game.player.y) then
+		self.delay = self.rand.int(10, 60)
 	end
 	if self.delay <= 10 and self.delay % 10 == 0 then
 		local dx = game.player.x - self.x
@@ -71,6 +71,7 @@ function SquareEnemy:subUpdate()
 			self.delay = self.rand.int(200, 300)
 		end
 	end
+	self.delay = self.delay - 1
 end
 RapidBullet = Bullet:New {
 	color = { 146, 255, 146 },

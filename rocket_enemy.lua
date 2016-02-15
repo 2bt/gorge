@@ -39,14 +39,14 @@ function RocketEnemy:subUpdate()
 	transform(self)
 
 
-	if self.entered_screen and not self.active and game.player.alive
-	and not game.walls:checkSight(self.x, self.y, game.player.x, game.player.y) then
+	if self.entered_screen and not self.active and game.player.alive then
 		local dx = game.player.x - self.x
 		local dy = game.player.y - self.y
 		local dot = self.nx * dx + self.ny * dy
 		if dot > 0 then
 			local cross = self.nx * dy - self.ny * dx
-			if math.abs(cross) < 50 then
+			if math.abs(cross) < 50
+			and not game.walls:checkSight(self.x, self.y, game.player.x, game.player.y) then
 				self.active = true
 				self.engine_sound:play()
 			end

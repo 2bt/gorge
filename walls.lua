@@ -326,32 +326,51 @@ local function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
 end
 
 function Walls:checkSight(ax, ay, bx, by)
-	local result = nil
+	local abx = bx - ax
+	local aby = by - ay
+	local l = (abx*abx + aby*aby) ^ 0.5
+	abx = abx / l
+	aby = aby / l
+
+
+--	local result = nil
 	local x1, y1 = self:getTileAddress(ax, ay)
 	local x2, y2 = self:getTileAddress(bx, by)
 	for y = math.min(y1, y2), math.max(y1, y2) do
 		local row = self.data[y]
 		if row then
 			for x = math.min(x1, x2), math.max(x1, x2) do
-				local p = self.polys[row[x]]
-				if p then
-
-					local qx = p[#p-1] + x * 32 - 448
-					local qy = p[#p] + 332 + self.offset - y * 32
-					for i = 1, #p, 2 do
-						local wx = p[i] + x * 32 - 448
-						local wy = p[i+1] + 332 + self.offset - y * 32
-
-						local u, v = checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
-						if u then
-							result = math.min(u, result or 1)
-						end
-
-						qx, qy = wx, wy
+				-- optimization
+				if self.polys[row[x]] then
+					local mx = x * 32 - 432
+					local my = 348 + self.offset - y * 32
+					local dist = (aby * (mx - ax)) - (abx * (my - ay))
+					if math.abs(dist) < 16 then
+						return true
+--						G.rectangle("line", mx - 16, my - 16, 32, 32)
 					end
 				end
+
+
+--				local p = self.polys[row[x]]
+--				if p then
+--					local qx = p[#p-1] + x * 32 - 448
+--					local qy = p[#p] + 332 + self.offset - y * 32
+--					for i = 1, #p, 2 do
+--						local wx = p[i] + x * 32 - 448
+--						local wy = p[i+1] + 332 + self.offset - y * 32
+--						local u, v = checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
+--						if u then
+--							result = math.min(u, result or 1)
+--						end
+--						qx, qy = wx, wy
+--					end
+--				end
+
+
 			end
 		end
 	end
-	return result
+--	return result
+	return false
 end

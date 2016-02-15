@@ -134,7 +134,7 @@ function polygonCollision(a, b)
 				end
 			end
 			if c_d == 0 then return 0 end
-			local l = math.sqrt(nx * nx + ny * ny)
+			local l = (nx * nx + ny * ny) ^ 0.5
 			c_d = c_d /  l
 
 			if c_d < distance then
