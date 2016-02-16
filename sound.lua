@@ -2,6 +2,7 @@
 
 love.audio.setPosition(0, 0, -700)
 
+local volume = 1
 
 local sounds = {
 	pause			= { "media/pause.wav",			1 },
@@ -59,6 +60,7 @@ function sound.newLoopSource(name)
 	local s = love.audio.newSource(sounds[name].data)
 	s:setAttenuationDistances(700, 1000)
 	s:setLooping(true)
+	s:setVolume(volume)
 	loop_sources[s] = name
 	return s
 end
@@ -83,6 +85,7 @@ function sound.stopLoopSources()
 end
 
 function sound.setVolume(vol)
+	volume = vol
 	collectgarbage()
 	collectgarbage()
 	for s, n in pairs(loop_sources) do
