@@ -10,6 +10,7 @@ function submitOnlineHighscore(highscore)
 	if err == 200 then return tonumber(ret) end
 	print("Submitting online highscore failed: " .. err)
 	print(ret, err)
+	return 0
 end
 
 
