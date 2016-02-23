@@ -39,6 +39,7 @@ local stats = {
 	demo = nil,
 }
 
+
 function loadStats()
 	if not love.filesystem.isFile(VERSION) then return end
 	local zipped = love.filesystem.read(VERSION)
@@ -60,6 +61,7 @@ function loadStats()
 	love.window.setFullscreen(stats.fullscreen, "desktop")
 end
 loadStats()
+love.window.setMode(G.getWidth(), G.getHeight(), { vsync=true })
 
 local function saveStats()
 	local buf = {}
@@ -332,7 +334,7 @@ function Menu:draw()
 	if self.state == "main" then
 		G.setColor(255, 255, 255)
 		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
-		Particle:DrawAll()
+		Particle:DrawBatch()
 
 		G.setColor(255, 255, 255)
 		for i, m in ipairs(self.options.main) do
@@ -349,7 +351,7 @@ function Menu:draw()
 
 		G.setColor(255, 255, 255)
 		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
-		Particle:DrawAll()
+		Particle:DrawBatch()
 
 		local x = 184
 		local y = 320
