@@ -141,8 +141,10 @@ function Game:next_wall_row()
 	end
 end
 function Game:setPause(p)
-	self.pause = p
-	sound.pauseLoopSources(self.pause)
+	if not self.is_demo then
+		self.pause = p
+		sound.pauseLoopSources(self.pause)
+	end
 end
 function Game:update()
 	-- DEBUG

@@ -250,12 +250,9 @@ function Player:update(input)
 		sound.play("laser", self.x, self.y)
 		self.shoot_delay = 10
 		Laser(self.x, self.y - 4)
+
 		self.balls[1]:shoot(self.side_shoot)
 		self.balls[2]:shoot(self.side_shoot)
-
-
-		-- DEBUG
---		PraxisParticle(self.x, self.y)
 
 	end
 	if self.shoot_delay > 0 then
@@ -446,9 +443,9 @@ data:setPixel(4, 0, 0, 0, 0, 0)
 data:setPixel(5, 0, 255, 255, 255, 255)
 data:setPixel(6, 0, 0, 0, 0, 0)
 EnergyBlast.img = G.newImage(data)
-EnergyBlast.shader:send("table", EnergyBlast.img)
 
 function EnergyBlast:activate(x, y)
+	self.shader:send("table", self.img)
 	sound.play("blast", self.x, self.y)
 	self.damage = 4
 	self.alive = true

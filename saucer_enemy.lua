@@ -154,25 +154,10 @@ initPolygonRadius(SaucerBullet.model)
 PraxisParticle = Particle:New {
 	layer = "back",
 	canvas = G.newCanvas(80, 80),
-	-- TODO: fix this for android
---[=[
-	shader = G.newShader([[
-		uniform float f;
-		float a[5] = float[5]( 1.0, 1.0, 0.0, 0.0, 1.0 );
-		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
-			float d = distance(vec2(40.0, 40.0), screen_coords);
-			int i = int(f - d);
-			if (i >= 0 && i < a.length()) return vec4(col.rgb, col.a * a[i]);
-			return vec4(0.0);
-		}
-	]]),
---]=]
 	shader = G.newShader([[
 		uniform float f;
 		vec4 effect(vec4 col, sampler2D tex, vec2 tex_coords, vec2 screen_coords) {
 			float d = distance(vec2(40.0, 40.0), screen_coords);
-//			int i = int(f - d);
-//			if (i >= 0 && i < 5 && i != 2) return vec4(col.rgb, col.a);
 			d = f - d;
 			if (d >= 0.0 && d < 5.0 && !(d > 2.0 && d < 4.0)) return vec4(col.rgb, col.a);
 			return vec4(0.0);
@@ -191,14 +176,13 @@ function PraxisParticle:update()
 	if self.tick > 30 then return "kill" end
 end
 function PraxisParticle:draw()
-
 	local f = self.tick / 30
-	local c = (1 - f) ^ 0.4 * 200
+	local alpha = (1.02 - f) ^ 0.3 * 300 - 100
 	self.canvas:renderTo(function()
 		G.clear(0, 0, 0, 0)
 		G.push()
 		G.origin()
-		G.setColor(160, 160, 160, c)
+		G.setColor(160, 160, 160, alpha)
 		self.shader:send("f", (1 - 2 ^ (-3 * f)) * 40)
 		G.setShader(self.shader)
 		G.rectangle("fill", 0, 0, 80, 80)
