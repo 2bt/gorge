@@ -72,7 +72,7 @@ end
 if not MOBILE then
 
 function love.joystickadded(joy)
---	Input(joy)
+	Input(joy)
 end
 function love.joystickremoved(joy)
 	local i = 1

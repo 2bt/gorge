@@ -252,7 +252,7 @@ function Menu:update()
 				state = game
 				game:start(love.math.random(0xfffffff), self.input)
 			elseif self.action == "HIGHSCORE" then
-				love.keyboard.setTextInput(true)
+--				love.keyboard.setTextInput(true)
 				self:swapState("highscore")
 			elseif self.action == "OPTIONS" then
 				self:swapState("options")

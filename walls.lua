@@ -178,7 +178,7 @@ if DEBUG then
 		local row = self.gen_data[y]
 		for x, cell in ipairs(row) do
 			if cell > 0 then
-				batch.add(x * 32 - 448, 76 - y * 32 + self.offset - 32 * 20, 0, 4, 4)
+				batch:add(x * 32 - 448, 76 - y * 32 + self.offset - 32 * 20, 0, 4, 4)
 			end
 		end
 	end
