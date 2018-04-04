@@ -2,7 +2,7 @@ local G = love.graphics
 
 
 Particle = BatchDrawer(300, {
-	color = { 255, 255, 255 },
+	color = { 1, 1, 1 },
 	alive = true,
 	frame_length = 3,
 	layer = "front",
@@ -60,7 +60,7 @@ end
 
 
 LaserParticle = SparkParticle:New {
-	color = {0, 155, 155},
+	color = {0, 0.61, 0.61},
 	friction = 0.7,
 }
 
@@ -78,11 +78,11 @@ function ExplosionSparkParticle:init(x, y)
 	self.vx = math.sin(ang) * s
 	self.vy = math.cos(ang) * s
 	self.ttl = math.random(10, 15)
-	self.color = {255, math.random(0, 255), 0}
+	self.color = {1, math.random(), 0}
 end
 function ExplosionSparkParticle:draw()
 	local c = self.color
-	self.quads.batch:setColor(c[1], c[2], 0, math.min(255, self.ttl * 50))
+	self.quads.batch:setColor(c[1], c[2], 0, math.min(1, self.ttl * 0.2))
 	self.quads.batch:add(self.quads[1], self.x, self.y, 0, 4, 4, 1.5, 1.5)
 end
 
@@ -108,7 +108,7 @@ end
 SmokeParticle.update = SparkParticle.update
 function SmokeParticle:draw()
 	local f = math.max(1, #self.quads - math.floor(self.ttl / 3))
-	self.quads.batch:setColor(30, 30, 30, 150)
+	self.quads.batch:setColor(0.12, 0.12, 0.12, 0.59)
 	self.quads.batch:add(self.quads[f], self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
 end
 

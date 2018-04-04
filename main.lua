@@ -56,7 +56,7 @@ function love.update()
 end
 function love.draw()
 	state:draw()
---	G.setColor(255, 255, 255)
+--	G.setColor(1, 1, 1)
 --	G.print(love.timer.getFPS(), 10, 40)
 end
 function love.keypressed(key)

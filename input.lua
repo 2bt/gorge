@@ -44,8 +44,8 @@ function Input:update()
 			up		= self:_isDown("up"),
 			down	= self:_isDown("down"),
 			a		= self:_isDown("x"),
-			b		= self:_isDown("y") or isDown("z"),
-			start	= self:_isDown("space") or self:_isDown(" ") or self:_isDown("return"),
+			b		= self:_isDown("y") or self:_isDown("z"),
+			start	= self:_isDown("space") or self:_isDown("return"),
 			enter	= self:_isDown("return"),
 			back	= self:_isDown("escape"),
 		}

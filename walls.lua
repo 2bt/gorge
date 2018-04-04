@@ -167,7 +167,7 @@ function Walls:generate()
 end
 function Walls:draw()
 
-	G.setColor(84, 38, 90)
+	G.setColor(0.33, 0.15, 0.35)
 	local batch = self.batch
 	batch:clear()
 

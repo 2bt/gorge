@@ -365,8 +365,8 @@ end
 
 	-- bump texture
 	Boom.canvas:renderTo(function()
-		G.clear(0, 0, 0, 255)
-		G.setColor(255, 255, 255)
+		G.clear(0, 0, 0, 1)
+		G.setColor(1, 1, 1)
 		G.setBlendMode("add")
 		Boom:DrawAll()
 		G.setBlendMode("alpha")
@@ -375,12 +375,12 @@ end
 
 	-- background stuff
 	self.canvas:renderTo(function()
-		G.clear(0, 0, 0, 255)
+		G.clear(0, 0, 0, 1)
 
 		self.stars:draw()
 
 		Particle:DrawBatch("back")
-		G.setColor(255, 255, 255)
+		G.setColor(1, 1, 1)
 		Item:DrawBatch("back")
 
 		Player.quad_generator.batch:clear()
@@ -391,7 +391,7 @@ end
 		G.setShader()
 
 		-- draw lasers and bullets
-		G.setColor(255, 255, 255)
+		G.setColor(1, 1, 1)
 		Laser.quad_generator.batch:clear()
 		Bullet:DrawAll()
 		Laser:DrawAll()
@@ -403,7 +403,7 @@ end
 
 	-- apply bump
 	G.origin()
-	G.setColor(255, 255, 255)
+	G.setColor(1, 1, 1)
 	Boom.shader:send("bump", Boom.canvas)
 	G.setShader(Boom.shader)
 	G.setBlendMode("replace")
@@ -431,7 +431,7 @@ end
 	-- score
 	G.origin()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
-	G.setColor(255, 255, 255)
+	G.setColor(1, 1, 1)
 	font:print(("%07d"):format(self.player.score), 800 - 6 * 4 * 7 - 8, 0)
 
 	-- hearts
@@ -447,24 +447,24 @@ end
 	-- energy
 	local m = self.player.max_energy
 	local e = self.player.energy
-	G.setColor(60, 60, 60, 100)
+	G.setColor(0.235, 0.235, 0.235, 0.392)
 	G.rectangle("fill", 400-m*2,	8, 4*m, 4)
-	G.setColor(0, 200, 200)
+	G.setColor(0, 0.784, 0.784)
 	if self.player.field_active then
 		if self.tick % 8 < 4 then
-			G.setColor(0, 127, 127)
+			G.setColor(0, 0.498, 0.498)
 		end
 	else
 		if self.player.energy == self.player.max_energy and self.tick % 8 < 4 then
-			G.setColor(255, 255, 255)
+			G.setColor(1, 1, 1)
 		end
 	end
-	G.rectangle("fill", 400-m*2,	8, 4*e, 4)
+	G.rectangle("fill", 400-m*2, 8, 4*e, 4)
 
 
 	-- pause
 	if self.pause then
-		G.setColor(255, 255, 255)
+		G.setColor(1, 1, 1)
 		font:printCentered("PAUSE", 398, 300 - 20)
 	end
 
@@ -483,7 +483,7 @@ end
 		blend = math.max(blend, math.min(1, (self.outro - 200) / 50))
 	end
 	if blend > 0 then
-		G.setColor(0, 0, 0, blend * 255)
+		G.setColor(0, 0, 0, blend)
 		G.rectangle("fill", 0, 0, 800, 600)
 	end
 end

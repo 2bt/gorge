@@ -127,7 +127,7 @@ function TwisterEnemy:die()
 end
 -- for debuging
 function TwisterEnemy:subDraw_()
-	G.setColor(255, 0, 0)
+	G.setColor(1, 0, 0)
 	G.rectangle("fill", self.x - 10, self.y - 10, 20, 20)
 	transform(self, self.right_turn_model)
 	G.polygon("line", self.trans_model)

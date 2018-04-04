@@ -100,7 +100,7 @@ function SaucerEnemy:subUpdate()
 	transform(self, self.model)
 end
 --function SaucerEnemy:draw()
---	G.setColor(255, 255, 255)
+--	G.setColor(1, 1, 1)
 --	G.polygon("line", self.trans_model)
 --	transform(self, self.bounce_model)
 --	G.polygon("line", self.trans_model)
@@ -135,7 +135,7 @@ function SaucerParticle:update()
 	end
 end
 function SaucerParticle:draw()
-	self.quads.batch:setColor(127, 127, 127)
+	self.quads.batch:setColor(0.498, 0.498, 0.498)
 	self.quads.batch:add(self.quads[1],
 		self.x, self.y, 0, 4, 4, self.size / 2, self.size / 2)
 end
@@ -144,7 +144,7 @@ end
 SaucerBullet = Bullet:New {
 	model = { 2,  10, 2, -10, -2, -10, -2,  10, },
 	size = 9,
-	color = { 255, 255, 120 },
+	color = { 1, 1, 0.471 },
 }
 SaucerBullet:InitQuads("media/saucer_bullet.png")
 initPolygonRadius(SaucerBullet.model)
@@ -177,19 +177,19 @@ function PraxisParticle:update()
 end
 function PraxisParticle:draw()
 	local f = self.tick / 30
-	local alpha = (1.02 - f) ^ 0.3 * 300 - 100
+	local alpha = ((1.02 - f) ^ 0.3 * 300 - 100) / 255
 	self.canvas:renderTo(function()
 		G.clear(0, 0, 0, 0)
 		G.push()
 		G.origin()
-		G.setColor(160, 160, 160, alpha)
+		G.setColor(0.627, 0.627, 0.627, alpha)
 		self.shader:send("f", (1 - 2 ^ (-3 * f)) * 40)
 		G.setShader(self.shader)
 		G.rectangle("fill", 0, 0, 80, 80)
 		G.setShader()
 		G.pop()
 	end)
-	G.setColor(255, 255, 255)
+	G.setColor(1, 1, 1)
 	G.draw(self.canvas, self.x, self.y, 0, 4, 4, 40, 40)
 end
 

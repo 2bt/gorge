@@ -9,10 +9,10 @@ local data = love.image.newImageData(128, 128)
 for x = 0, 127 do
 	for y = 0, 127 do
 		data:setPixel(x, y,
-			r:random(0, 255),
-			r:random(0, 255),
-			r:random(0, 255),
-			r:random(0, 255))
+			r:random(),
+			r:random(),
+			r:random(),
+			r:random())
 	end
 end
 Stars.noise = G.newImage(data)
@@ -50,7 +50,7 @@ end
 function Stars:resetStar(s)
 	s.frame = self.rand.int(1, 4)
 	local b = self.rand.float(0.3, 1)
-	local c = (b - 0.3) * 100
+	local c = (b - 0.3) * 0.4
 	local d = c * self.rand.float(1, 2)
 	s.color = { c, d, d }
 	s.dy = b * 0.7
@@ -89,7 +89,7 @@ function Stars:draw()
 		G.setShader()
 		G.pop()
 	end)
-	G.setColor(255, 255, 255)
+	G.setColor(1, 1, 1)
 	G.draw(self.canvas, -400, -304 + (self.xx % 1 * 4), 0, 4)
 --]]
 	local batch = self.batch

@@ -70,9 +70,9 @@ function Enemy:update()
 end
 function Enemy:draw()
 	if self.flash > 0 then
-		self.quads.batch:setColor(255, 255, 255, 127)
+		self.quads.batch:setColor(1, 1, 1, 0.5)
 	else
-		self.quads.batch:setColor(255, 255, 255)
+		self.quads.batch:setColor(1, 1, 1)
 	end
 	self:subDraw()
 end
@@ -191,7 +191,7 @@ function BulletParticle:init(x, y, color)
 	self.color = color
 end
 PlasmaBullet = Bullet:New {
-	color = { 255, 36, 36 },
+	color = { 1, 0.14, 0.14 },
 	model = { 4, 4, 4, -4, -4, -4, -4, 4, },
 	frame_length = 2,
 	size = 7,

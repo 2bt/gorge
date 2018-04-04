@@ -32,7 +32,7 @@ function Boom:update()
 
 end
 function Boom:draw()
-	G.setColor(255, 255, 255, 255 * (1 - self.l) ^ 3)
+	G.setColor(1, 1, 1, (1 - self.l) ^ 3)
 	local s = self.l * 16
 	local o = self.img:getWidth() / 2
 	G.draw(self.img, self.x, self.y, 0, s, s, o, o)

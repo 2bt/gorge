@@ -72,7 +72,7 @@ function sound.pauseLoopSources(p)
 		if p then
 			s:pause()
 		else
-			s:resume()
+			s:play()
 		end
 	end
 end

@@ -41,10 +41,10 @@ local stats = {
 
 
 function loadStats()
-	if not love.filesystem.isFile(VERSION) then return end
+	if not love.filesystem.getInfo(VERSION) then return end
 	local zipped = love.filesystem.read(VERSION)
 	local unzipped
-	pcall(function() unzipped = love.math.decompress(zipped, "zlib") end)
+	pcall(function() unzipped = love.data.decompress("string", "zlib", zipped) end)
 	if not unzipped then return end
 	local s = loadstring("return " .. unzipped)()
 
@@ -89,7 +89,7 @@ local function saveStats()
 		end
 	end
 	w(stats)
-	local zipped = love.math.compress(table.concat(buf), "zlib")
+	local zipped = love.data.compress("string", "zlib", table.concat(buf))
 	local f = love.filesystem.newFile(VERSION, "w")
 	f:write(zipped)
 	f:close()
@@ -332,11 +332,11 @@ function Menu:draw()
 	G.scale(G.getWidth() / 800, G.getHeight() / 600)
 
 	if self.state == "main" then
-		G.setColor(255, 255, 255)
+		G.setColor(1, 1, 1)
 		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
 		Particle:DrawBatch()
 
-		G.setColor(255, 255, 255)
+		G.setColor(1, 1, 1)
 		for i, m in ipairs(self.options.main) do
 			font:print(m, 280, 320 + 40 * (i - 1))
 		end
@@ -344,19 +344,19 @@ function Menu:draw()
 			font:print(">", 248, 320 + 40 * (self.select - 1))
 		end
 
-		G.setColor(80, 80, 80)
+		G.setColor(0.314, 0.314, 0.314)
 		font:printCentered("\0 2016 DANIEL LANGNER", 400, 360 + 40 * 5)
 
 	elseif self.state == "options" then
 
-		G.setColor(255, 255, 255)
+		G.setColor(1, 1, 1)
 		G.draw(self.img, 400, 140, 0, 4, 4, self.img:getWidth() / 2)
 		Particle:DrawBatch()
 
 		local x = 184
 		local y = 320
 
-		G.setColor(255, 255, 255)
+		G.setColor(1, 1, 1)
 		for i, m in ipairs(self.options.options) do
 			font:print(m, x, y + 40 * (i - 1))
 		end
@@ -367,21 +367,21 @@ function Menu:draw()
 		drawFrame(x + 4 + 6 * 4 * 13, y+8 + 40 * 0, 8 + 12*10, 20)
 		drawFrame(x + 4 + 6 * 4 * 13, y+8 + 40 * 1, 8 + 12*10, 20)
 
-		G.setColor(191, 191, 0)
+		G.setColor(0.749, 0.749, 0)
 		G.rectangle("fill", x + 8 + 6 * 4 * 13, y+12 + 40 * 0, 12 * stats.sound_vol, 12)
 		G.rectangle("fill", x + 8 + 6 * 4 * 13, y+12 + 40 * 1, 12 * stats.music_vol, 12)
 
 
-		G.setColor(80, 80, 80)
+		G.setColor(0.314, 0.314, 0.314)
 		font:printCentered("\0 2016 DANIEL LANGNER", 400, 360 + 40 * 5)
 
 
 	elseif self.state == "highscore" then
 
-		G.setColor(255, 255, 0)
+		G.setColor(1, 1, 0)
 		font:print("HIGHSCORE", 184, 72)
 
-		G.setColor(255, 255, 255)
+		G.setColor(1, 1, 1)
 		for i, e in ipairs(stats.highscore) do
 			font:print(("%2d. %-13s  %07d"):format(i, e[1], e[2]),
 						400 - 24 * 13,
@@ -396,7 +396,7 @@ function Menu:draw()
 
 
 	if self.blend > 0 then
-		G.setColor(0, 0, 0, 255 * self.blend)
+		G.setColor(0, 0, 0, self.blend)
 		G.rectangle("fill", 0, 0, 800, 600)
 	end
 end

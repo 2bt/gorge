@@ -92,15 +92,15 @@ function Ball:drawField()
 	if not self.alive then return end
 	local q1 = math.floor( self.player.tick      / 4) % #self.field.quads + 1
 	local q2 = math.floor((self.player.tick + 3) / 4) % #self.field.quads + 1
-	self.quads.batch:setColor(0, 80, 80)
+	self.quads.batch:setColor(0, 0.31, 0.31)
 	self.quads.batch:add(self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-	self.quads.batch:setColor(40 + math.sin(self.player.tick / 2) * 40, 80, 80)
+	self.quads.batch:setColor(0.16 + math.sin(self.player.tick / 2) * 0.15, 0.31, 0.31)
 	self.quads.batch:add(self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
 end
 function Ball:draw()
 	if not self.alive then return end
 	local f = math.floor(self.player.tick / 4) % #self.quads + 1
-	self.quads.batch:setColor(255, 255, 255)
+	self.quads.batch:setColor(1, 1, 1)
 	self.quads.batch:add(self.quads[f], self.x, self.y, 0, 4 * self.dir, 4, 4, 4)
 end
 
@@ -323,9 +323,9 @@ function Player:draw()
 		self.balls[2]:drawField()
 		local q1 = math.floor( self.tick      / 4) % #self.field.quads + 1
 		local q2 = math.floor((self.tick + 3) / 4) % #self.field.quads + 1
-		batch:setColor(0, 80, 80)
+		batch:setColor(0, 0.31, 0.31)
 		batch:add(self.field.quads[q1], self.x, self.y, 0, 4, 4, 8, 8)
-		batch:setColor(40 + math.sin(self.tick / 2) * 40, 80, 80)
+		batch:setColor(0.16 + math.sin(self.tick / 2) * 0.15, 0.31, 0.31)
 		batch:add(self.field.quads[q2], self.x, self.y, 0, 4, 4, 8, 8)
 	end
 
@@ -336,9 +336,9 @@ function Player:draw()
 	if self.invincible % 8 >= 4 then return end
 
 	if self.flash > 0 then
-		batch:setColor(255, 255, 255, 127)
+		batch:setColor(1, 1, 1, 0.5)
 	else
-		batch:setColor(255, 255, 255)
+		batch:setColor(1, 1, 1)
 	end
 	batch:add(self.quads[1 + math.floor(self.tick / 8 % 2)],
 		self.x, self.y, 0, 4, 4, 8, 8)
@@ -487,7 +487,7 @@ function EnergyBlast:draw()
 		G.setShader(s)
 		G.pop()
 	end)
-	G.setColor(255, 255, 255, 200)
+	G.setColor(1, 1, 1, 0.78)
 	G.draw(self.canvas, self.x, self.y, 0, 4, 4, 50, 50)
 end
 
