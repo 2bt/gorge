@@ -5,6 +5,8 @@ Endless shoot 'em up game.
 It's still kinda in development but already playable, even on Android.
 You'll need LÖVE 0.10.0.
 
+<video src="video.mp4"></video>
+
 ### Controls ###
 <table>
 	<tr><td>arrow keys</td>			<td>move</td></tr>
@@ -20,3 +22,4 @@ You'll need LÖVE 0.10.0.
 
 Gamepad should work as well.
 There's a rudimentary online highscore at [http://www.langnerd.de/gorge.html]
+

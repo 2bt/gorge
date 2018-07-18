@@ -50,9 +50,15 @@ function love.update()
 	state:update()
 
 	-- fast forward
-	if love.keyboard.isDown("^") then
+	if love.keyboard.isDown("backspace") then
 		for i = 1, 20 do state:update() end
 	end
+
+	-- screenshots
+--	if love.keyboard.isDown("p") then
+--		t = t and t + 1 or 0
+--		G.captureScreenshot(("%05d.png"):format(t))
+--	end
 end
 function love.draw()
 	state:draw()
