@@ -489,5 +489,6 @@ function EnergyBlast:draw()
 	end)
 	G.setColor(1, 1, 1, 0.78)
 	G.draw(self.canvas, self.x, self.y, 0, 4, 4, 50, 50)
+	G.setColor(1, 1, 1)
 end
 
