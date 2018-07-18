@@ -1,5 +1,3 @@
-
-
 love.audio.setPosition(0, 0, -700)
 
 local volume = 1
@@ -54,6 +52,7 @@ end
 
 
 local loop_sources = setmetatable({}, { __mode = "k" })
+local paused_sources = setmetatable({}, { __mode = "k" })
 
 
 function sound.newLoopSource(name)
@@ -70,9 +69,14 @@ function sound.pauseLoopSources(p)
 	collectgarbage()
 	for s in pairs(loop_sources) do
 		if p then
-			s:pause()
+			if s:isPlaying() then
+				s:pause()
+				paused_sources[s] = true
+			end
 		else
-			s:play()
+			if paused_sources[s] then
+				s:play()
+			end
 		end
 	end
 end
