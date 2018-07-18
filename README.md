@@ -5,7 +5,7 @@ Endless shoot 'em up game.
 It's still kinda in development but already playable, even on Android.
 You'll need LÖVE 0.10.0.
 
-<video src="video.mp4"></video>
+<image src="gameplay.gif" width="800" height="600">
 
 ### Controls ###
 <table>
