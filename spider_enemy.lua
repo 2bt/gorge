@@ -139,7 +139,7 @@ function SpiderEnemy:subDraw()
 --	G.polygon("line", self.trans_model)
 end
 SpiderBullet = Bullet:New {
-	color = { 255, 241, 0 },
+	color = { 1.0, 0.94, 0 },
 	model = { 4, 4, 4, -4, -4, -4, -4, 4, },
 	size = 8,
 	frame_length = 4,

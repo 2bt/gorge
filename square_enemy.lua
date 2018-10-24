@@ -74,7 +74,7 @@ function SquareEnemy:subUpdate()
 	self.delay = self.delay - 1
 end
 RapidBullet = Bullet:New {
-	color = { 146, 255, 146 },
+	color = { 0.57, 1.0, 0.57 },
 	model = { 2, 6, 2, -6, -2, -6, -2, 6, },
 	size = 7,
 }

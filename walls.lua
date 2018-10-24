@@ -300,30 +300,30 @@ function Walls:checkCollision(poly, skip_meta)
 	return dist, norm, where
 end
 
-local function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
-
-	local abx = bx - ax
-	local aby = by - ay
-	local qwx = wx - qx
-	local qwy = wy - qy
-	local aqx = qx - ax
-	local aqy = qy - ay
-
-	local det = abx*qwy - aby*qwx;
-	if math.abs(det) < 0.0001 then -- parallel
-		return
-	end
-
-	local abi = (aqx*qwy - aqy*qwx) / det
-	local qwi = (aqx*aby - aqy*abx) / det
-
-	if abi < 0 or abi > 1
-	or qwi < 0 or qwi > 1 then
-		return
-	end
-	return abi, qwi
-
-end
+--local function checkLineIntersection(ax, ay, bx, by, qx, qy, wx, wy)
+--
+--	local abx = bx - ax
+--	local aby = by - ay
+--	local qwx = wx - qx
+--	local qwy = wy - qy
+--	local aqx = qx - ax
+--	local aqy = qy - ay
+--
+--	local det = abx*qwy - aby*qwx;
+--	if math.abs(det) < 0.0001 then -- parallel
+--		return
+--	end
+--
+--	local abi = (aqx*qwy - aqy*qwx) / det
+--	local qwi = (aqx*aby - aqy*abx) / det
+--
+--	if abi < 0 or abi > 1
+--	or qwi < 0 or qwi > 1 then
+--		return
+--	end
+--	return abi, qwi
+--
+--end
 
 function Walls:checkSight(ax, ay, bx, by)
 	local abx = bx - ax

@@ -114,7 +114,6 @@ function polygonCollision(a, b)
 			local p2y = a[i + 1]
 
 			local c_d = 0
-			local c_n = {}
 			local c_w = {}
 
 			local nx = p1y - p2y
@@ -127,8 +126,6 @@ function polygonCollision(a, b)
 				local d = (p1x - wx) * nx + (p1y - wy) * ny
 				if d > c_d then
 					c_d = d
-					c_n[1] = nx
-					c_n[2] = ny
 					c_w[1] = wx
 					c_w[2] = wy
 				end

@@ -377,8 +377,8 @@ function Laser:update()
 
 		local d, n, w = game.walls:checkCollision(self.trans_model, true)
 		if d > 0 then
+			sound.play("miss", w[1], w[2])
 			for i = 1, 10 do
-				sound.play("miss", w[1], w[2])
 				LaserParticle(w[1], w[2])
 			end
 			return "kill"
