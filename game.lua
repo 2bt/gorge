@@ -405,11 +405,18 @@ end
 	G.origin()
 	G.setColor(1, 1, 1)
 	Boom.shader:send("bump", Boom.canvas)
+
 	G.setShader(Boom.shader)
 	G.setBlendMode("replace")
 	G.draw(self.canvas)
 	G.setBlendMode("alpha")
 	G.setShader()
+
+--	G.setBlendMode("replace")
+--	G.draw(self.canvas)
+--	G.setBlendMode("add")
+--	G.draw(Boom.canvas)
+--	G.setBlendMode("alpha")
 
 
 	-- foreground stuff

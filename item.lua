@@ -140,12 +140,12 @@ function EnergyItem:update()
 	if d > 0 then
 		self.x = self.x - n[1] * d
 		self.y = self.y - n[2] * d
+		transform(self)
 
 		local dot = (self.vx * n[1] + self.vy * n[2]) * 2
 		self.vx = self.vx - dot * n[1]
 		self.vy = self.vy - dot * n[2]
 	end
-	transform(self)
 
 	local player = game.player
 	if player.alive then

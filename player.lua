@@ -396,10 +396,6 @@ function Laser:update()
 
 		end
 	end
-	if self.ttl then
-		self.ttl = self.ttl - 1
-		if self.ttl <= 0 then return "kill" end
-	end
 end
 function Laser:draw()
 	self.quads.batch:add(self.quads[1], self.x, self.y, -self.ang, 2, 2, 6, 6)
@@ -453,7 +449,6 @@ function EnergyBlast:activate(x, y)
 	self.y = y
 	self.level = 0
 	self.radius = 0
-	self.hit_enemies = {}
 	self:update()
 end
 function EnergyBlast:update()
