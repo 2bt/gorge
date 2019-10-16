@@ -57,7 +57,7 @@ TwisterEnemy = Enemy:New {
 	shield = 1,
 	score = 120,
 	speed = 2,
-	turn_speed = 1 / 32.0 * 4
+	turn_speed = 0.125
 }
 TwisterEnemy:InitQuads("media/twister.png")
 initPolygonRadius(TwisterEnemy.model)

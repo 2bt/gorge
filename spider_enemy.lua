@@ -24,9 +24,7 @@ function SpiderEnemy:init(rand, x, y, wall)
 	else
 		self.dir = rand.int(0, 1) * 2 - 1
 	end
-	self.turn = false
 	self.floating = false
-
 	self.shoot = false
 	self.delay = self.rand.int(200, 300)
 
@@ -46,8 +44,6 @@ function SpiderEnemy:subUpdate()
 		transform(self)
 		return
 	end
-
-	self.ang = 0
 
 	-- stick to wall
 	self.x = self.x - self.nx

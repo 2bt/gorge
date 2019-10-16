@@ -164,7 +164,7 @@ function Player:hit(d, n, w, e)
 		self.x = self.x + n[1] * d
 		self.y = self.y + n[2] * d
 
-		-- instand death
+		-- instant death
 		if self.y > 284 and (not e or e.alive) then
 			self.invincible = 0
 			self.shield = 0
